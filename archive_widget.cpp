@@ -44,11 +44,16 @@ void Archive_widget::setData(QString sFileName)
 
     QString sBaseName=QFileInfo(sFileName).fileName();
 
-    QStandardItem *pRootItem=new QStandardItem;
-    pRootItem->setText(sBaseName);
+    QStandardItem *pRootItemName=new QStandardItem;
+    pRootItemName->setText(sBaseName);
 
-    pNewModel->setItem(0,0,pRootItem);
-//    pNewModel->setItem(0,1,new QStandardItem("Test"));
+    pNewModel->setItem(0,0,pRootItemName);
+
+    QStandardItem *pRootItemSize=new QStandardItem;
+    pRootItemSize->setText(QString::number(XBinary::getSize(sFileName)));
+    pRootItemSize->setTextAlignment(Qt::AlignRight);
+
+    pNewModel->setItem(0,1,pRootItemSize);
 
     QMap<QString,QStandardItem *> mapItems;
 
@@ -84,7 +89,7 @@ void Archive_widget::setData(QString sFileName)
 
                 if(j==0)
                 {
-                    pParent=pRootItem;
+                    pParent=pRootItemName;
                 }
                 else
                 {
@@ -99,6 +104,7 @@ void Archive_widget::setData(QString sFileName)
                 {
                     QStandardItem *pItemSize=new QStandardItem;
                     pItemSize->setText(QString::number(record.nUncompressedSize));
+                    pItemSize->setTextAlignment(Qt::AlignRight);
 
                     listItems.append(pItemSize);
                 }
