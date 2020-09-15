@@ -124,7 +124,7 @@ void Archive_widget::setData(QString sFileName)
     ui->treeViewArchive->header()->setSectionResizeMode(0,QHeaderView::Stretch);
     ui->treeViewArchive->header()->setSectionResizeMode(1,QHeaderView::Interactive);
 
-    ui->treeViewArchive->expandAll();
+    ui->treeViewArchive->expand(pNewModel->index(0,0));
 
     delete pOldModel;
 }
