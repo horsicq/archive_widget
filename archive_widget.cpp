@@ -133,3 +133,62 @@ Archive_widget::~Archive_widget()
 {
     delete ui;
 }
+
+void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint &pos)
+{
+    qDebug("ContextMenu");
+
+    int nRow=ui->treeViewArchive->currentIndex().row();
+
+    if(nRow!=-1)
+    {
+        QMenu contextMenu(this);
+
+        QAction actionScan(tr("Scan"),this);
+        connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
+        contextMenu.addAction(&actionScan);
+
+        QAction actionHex(QString("Hex"),this);
+        connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
+        contextMenu.addAction(&actionHex);
+
+        QAction actionStrings(tr("Strings"),this);
+        connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
+        contextMenu.addAction(&actionStrings);
+
+        QAction actionEntropy(QString("Entropy"),this);
+        connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
+        contextMenu.addAction(&actionEntropy);
+
+        QAction actionHash(QString("Hash"),this);
+        connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
+        contextMenu.addAction(&actionHash);
+
+        contextMenu.exec(ui->treeViewArchive->viewport()->mapToGlobal(pos));
+    }
+}
+
+void Archive_widget::scanRecord()
+{
+    qDebug("scanRecord");
+}
+
+void Archive_widget::hexRecord()
+{
+    qDebug("hexRecord");
+}
+
+void Archive_widget::stringsRecord()
+{
+    qDebug("stringsRecord");
+}
+
+void Archive_widget::entropyRecord()
+{
+    qDebug("entropyRecord");
+}
+
+void Archive_widget::hashRecord()
+{
+    qDebug("hashRecord");
+}

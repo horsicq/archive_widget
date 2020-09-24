@@ -22,8 +22,13 @@
 #define ARCHIVE_WIDGET_H
 
 #include <QWidget>
+#include <QMenu>
 #include "xarchives.h"
 #include <QStandardItemModel>
+#include "dialogentropy.h"
+#include "dialoghash.h"
+#include "dialogsearchstrings.h"
+#include "dialoghex.h"
 
 namespace Ui {
 class Archive_widget;
@@ -37,6 +42,15 @@ public:
     explicit Archive_widget(QWidget *pParent=nullptr);
     void setData(QString sFileName);
     ~Archive_widget();
+
+private slots:
+    void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
+
+    void scanRecord();
+    void hexRecord();
+    void stringsRecord();
+    void entropyRecord();
+    void hashRecord();
 
 private:
     Ui::Archive_widget *ui;
