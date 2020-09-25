@@ -26,16 +26,17 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui(new Ui::Archive_widget)
 {
     ui->setupUi(this);
-
 }
 
 void Archive_widget::setData(QString sFileName)
 {
-    this->sFileName=sFileName;
+    this->g_sFileName=sFileName;
 
-    QList<XArchive::RECORD> listRecords=XArchives::getRecords(sFileName);
+    qint64 nFileSize=XBinary::getSize(sFileName);
 
-    int nNumberOfRecords=listRecords.count();
+    g_listRecords=XArchives::getRecords(sFileName);
+
+    int nNumberOfRecords=g_listRecords.count();
 
     QAbstractItemModel *pOldModel=ui->treeViewArchive->model();
 
@@ -46,11 +47,14 @@ void Archive_widget::setData(QString sFileName)
 
     QStandardItem *pRootItemName=new QStandardItem;
     pRootItemName->setText(sBaseName);
+    pRootItemName->setData(sFileName,Qt::UserRole+UR_PATH);
+    pRootItemName->setData(nFileSize,Qt::UserRole+UR_SIZE);
+    pRootItemName->setData(true,Qt::UserRole+UR_ISROOT);
 
     pNewModel->setItem(0,0,pRootItemName);
 
     QStandardItem *pRootItemSize=new QStandardItem;
-    pRootItemSize->setText(QString::number(XBinary::getSize(sFileName)));
+    pRootItemSize->setText(QString::number(nFileSize));
     pRootItemSize->setTextAlignment(Qt::AlignRight);
 
     pNewModel->setItem(0,1,pRootItemSize);
@@ -60,30 +64,39 @@ void Archive_widget::setData(QString sFileName)
     // TODO move to thread
     for(int i=0;i<nNumberOfRecords;i++)
     {
-        XArchive::RECORD record=listRecords.at(i);
+        XArchive::RECORD record=g_listRecords.at(i);
 
-        QString sFileName=record.sFileName;
+        QString sRecordFileName=record.sFileName;
 
-        int nNumberOfParts=sFileName.count("/");
+        int nNumberOfParts=sRecordFileName.count("/");
 
         for(int j=0;j<=nNumberOfParts;j++)
         {
-            QString sPart=sFileName.section("/",j,j);
+            QString sPart=sRecordFileName.section("/",j,j);
             QString sRelPart;
 
             if(j!=nNumberOfParts)
             {
-                sRelPart=sFileName.section("/",0,j);
+                sRelPart=sRecordFileName.section("/",0,j);
             }
             else
             {
-                sRelPart=sFileName;
+                sRelPart=sRecordFileName;
             }
 
             if(!mapItems.contains(sRelPart))
             {
                 QStandardItem *pItemName=new QStandardItem;
                 pItemName->setText(sPart);
+
+                if(j==(nNumberOfParts))
+                {
+                    pItemName->setData(Qt::UserRole+1);
+
+                    pItemName->setData(sRecordFileName,Qt::UserRole+UR_PATH);
+                    pItemName->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
+                    pRootItemName->setData(false,Qt::UserRole+UR_ISROOT);
+                }
 
                 QStandardItem *pParent=0;
 
@@ -93,7 +106,7 @@ void Archive_widget::setData(QString sFileName)
                 }
                 else
                 {
-                    pParent=mapItems.value(sFileName.section("/",0,j-1));
+                    pParent=mapItems.value(sRecordFileName.section("/",0,j-1));
                 }
 
                 QList<QStandardItem *> listItems;
@@ -136,12 +149,30 @@ Archive_widget::~Archive_widget()
 
 void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint &pos)
 {
-    qDebug("ContextMenu");
+    QModelIndexList listIndexes=ui->treeViewArchive->selectionModel()->selectedIndexes();
 
-    int nRow=ui->treeViewArchive->currentIndex().row();
-
-    if(nRow!=-1)
+    if(listIndexes.size()>0)
     {
+        QModelIndex index=listIndexes.at(0);
+
+        qint64 nSize=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_SIZE).toLongLong();
+        bool bIsRoot=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_ISROOT).toBool();
+        QString sRecordFileName=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_PATH).toString();
+
+        QSet<XBinary::FT> stFileTypes;
+
+        if(bIsRoot)
+        {
+            stFileTypes=XBinary::getFileTypes(sRecordFileName);
+        }
+        else
+        {
+            XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
+
+            QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
+            stFileTypes=XBinary::getFileTypes(&baData);
+        }
+
         QMenu contextMenu(this);
 
         QAction actionScan(tr("Scan"),this);
@@ -170,25 +201,87 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
 
 void Archive_widget::scanRecord()
 {
-    qDebug("scanRecord");
+    handleAction(ACTION_SCAN);
 }
 
 void Archive_widget::hexRecord()
 {
-    qDebug("hexRecord");
+    handleAction(ACTION_HEX);
 }
 
 void Archive_widget::stringsRecord()
 {
-    qDebug("stringsRecord");
+    handleAction(ACTION_STRINGS);
 }
 
 void Archive_widget::entropyRecord()
 {
-    qDebug("entropyRecord");
+    handleAction(ACTION_ENTROPY);
 }
 
 void Archive_widget::hashRecord()
 {
-    qDebug("hashRecord");
+    handleAction(ACTION_HASH);
+}
+
+void Archive_widget::handleAction(Archive_widget::ACTION action)
+{
+    QModelIndexList listIndexes=ui->treeViewArchive->selectionModel()->selectedIndexes();
+
+    if(listIndexes.size()>0)
+    {
+        QModelIndex index=listIndexes.at(0);
+
+        qint64 nSize=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_SIZE).toLongLong();
+        bool bIsRoot=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_ISROOT).toBool();
+        QString sRecordFileName=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_PATH).toString();
+
+        if(bIsRoot)
+        {
+            QFile file;
+
+            file.setFileName(sRecordFileName);
+
+            if(file.open(QIODevice::ReadOnly))
+            {
+                _handleAction(action,&file);
+
+                file.close();
+            }
+        }
+        else
+        {
+            if(nSize<=XArchive::getCompressBufferSize())
+            {
+                XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
+
+                QByteArray baData=XArchives::decompress(g_sFileName,&record);
+
+                QBuffer buffer;
+
+                buffer.setBuffer(&baData);
+
+                if(buffer.open(QIODevice::ReadOnly))
+                {
+                    _handleAction(action,&buffer);
+
+                    buffer.close();
+                }
+            }
+            else
+            {
+                // nSize
+            }
+        }
+    }
+}
+
+void Archive_widget::_handleAction(Archive_widget::ACTION action, QIODevice *pDevice)
+{
+    if(action==ACTION_HEX)
+    {
+        DialogHex dialogHex(this,pDevice);
+
+        dialogHex.exec();
+    }
 }

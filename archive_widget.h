@@ -29,6 +29,7 @@
 #include "dialoghash.h"
 #include "dialogsearchstrings.h"
 #include "dialoghex.h"
+#include "dialogstaticscan.h"
 
 namespace Ui {
 class Archive_widget;
@@ -37,6 +38,22 @@ class Archive_widget;
 class Archive_widget : public QWidget
 {
     Q_OBJECT
+
+    enum UR
+    {
+        UR_PATH=0,
+        UR_SIZE,
+        UR_ISROOT
+    };
+
+    enum ACTION
+    {
+        ACTION_SCAN=0,
+        ACTION_HEX,
+        ACTION_STRINGS,
+        ACTION_ENTROPY,
+        ACTION_HASH
+    };
 
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
@@ -52,9 +69,13 @@ private slots:
     void entropyRecord();
     void hashRecord();
 
+    void handleAction(ACTION action);
+    void _handleAction(ACTION action,QIODevice *pDevice);
+
 private:
     Ui::Archive_widget *ui;
-    QString sFileName;
+    QString g_sFileName;
+    QList<XArchive::RECORD> g_listRecords;
 };
 
 #endif // ARCHIVE_WIDGET_H
