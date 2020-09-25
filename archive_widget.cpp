@@ -251,10 +251,10 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
         }
         else
         {
+            XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
+
             if(nSize<=XArchive::getCompressBufferSize())
             {
-                XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
-
                 QByteArray baData=XArchives::decompress(g_sFileName,&record);
 
                 QBuffer buffer;
@@ -270,7 +270,14 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
             }
             else
             {
-                // nSize
+                QTemporaryFile file;
+
+                if(file.open(QIODevice::ReadOnly))
+                {
+
+
+                    file.close();
+                }
             }
         }
     }
