@@ -155,7 +155,6 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
     {
         QModelIndex index=listIndexes.at(0);
 
-        qint64 nSize=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_SIZE).toLongLong();
         bool bIsRoot=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_ISROOT).toBool();
         QString sRecordFileName=ui->treeViewArchive->model()->data(index,Qt::UserRole+UR_PATH).toString();
 
@@ -270,13 +269,25 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
             }
             else
             {
-                QTemporaryFile file;
+                QTemporaryFile fileTemp;
 
-                if(file.open(QIODevice::ReadOnly))
+                if(fileTemp.open())
                 {
+                    QString sTempFileName=fileTemp.fileName();
 
+                    // TODO Thread
+                    XArchives::decompressToFile(g_sFileName,&record,sTempFileName);
 
-                    file.close();
+                    QFile file;
+
+                    file.setFileName(sTempFileName);
+
+                    if(file.open(QIODevice::ReadOnly))
+                    {
+                        _handleAction(action,&file);
+
+                        file.close();
+                    }
                 }
             }
         }
@@ -285,10 +296,34 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
 void Archive_widget::_handleAction(Archive_widget::ACTION action, QIODevice *pDevice)
 {
-    if(action==ACTION_HEX)
+    if(action==ACTION_SCAN)
+    {
+        DialogStaticScan dialogStaticScan(this,pDevice,true);
+
+        dialogStaticScan.exec();
+    }
+    else if(action==ACTION_HEX)
     {
         DialogHex dialogHex(this,pDevice);
 
         dialogHex.exec();
+    }
+    else if(action==ACTION_STRINGS)
+    {
+        DialogSearchStrings dialogSearchStrings(this,pDevice,nullptr,true);
+
+        dialogSearchStrings.exec();
+    }
+    else if(action==ACTION_ENTROPY)
+    {
+        DialogEntropy dialogEntropy(this,pDevice);
+
+        dialogEntropy.exec();
+    }
+    else if(action==ACTION_HASH)
+    {
+        DialogHash dialogHash(this,pDevice);
+
+        dialogHash.exec();
     }
 }
