@@ -18,61 +18,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef ARCHIVE_WIDGET_H
-#define ARCHIVE_WIDGET_H
+#ifndef DIALOGCREATEVIEWMODEL_H
+#define DIALOGCREATEVIEWMODEL_H
 
-#include <QWidget>
-#include <QMenu>
-#include "xarchives.h"
+#include <QDialog>
 #include <QStandardItemModel>
-#include "dialogentropy.h"
-#include "dialoghash.h"
-#include "dialogsearchstrings.h"
-#include "dialoghex.h"
-#include "dialogstaticscan.h"
-#include "dialogcreateviewmodel.h"
-#include "dialogunpackfile.h"
+#include <QThread>
+#include "createviewmodelprocess.h"
 
 namespace Ui {
-class Archive_widget;
+class DialogCreateViewModel;
 }
 
-class Archive_widget : public QWidget
+class DialogCreateViewModel : public QDialog
 {
     Q_OBJECT
 
-    enum ACTION
-    {
-        ACTION_SCAN=0,
-        ACTION_HEX,
-        ACTION_STRINGS,
-        ACTION_ENTROPY,
-        ACTION_HASH,
-        ACTION_DUMP
-    };
-
 public:
-    explicit Archive_widget(QWidget *pParent=nullptr);
-    void setData(QString sFileName);
-    ~Archive_widget();
+    explicit DialogCreateViewModel(QWidget *pParent=nullptr);
+    ~DialogCreateViewModel();
+    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppModel);
 
 private slots:
-    void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
-
-    void scanRecord();
-    void hexRecord();
-    void stringsRecord();
-    void entropyRecord();
-    void hashRecord();
-    void dumpRecord();
-
-    void handleAction(ACTION action);
-    void _handleAction(ACTION action,QIODevice *pDevice);
+    void on_pushButtonCancel_clicked();
+    void onCompleted(qint64 nElapsed);
 
 private:
-    Ui::Archive_widget *ui;
-    QString g_sFileName;
-    QList<XArchive::RECORD> g_listRecords;
+    Ui::DialogCreateViewModel *ui;
+
+    CreateViewModelProcess *pCreateViewModelProcess;
+    QThread *pThread;
 };
 
-#endif // ARCHIVE_WIDGET_H
+#endif // DIALOGCREATEVIEWMODEL_H

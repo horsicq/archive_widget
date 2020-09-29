@@ -18,61 +18,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 //
-#ifndef ARCHIVE_WIDGET_H
-#define ARCHIVE_WIDGET_H
+#ifndef CREATEVIEWMODELPROCESS_H
+#define CREATEVIEWMODELPROCESS_H
 
-#include <QWidget>
-#include <QMenu>
-#include "xarchives.h"
+#include <QObject>
+#include <QElapsedTimer>
 #include <QStandardItemModel>
-#include "dialogentropy.h"
-#include "dialoghash.h"
-#include "dialogsearchstrings.h"
-#include "dialoghex.h"
-#include "dialogstaticscan.h"
-#include "dialogcreateviewmodel.h"
-#include "dialogunpackfile.h"
+#include "xarchives.h"
 
-namespace Ui {
-class Archive_widget;
-}
-
-class Archive_widget : public QWidget
+class CreateViewModelProcess : public QObject
 {
     Q_OBJECT
-
-    enum ACTION
+public:
+    enum UR
     {
-        ACTION_SCAN=0,
-        ACTION_HEX,
-        ACTION_STRINGS,
-        ACTION_ENTROPY,
-        ACTION_HASH,
-        ACTION_DUMP
+        UR_PATH=0,
+        UR_SIZE,
+        UR_ISROOT
     };
 
-public:
-    explicit Archive_widget(QWidget *pParent=nullptr);
-    void setData(QString sFileName);
-    ~Archive_widget();
+    explicit CreateViewModelProcess(QObject *pParent=nullptr);
+    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppModel);
 
-private slots:
-    void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
+signals:
+    void errorMessage(QString sText);
+    void completed(qint64 nElapsed);
 
-    void scanRecord();
-    void hexRecord();
-    void stringsRecord();
-    void entropyRecord();
-    void hashRecord();
-    void dumpRecord();
-
-    void handleAction(ACTION action);
-    void _handleAction(ACTION action,QIODevice *pDevice);
+public slots:
+    void stop();
+    void process();
 
 private:
-    Ui::Archive_widget *ui;
-    QString g_sFileName;
-    QList<XArchive::RECORD> g_listRecords;
+    QIODevice *pDevice;
+    QString sFileName;
+    QList<XArchive::RECORD> *pListArchiveRecords;
+    QStandardItemModel **ppModel;
+    bool bIsStop;
 };
 
-#endif // ARCHIVE_WIDGET_H
+#endif // CREATEVIEWMODELPROCESS_H
