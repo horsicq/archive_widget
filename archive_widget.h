@@ -34,6 +34,8 @@
 #include "dialogstaticscan.h"
 #include "dialogcreateviewmodel.h"
 #include "dialogunpackfile.h"
+#include "dialogshowimage.h"
+#include "dialogshowtext.h"
 
 namespace Ui {
 class Archive_widget;

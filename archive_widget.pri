@@ -6,12 +6,16 @@ DEPENDPATH += $$PWD
 FORMS += \
     $$PWD/archive_widget.ui \
     $$PWD/dialogcreateviewmodel.ui \
+    $$PWD/dialogshowimage.ui \
+    $$PWD/dialogshowtext.ui \
     $$PWD/dialogunpackfile.ui
 
 HEADERS += \
     $$PWD/archive_widget.h \
     $$PWD/createviewmodelprocess.h \
     $$PWD/dialogcreateviewmodel.h \
+    $$PWD/dialogshowimage.h \
+    $$PWD/dialogshowtext.h \
     $$PWD/dialogunpackfile.h \
     $$PWD/unpackfileprocess.h
 
@@ -19,6 +23,8 @@ SOURCES += \
     $$PWD/archive_widget.cpp \
     $$PWD/createviewmodelprocess.cpp \
     $$PWD/dialogcreateviewmodel.cpp \
+    $$PWD/dialogshowimage.cpp \
+    $$PWD/dialogshowtext.cpp \
     $$PWD/dialogunpackfile.cpp \
     $$PWD/unpackfileprocess.cpp
 
