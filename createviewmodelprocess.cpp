@@ -102,7 +102,7 @@ void CreateViewModelProcess::process()
 
                     pItemName->setData(sRecordFileName,Qt::UserRole+UR_PATH);
                     pItemName->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
-                    pRootItemName->setData(false,Qt::UserRole+UR_ISROOT);
+                    pItemName->setData(false,Qt::UserRole+UR_ISROOT);
                 }
 
                 QStandardItem *pParent=0;

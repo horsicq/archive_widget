@@ -25,6 +25,8 @@
 #include <QMenu>
 #include "xarchives.h"
 #include <QStandardItemModel>
+#include <QMessageBox>
+#include <QFileDialog>
 #include "dialogentropy.h"
 #include "dialoghash.h"
 #include "dialogsearchstrings.h"
@@ -43,7 +45,8 @@ class Archive_widget : public QWidget
 
     enum ACTION
     {
-        ACTION_SCAN=0,
+        ACTION_OPEN=0,
+        ACTION_SCAN,
         ACTION_HEX,
         ACTION_STRINGS,
         ACTION_ENTROPY,
@@ -59,6 +62,7 @@ public:
 private slots:
     void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
 
+    void openRecord();
     void scanRecord();
     void hexRecord();
     void stringsRecord();

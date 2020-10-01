@@ -67,48 +67,68 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
         bool bIsRoot=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
         QString sRecordFileName=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
 
-        QSet<XBinary::FT> stFileTypes;
-
-        if(bIsRoot)
+        if(sRecordFileName!="")
         {
-            stFileTypes=XBinary::getFileTypes(sRecordFileName);
+            QSet<XBinary::FT> stFileTypes;
+
+            if(bIsRoot)
+            {
+                stFileTypes=XBinary::getFileTypes(sRecordFileName,true);
+            }
+            else
+            {
+                XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
+
+                QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
+                stFileTypes=XBinary::getFileTypes(&baData,true);
+            }
+
+            QMenu contextMenu(this);
+
+            QAction actionOpen(tr("Open"),this);
+
+            if(stFileTypes.contains(XBinary::FT_PNG))
+            {
+                connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
+                contextMenu.addAction(&actionOpen);
+            }
+
+            QAction actionScan(tr("Scan"),this);
+            connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
+            contextMenu.addAction(&actionScan);
+
+            QAction actionHex(QString("Hex"),this);
+            connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
+            contextMenu.addAction(&actionHex);
+
+            QAction actionStrings(tr("Strings"),this);
+            connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
+            contextMenu.addAction(&actionStrings);
+
+            QAction actionEntropy(tr("Entropy"),this);
+            connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
+            contextMenu.addAction(&actionEntropy);
+
+            QAction actionHash(tr("Hash"),this);
+            connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
+            contextMenu.addAction(&actionHash);
+
+            QAction actionDump(tr("Dump"),this);
+
+            if(!bIsRoot)
+            {
+                connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
+                contextMenu.addAction(&actionDump);
+            }
+
+            contextMenu.exec(ui->treeViewArchive->viewport()->mapToGlobal(pos));
         }
-        else
-        {
-            XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
-
-            QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
-            stFileTypes=XBinary::getFileTypes(&baData);
-        }
-
-        QMenu contextMenu(this);
-
-        QAction actionScan(tr("Scan"),this);
-        connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
-        contextMenu.addAction(&actionScan);
-
-        QAction actionHex(QString("Hex"),this);
-        connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
-        contextMenu.addAction(&actionHex);
-
-        QAction actionStrings(tr("Strings"),this);
-        connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
-        contextMenu.addAction(&actionStrings);
-
-        QAction actionEntropy(tr("Entropy"),this);
-        connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
-        contextMenu.addAction(&actionEntropy);
-
-        QAction actionHash(tr("Hash"),this);
-        connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
-        contextMenu.addAction(&actionHash);
-
-        QAction actionDump(tr("Dump"),this);
-        connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
-        contextMenu.addAction(&actionDump);
-
-        contextMenu.exec(ui->treeViewArchive->viewport()->mapToGlobal(pos));
     }
+}
+
+void Archive_widget::openRecord()
+{
+    handleAction(ACTION_OPEN);
 }
 
 void Archive_widget::scanRecord()
@@ -138,7 +158,7 @@ void Archive_widget::hashRecord()
 
 void Archive_widget::dumpRecord()
 {
-    qDebug("dumpRecord");
+    handleAction(ACTION_DUMP);
 }
 
 void Archive_widget::handleAction(Archive_widget::ACTION action)
@@ -170,22 +190,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
         {
             XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
 
-            if(nSize<=XArchive::getCompressBufferSize())
-            {
-                QByteArray baData=XArchives::decompress(g_sFileName,&record);
-
-                QBuffer buffer;
-
-                buffer.setBuffer(&baData);
-
-                if(buffer.open(QIODevice::ReadOnly))
-                {
-                    _handleAction(action,&buffer);
-
-                    buffer.close();
-                }
-            }
-            else
+            if(action==ACTION_OPEN)
             {
                 QTemporaryFile fileTemp;
 
@@ -199,15 +204,70 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     if(dialogUnpackFile.exec()==QDialog::Accepted)
                     {
-                        QFile file;
+                        // TODO
+                        // sTempFileName
+                    }
+                }
+            }
+            else if(action==ACTION_DUMP)
+            {
+                QString sSaveFileName=QFileInfo(g_sFileName).absolutePath()+QDir::separator()+QFileInfo(record.sFileName).fileName();
 
-                        file.setFileName(sTempFileName);
+                sSaveFileName=QFileDialog::getSaveFileName(this,tr("Save file"),sSaveFileName,QFileInfo(record.sFileName).completeSuffix());
 
-                        if(file.open(QIODevice::ReadOnly))
+                if(sSaveFileName!="")
+                {
+                    DialogUnpackFile dialogUnpackFile(this);
+
+                    dialogUnpackFile.setData(g_sFileName,&record,sSaveFileName);
+
+                    if(dialogUnpackFile.exec()!=QDialog::Accepted)
+                    {
+                        QMessageBox::critical(this,tr("Error"),tr("Cannot save file"));
+                    }
+                }
+            }
+            else
+            {
+                if(nSize<=XArchive::getCompressBufferSize())
+                {
+                    QByteArray baData=XArchives::decompress(g_sFileName,&record);
+
+                    QBuffer buffer;
+
+                    buffer.setBuffer(&baData);
+
+                    if(buffer.open(QIODevice::ReadOnly))
+                    {
+                        _handleAction(action,&buffer);
+
+                        buffer.close();
+                    }
+                }
+                else
+                {
+                    QTemporaryFile fileTemp;
+
+                    if(fileTemp.open())
+                    {
+                        QString sTempFileName=fileTemp.fileName();
+
+                        DialogUnpackFile dialogUnpackFile(this);
+
+                        dialogUnpackFile.setData(g_sFileName,&record,sTempFileName);
+
+                        if(dialogUnpackFile.exec()==QDialog::Accepted)
                         {
-                            _handleAction(action,&file);
+                            QFile file;
 
-                            file.close();
+                            file.setFileName(sTempFileName);
+
+                            if(file.open(QIODevice::ReadOnly))
+                            {
+                                _handleAction(action,&file);
+
+                                file.close();
+                            }
                         }
                     }
                 }
