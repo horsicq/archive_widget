@@ -88,6 +88,8 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
             QAction actionOpen(tr("Open"),this);
 
             if( stFileTypes.contains(XBinary::FT_PNG)||
+                stFileTypes.contains(XBinary::FT_JPEG)||
+                stFileTypes.contains(XBinary::FT_GIF)||
                 stFileTypes.contains(XBinary::FT_TEXT))
             {
                 connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
@@ -321,7 +323,9 @@ void Archive_widget::_handleActionOpenFile(QString sFileName)
 {
     QSet<XBinary::FT> stFileTypes=XBinary::getFileTypes(sFileName,true);
 
-    if(stFileTypes.contains(XBinary::FT_PNG))
+    if( stFileTypes.contains(XBinary::FT_PNG)||
+        stFileTypes.contains(XBinary::FT_JPEG)||
+        stFileTypes.contains(XBinary::FT_GIF))
     {
         DialogShowImage dialogShowImage(this,sFileName);
 
