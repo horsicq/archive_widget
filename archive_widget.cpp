@@ -87,9 +87,16 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
 
             QAction actionOpen(tr("Open"),this);
 
-            if( stFileTypes.contains(XBinary::FT_PNG)||
+            if( stFileTypes.contains(XBinary::FT_MSDOS)||
+                stFileTypes.contains(XBinary::FT_NE)||
+                stFileTypes.contains(XBinary::FT_LE)||
+                stFileTypes.contains(XBinary::FT_PE)||
+                stFileTypes.contains(XBinary::FT_ELF)||
+                stFileTypes.contains(XBinary::FT_MACH)||
+                stFileTypes.contains(XBinary::FT_PNG)||
                 stFileTypes.contains(XBinary::FT_JPEG)||
                 stFileTypes.contains(XBinary::FT_GIF)||
+                stFileTypes.contains(XBinary::FT_TIFF)||
                 stFileTypes.contains(XBinary::FT_TEXT))
             {
                 connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
@@ -325,6 +332,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName)
 
     if( stFileTypes.contains(XBinary::FT_PNG)||
         stFileTypes.contains(XBinary::FT_JPEG)||
+        stFileTypes.contains(XBinary::FT_TIFF)||
         stFileTypes.contains(XBinary::FT_GIF))
     {
         DialogShowImage dialogShowImage(this,sFileName);
@@ -336,5 +344,84 @@ void Archive_widget::_handleActionOpenFile(QString sFileName)
         DialogShowText dialogShowText(this,sFileName);
 
         dialogShowText.exec();
+    }
+    else if( stFileTypes.contains(XBinary::FT_MSDOS)||
+             stFileTypes.contains(XBinary::FT_NE)||
+             stFileTypes.contains(XBinary::FT_LE)||
+             stFileTypes.contains(XBinary::FT_PE)||
+             stFileTypes.contains(XBinary::FT_ELF)||
+             stFileTypes.contains(XBinary::FT_MACH))
+    {
+        QFile file;
+
+        file.setFileName(sFileName);
+
+        if(file.open(QIODevice::ReadOnly))
+        {
+            FW_DEF::OPTIONS options={};
+
+            if(stFileTypes.contains(XBinary::FT_PE))
+            {
+                options.nStartType=SPE::TYPE_HEURISTICSCAN;
+
+                DialogPE dialogPE(this);
+
+                dialogPE.setData(&file,&options);
+
+                dialogPE.exec();
+            }
+            else if(stFileTypes.contains(XBinary::FT_LE))
+            {
+                options.nStartType=SLE::TYPE_HEURISTICSCAN;
+
+                DialogLE dialogLE(this);
+
+                dialogLE.setData(&file,&options);
+
+                dialogLE.exec();
+            }
+            else if(stFileTypes.contains(XBinary::FT_NE))
+            {
+                options.nStartType=SNE::TYPE_HEURISTICSCAN;
+
+                DialogNE dialogNE(this);
+
+                dialogNE.setData(&file,&options);
+
+                dialogNE.exec();
+            }
+            else if(stFileTypes.contains(XBinary::FT_MSDOS))
+            {
+                options.nStartType=SMSDOS::TYPE_HEURISTICSCAN;
+
+                DialogMSDOS dialogMSDOS(this);
+
+                dialogMSDOS.setData(&file,&options);
+
+                dialogMSDOS.exec();
+            }
+            else if(stFileTypes.contains(XBinary::FT_ELF))
+            {
+                options.nStartType=SELF::TYPE_HEURISTICSCAN;
+
+                DialogELF dialogELF(this);
+
+                dialogELF.setData(&file,&options);
+
+                dialogELF.exec();
+            }
+            else if(stFileTypes.contains(XBinary::FT_MACH))
+            {
+                options.nStartType=SMACH::TYPE_HEURISTICSCAN;
+
+                DialogMACH dialogMACH(this);
+
+                dialogMACH.setData(&file,&options);
+
+                dialogMACH.exec();
+            }
+
+            file.close();
+        }
     }
 }

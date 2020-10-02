@@ -36,6 +36,12 @@
 #include "dialogunpackfile.h"
 #include "dialogshowimage.h"
 #include "dialogshowtext.h"
+#include "dialogmsdos.h"
+#include "dialogne.h"
+#include "dialogle.h"
+#include "dialogpe.h"
+#include "dialogelf.h"
+#include "dialogmach.h"
 
 namespace Ui {
 class Archive_widget;
