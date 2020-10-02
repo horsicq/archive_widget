@@ -26,6 +26,10 @@ DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName) :
     ui(new Ui::DialogShowImage)
 {
     ui->setupUi(this);
+
+    QPixmap pixmap(sFileName);
+    ui->labelImage->setPixmap(pixmap);
+    ui->labelImage->setScaledContents(true);
 }
 
 DialogShowImage::~DialogShowImage()

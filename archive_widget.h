@@ -73,7 +73,8 @@ private slots:
     void dumpRecord();
 
     void handleAction(ACTION action);
-    void _handleAction(ACTION action,QIODevice *pDevice);
+    void _handleActionDevice(ACTION action,QIODevice *pDevice);
+    void _handleActionOpenFile(QString sFileName);
 
 private:
     Ui::Archive_widget *ui;

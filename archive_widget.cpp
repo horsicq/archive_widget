@@ -87,7 +87,8 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
 
             QAction actionOpen(tr("Open"),this);
 
-            if(stFileTypes.contains(XBinary::FT_PNG))
+            if( stFileTypes.contains(XBinary::FT_PNG)||
+                stFileTypes.contains(XBinary::FT_TEXT))
             {
                 connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
                 contextMenu.addAction(&actionOpen);
@@ -175,15 +176,22 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
         if(bIsRoot)
         {
-            QFile file;
-
-            file.setFileName(sRecordFileName);
-
-            if(file.open(QIODevice::ReadOnly))
+            if(action==ACTION_OPEN)
             {
-                _handleAction(action,&file);
+                _handleActionOpenFile(sRecordFileName);
+            }
+            else
+            {
+                QFile file;
 
-                file.close();
+                file.setFileName(sRecordFileName);
+
+                if(file.open(QIODevice::ReadOnly))
+                {
+                    _handleActionDevice(action,&file);
+
+                    file.close();
+                }
             }
         }
         else
@@ -204,8 +212,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     if(dialogUnpackFile.exec()==QDialog::Accepted)
                     {
-                        // TODO
-                        // sTempFileName
+                        _handleActionOpenFile(sTempFileName);
                     }
                 }
             }
@@ -239,7 +246,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     if(buffer.open(QIODevice::ReadOnly))
                     {
-                        _handleAction(action,&buffer);
+                        _handleActionDevice(action,&buffer);
 
                         buffer.close();
                     }
@@ -264,7 +271,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                             if(file.open(QIODevice::ReadOnly))
                             {
-                                _handleAction(action,&file);
+                                _handleActionDevice(action,&file);
 
                                 file.close();
                             }
@@ -276,7 +283,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
     }
 }
 
-void Archive_widget::_handleAction(Archive_widget::ACTION action, QIODevice *pDevice)
+void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevice *pDevice)
 {
     if(action==ACTION_SCAN)
     {
@@ -307,5 +314,23 @@ void Archive_widget::_handleAction(Archive_widget::ACTION action, QIODevice *pDe
         DialogHash dialogHash(this,pDevice);
 
         dialogHash.exec();
+    }
+}
+
+void Archive_widget::_handleActionOpenFile(QString sFileName)
+{
+    QSet<XBinary::FT> stFileTypes=XBinary::getFileTypes(sFileName,true);
+
+    if(stFileTypes.contains(XBinary::FT_PNG))
+    {
+        DialogShowImage dialogShowImage(this,sFileName);
+
+        dialogShowImage.exec();
+    }
+    else if(stFileTypes.contains(XBinary::FT_TEXT))
+    {
+        DialogShowText dialogShowText(this,sFileName);
+
+        dialogShowText.exec();
     }
 }
