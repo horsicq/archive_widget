@@ -27,6 +27,7 @@ DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName) :
 {
     ui->setupUi(this);
 
+    // TODO resize
     QPixmap pixmap(sFileName);
     ui->labelImage->setPixmap(pixmap);
     ui->labelImage->setScaledContents(true);
@@ -35,4 +36,9 @@ DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName) :
 DialogShowImage::~DialogShowImage()
 {
     delete ui;
+}
+
+void DialogShowImage::on_pushButtonClose_clicked()
+{
+    this->close();
 }

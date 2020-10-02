@@ -36,6 +36,9 @@ public:
     explicit DialogShowText(QWidget *pParent,QString sFileName);
     ~DialogShowText();
 
+private slots:
+    void on_pushButtonClose_clicked();
+
 private:
     Ui::DialogShowText *ui;
 };

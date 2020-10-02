@@ -43,3 +43,8 @@ DialogShowText::~DialogShowText()
 {
     delete ui;
 }
+
+void DialogShowText::on_pushButtonClose_clicked()
+{
+    this->close();
+}

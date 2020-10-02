@@ -35,6 +35,9 @@ public:
     explicit DialogShowImage(QWidget *pParent,QString sFileName);
     ~DialogShowImage();
 
+private slots:
+    void on_pushButtonClose_clicked();
+
 private:
     Ui::DialogShowImage *ui;
 };
