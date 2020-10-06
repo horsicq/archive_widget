@@ -42,6 +42,7 @@
 #include "dialogpe.h"
 #include "dialogelf.h"
 #include "dialogmach.h"
+#include "dialogdex.h"
 
 namespace Ui {
 class Archive_widget;

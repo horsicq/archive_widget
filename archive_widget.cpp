@@ -92,6 +92,7 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
                 stFileTypes.contains(XBinary::FT_LE)||
                 stFileTypes.contains(XBinary::FT_PE)||
                 stFileTypes.contains(XBinary::FT_ELF)||
+                stFileTypes.contains(XBinary::FT_DEX)||
                 stFileTypes.contains(XBinary::FT_MACH)||
                 stFileTypes.contains(XBinary::FT_PNG)||
                 stFileTypes.contains(XBinary::FT_JPEG)||
@@ -350,7 +351,8 @@ void Archive_widget::_handleActionOpenFile(QString sFileName)
              stFileTypes.contains(XBinary::FT_LE)||
              stFileTypes.contains(XBinary::FT_PE)||
              stFileTypes.contains(XBinary::FT_ELF)||
-             stFileTypes.contains(XBinary::FT_MACH))
+             stFileTypes.contains(XBinary::FT_MACH)||
+             stFileTypes.contains(XBinary::FT_DEX))
     {
         QFile file;
 
@@ -419,6 +421,16 @@ void Archive_widget::_handleActionOpenFile(QString sFileName)
                 dialogMACH.setData(&file,&options);
 
                 dialogMACH.exec();
+            }
+            else if(stFileTypes.contains(XBinary::FT_DEX))
+            {
+                options.nStartType=SDEX::TYPE_HEURISTICSCAN;
+
+                DialogDEX dialogDEX(this);
+
+                dialogDEX.setData(&file,&options);
+
+                dialogDEX.exec();
             }
 
             file.close();
