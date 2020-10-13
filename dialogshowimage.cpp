@@ -27,6 +27,8 @@ DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(Qt::Window);
+
     // TODO resize
     QPixmap pixmap(sFileName);
     ui->labelImage->setPixmap(pixmap);

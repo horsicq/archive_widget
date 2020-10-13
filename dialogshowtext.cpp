@@ -27,6 +27,8 @@ DialogShowText::DialogShowText(QWidget *pParent, QString sFileName) :
 {
     ui->setupUi(this);
 
+    setWindowFlags(Qt::Window);
+
     QFile file(sFileName);
 
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
