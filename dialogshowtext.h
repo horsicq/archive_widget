@@ -33,7 +33,7 @@ class DialogShowText : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogShowText(QWidget *pParent,QString sFileName);
+    explicit DialogShowText(QWidget *pParent, QString sFileName, QString sTitle);
     ~DialogShowText();
 
 private slots:

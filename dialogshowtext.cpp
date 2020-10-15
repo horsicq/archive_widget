@@ -21,13 +21,14 @@
 #include "dialogshowtext.h"
 #include "ui_dialogshowtext.h"
 
-DialogShowText::DialogShowText(QWidget *pParent, QString sFileName) :
+DialogShowText::DialogShowText(QWidget *pParent, QString sFileName, QString sTitle) :
     QDialog(pParent),
     ui(new Ui::DialogShowText)
 {
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
+    setWindowTitle(sTitle);
 
     QFile file(sFileName);
 

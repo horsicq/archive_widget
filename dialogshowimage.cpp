@@ -21,13 +21,14 @@
 #include "dialogshowimage.h"
 #include "ui_dialogshowimage.h"
 
-DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName) :
+DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName, QString sTitle) :
     QDialog(pParent),
     ui(new Ui::DialogShowImage)
 {
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
+    setWindowTitle(sTitle);
 
     // TODO resize
     QPixmap pixmap(sFileName);

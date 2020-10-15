@@ -81,7 +81,7 @@ private slots:
 
     void handleAction(ACTION action);
     void _handleActionDevice(ACTION action,QIODevice *pDevice);
-    void _handleActionOpenFile(QString sFileName);
+    void _handleActionOpenFile(QString sFileName,QString sTitle);
 
 private:
     Ui::Archive_widget *ui;
