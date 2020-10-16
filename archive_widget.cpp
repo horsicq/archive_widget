@@ -365,7 +365,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
             if(stFileTypes.contains(XBinary::FT_PE))
             {
-                options.nStartType=SPE::TYPE_HEURISTICSCAN;
+                options.nStartType=SPE::TYPE_IMAGE_FILE_HEADER;
 
                 DialogPE dialogPE(this);
 
@@ -375,7 +375,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
             }
             else if(stFileTypes.contains(XBinary::FT_LE))
             {
-                options.nStartType=SLE::TYPE_HEURISTICSCAN;
+                options.nStartType=SLE::TYPE_VXD_HEADER;
 
                 DialogLE dialogLE(this);
 
@@ -385,7 +385,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
             }
             else if(stFileTypes.contains(XBinary::FT_NE))
             {
-                options.nStartType=SNE::TYPE_HEURISTICSCAN;
+                options.nStartType=SNE::TYPE_OS2_HEADER;
 
                 DialogNE dialogNE(this);
 
@@ -395,7 +395,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
             }
             else if(stFileTypes.contains(XBinary::FT_MSDOS))
             {
-                options.nStartType=SMSDOS::TYPE_HEURISTICSCAN;
+                options.nStartType=SMSDOS::TYPE_DOS_HEADER;
 
                 DialogMSDOS dialogMSDOS(this);
 
@@ -405,7 +405,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
             }
             else if(stFileTypes.contains(XBinary::FT_ELF))
             {
-                options.nStartType=SELF::TYPE_HEURISTICSCAN;
+                options.nStartType=SELF::TYPE_Elf_Ehdr;
 
                 DialogELF dialogELF(this);
 
@@ -415,7 +415,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
             }
             else if(stFileTypes.contains(XBinary::FT_MACH))
             {
-                options.nStartType=SMACH::TYPE_HEURISTICSCAN;
+                options.nStartType=SMACH::TYPE_mach_header;
 
                 DialogMACH dialogMACH(this);
 
@@ -425,7 +425,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
             }
             else if(stFileTypes.contains(XBinary::FT_DEX))
             {
-                options.nStartType=SDEX::TYPE_HEURISTICSCAN;
+                options.nStartType=SDEX::TYPE_HEADER;
 
                 DialogDEX dialogDEX(this);
 
