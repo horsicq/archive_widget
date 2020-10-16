@@ -60,6 +60,7 @@ class Archive_widget : public QWidget
         ACTION_STRINGS,
         ACTION_ENTROPY,
         ACTION_HASH,
+        ACTION_COPYFILENAME,
         ACTION_DUMP
     };
 
@@ -77,6 +78,7 @@ private slots:
     void stringsRecord();
     void entropyRecord();
     void hashRecord();
+    void copyFileName();
     void dumpRecord();
 
     void handleAction(ACTION action);

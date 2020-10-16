@@ -124,6 +124,12 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
             connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
             contextMenu.addAction(&actionHash);
 
+            QMenu menuCopy(tr("Copy"),this);
+            QAction actionCopyFileName(tr("File name"),this);
+            connect(&actionCopyFileName, SIGNAL(triggered()), this, SLOT(copyFileName()));
+            menuCopy.addAction(&actionCopyFileName);
+            contextMenu.addMenu(&menuCopy);
+
             QAction actionDump(tr("Dump"),this);
 
             if(!bIsRoot)
@@ -167,6 +173,11 @@ void Archive_widget::hashRecord()
     handleAction(ACTION_HASH);
 }
 
+void Archive_widget::copyFileName()
+{
+    handleAction(ACTION_COPYFILENAME);
+}
+
 void Archive_widget::dumpRecord()
 {
     handleAction(ACTION_DUMP);
@@ -189,6 +200,10 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
             if(action==ACTION_OPEN)
             {
                 _handleActionOpenFile(sRecordFileName,sRecordFileName);
+            }
+            else if(action==ACTION_COPYFILENAME)
+            {
+                QGuiApplication::clipboard()->setText(sRecordFileName);
             }
             else
             {
@@ -225,6 +240,10 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
                         _handleActionOpenFile(sTempFileName,record.sFileName);
                     }
                 }
+            }
+            else if(action==ACTION_COPYFILENAME)
+            {
+                QGuiApplication::clipboard()->setText(record.sFileName);
             }
             else if(action==ACTION_DUMP)
             {
