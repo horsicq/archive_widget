@@ -21,7 +21,7 @@
 #include "dialogshowtext.h"
 #include "ui_dialogshowtext.h"
 
-DialogShowText::DialogShowText(QWidget *pParent, QString sFileName, QString sTitle) :
+DialogShowText::DialogShowText(QWidget *pParent, QString sTitle) :
     QDialog(pParent),
     ui(new Ui::DialogShowText)
 {
@@ -29,17 +29,27 @@ DialogShowText::DialogShowText(QWidget *pParent, QString sFileName, QString sTit
 
     setWindowFlags(Qt::Window);
     setWindowTitle(sTitle);
+}
 
-    QFile file(sFileName);
-
-    if(file.open(QIODevice::ReadOnly|QIODevice::Text))
+void DialogShowText::setData(QString sString, DialogShowText::TYPE type)
+{
+    if(type==TYPE_FILECONTENT)
     {
-        QTextStream stream(&file);
+        QFile file(sString);
 
-        ui->plainTextEdit->setPlainText(stream.readAll());
+        if(file.open(QIODevice::ReadOnly|QIODevice::Text))
+        {
+            QTextStream stream(&file);
+
+            ui->plainTextEdit->setPlainText(stream.readAll());
+        }
+
+        file.close();
     }
-
-    file.close();
+    else if(type==TYPE_PLAINTEXT)
+    {
+        ui->plainTextEdit->setPlainText(sString);
+    }
 }
 
 DialogShowText::~DialogShowText()

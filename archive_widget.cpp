@@ -98,7 +98,8 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
                 stFileTypes.contains(XBinary::FT_JPEG)||
                 stFileTypes.contains(XBinary::FT_GIF)||
                 stFileTypes.contains(XBinary::FT_TIFF)||
-                stFileTypes.contains(XBinary::FT_TEXT))
+                stFileTypes.contains(XBinary::FT_TEXT)||
+                stFileTypes.contains(XBinary::FT_ANDROIDXML))
             {
                 connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
                 contextMenu.addAction(&actionOpen);
@@ -361,7 +362,19 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
     }
     else if(stFileTypes.contains(XBinary::FT_TEXT))
     {
-        DialogShowText dialogShowText(this,sFileName,sTitle);
+        DialogShowText dialogShowText(this,sTitle);
+
+        dialogShowText.setData(sFileName,DialogShowText::TYPE_FILECONTENT);
+
+        dialogShowText.exec();
+    }
+    else if(stFileTypes.contains(XBinary::FT_ANDROIDXML))
+    {
+        QString sString=XAndroidBinary::getDecoded(sFileName);
+
+        DialogShowText dialogShowText(this,sTitle);
+
+        dialogShowText.setData(sString,DialogShowText::TYPE_PLAINTEXT);
 
         dialogShowText.exec();
     }

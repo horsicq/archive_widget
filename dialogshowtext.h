@@ -33,7 +33,15 @@ class DialogShowText : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogShowText(QWidget *pParent, QString sFileName, QString sTitle);
+    enum TYPE
+    {
+        TYPE_UNKNOWN=0,
+        TYPE_FILECONTENT,
+        TYPE_PLAINTEXT
+    };
+
+    explicit DialogShowText(QWidget *pParent,QString sTitle);
+    void setData(QString sString,TYPE type);
     ~DialogShowText();
 
 private slots:

@@ -43,6 +43,7 @@
 #include "dialogelf.h"
 #include "dialogmach.h"
 #include "dialogdex.h"
+#include "xandroidbinary.h"
 
 namespace Ui {
 class Archive_widget;
