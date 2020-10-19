@@ -26,29 +26,60 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui(new Ui::Archive_widget)
 {
     ui->setupUi(this);
+
+    pFilterTable=new QSortFilterProxyModel(this);
+
+    ui->comboBoxType->addItem(tr("Tree"));
+    ui->comboBoxType->addItem(tr("Table"));
+
+    ui->comboBoxType->setCurrentIndex(0);
 }
 
 void Archive_widget::setData(QString sFileName)
 {
     this->g_sFileName=sFileName;
 
-    QAbstractItemModel *pOldModel=ui->treeViewArchive->model();
-    QStandardItemModel *pNewModel=0;
+    ui->tableViewArchive->setSortingEnabled(false);
+
+    QAbstractItemModel *pOldTreeModel=ui->treeViewArchive->model();
+    QStandardItemModel *pNewTreeModel=0;
+
+    QAbstractItemModel *pOldTableModel=pFilterTable->sourceModel();;
+    QStandardItemModel *pNewTableModel=0;
+
+    pFilterTable->setSourceModel(0);
+    ui->tableViewArchive->setModel(0);
+
+    ui->comboBoxType->setCurrentIndex(0);
+    ui->lineEditFilter->clear();
 
     DialogCreateViewModel dialogCreateViewModel(this);
 
-    dialogCreateViewModel.setData(sFileName,&g_listRecords,&pNewModel);
+    dialogCreateViewModel.setData(sFileName,&g_listRecords,&pNewTreeModel,&pNewTableModel);
 
     dialogCreateViewModel.exec();
 
-    ui->treeViewArchive->setModel(pNewModel);
+    ui->treeViewArchive->setModel(pNewTreeModel);
 
     ui->treeViewArchive->header()->setSectionResizeMode(0,QHeaderView::Stretch);
     ui->treeViewArchive->header()->setSectionResizeMode(1,QHeaderView::Interactive);
 
-    ui->treeViewArchive->expand(pNewModel->index(0,0));
+    pFilterTable->setSourceModel(pNewTableModel);
+    ui->tableViewArchive->setModel(pFilterTable);
 
-    delete pOldModel;
+    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
+    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Interactive);
+
+    delete pOldTreeModel;
+    delete pOldTableModel;
+
+    ui->tableViewArchive->setSortingEnabled(true);
+    ui->tableViewArchive->sortByColumn(0,Qt::AscendingOrder);
+
+    ui->tableViewArchive->setColumnWidth(0,20);
+
+    ui->treeViewArchive->expand(pNewTreeModel->index(0,0));
 }
 
 Archive_widget::~Archive_widget()
@@ -67,80 +98,100 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
         bool bIsRoot=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
         QString sRecordFileName=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
 
-        if(sRecordFileName!="")
+        showContext(sRecordFileName,bIsRoot,ui->treeViewArchive->viewport()->mapToGlobal(pos));
+    }
+}
+
+void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint &pos)
+{
+    QModelIndexList listIndexes=ui->tableViewArchive->selectionModel()->selectedIndexes();
+
+    if(listIndexes.size()>0)
+    {
+        QModelIndex index=listIndexes.at(0);
+
+        bool bIsRoot=ui->tableViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
+        QString sRecordFileName=ui->tableViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
+
+        showContext(sRecordFileName,bIsRoot,ui->tableViewArchive->viewport()->mapToGlobal(pos));
+    }
+}
+
+void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot,QPoint point)
+{
+    if(sRecordFileName!="")
+    {
+        QSet<XBinary::FT> stFileTypes;
+
+        if(bIsRoot)
         {
-            QSet<XBinary::FT> stFileTypes;
-
-            if(bIsRoot)
-            {
-                stFileTypes=XBinary::getFileTypes(sRecordFileName,true);
-            }
-            else
-            {
-                XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
-
-                QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
-                stFileTypes=XBinary::getFileTypes(&baData,true);
-            }
-
-            QMenu contextMenu(this);
-
-            QAction actionOpen(tr("Open"),this);
-
-            if( stFileTypes.contains(XBinary::FT_MSDOS)||
-                stFileTypes.contains(XBinary::FT_NE)||
-                stFileTypes.contains(XBinary::FT_LE)||
-                stFileTypes.contains(XBinary::FT_PE)||
-                stFileTypes.contains(XBinary::FT_ELF)||
-                stFileTypes.contains(XBinary::FT_DEX)||
-                stFileTypes.contains(XBinary::FT_MACH)||
-                stFileTypes.contains(XBinary::FT_PNG)||
-                stFileTypes.contains(XBinary::FT_JPEG)||
-                stFileTypes.contains(XBinary::FT_GIF)||
-                stFileTypes.contains(XBinary::FT_TIFF)||
-                stFileTypes.contains(XBinary::FT_TEXT)||
-                stFileTypes.contains(XBinary::FT_ANDROIDXML))
-            {
-                connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
-                contextMenu.addAction(&actionOpen);
-            }
-
-            QAction actionScan(tr("Scan"),this);
-            connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
-            contextMenu.addAction(&actionScan);
-
-            QAction actionHex(QString("Hex"),this);
-            connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
-            contextMenu.addAction(&actionHex);
-
-            QAction actionStrings(tr("Strings"),this);
-            connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
-            contextMenu.addAction(&actionStrings);
-
-            QAction actionEntropy(tr("Entropy"),this);
-            connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
-            contextMenu.addAction(&actionEntropy);
-
-            QAction actionHash(tr("Hash"),this);
-            connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
-            contextMenu.addAction(&actionHash);
-
-            QMenu menuCopy(tr("Copy"),this);
-            QAction actionCopyFileName(tr("File name"),this);
-            connect(&actionCopyFileName, SIGNAL(triggered()), this, SLOT(copyFileName()));
-            menuCopy.addAction(&actionCopyFileName);
-            contextMenu.addMenu(&menuCopy);
-
-            QAction actionDump(tr("Dump"),this);
-
-            if(!bIsRoot)
-            {
-                connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
-                contextMenu.addAction(&actionDump);
-            }
-
-            contextMenu.exec(ui->treeViewArchive->viewport()->mapToGlobal(pos));
+            stFileTypes=XBinary::getFileTypes(sRecordFileName,true);
         }
+        else
+        {
+            XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
+
+            QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
+            stFileTypes=XBinary::getFileTypes(&baData,true);
+        }
+
+        QMenu contextMenu(this);
+
+        QAction actionOpen(tr("Open"),this);
+
+        if( stFileTypes.contains(XBinary::FT_MSDOS)||
+            stFileTypes.contains(XBinary::FT_NE)||
+            stFileTypes.contains(XBinary::FT_LE)||
+            stFileTypes.contains(XBinary::FT_PE)||
+            stFileTypes.contains(XBinary::FT_ELF)||
+            stFileTypes.contains(XBinary::FT_DEX)||
+            stFileTypes.contains(XBinary::FT_MACH)||
+            stFileTypes.contains(XBinary::FT_PNG)||
+            stFileTypes.contains(XBinary::FT_JPEG)||
+            stFileTypes.contains(XBinary::FT_GIF)||
+            stFileTypes.contains(XBinary::FT_TIFF)||
+            stFileTypes.contains(XBinary::FT_TEXT)||
+            stFileTypes.contains(XBinary::FT_ANDROIDXML))
+        {
+            connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
+            contextMenu.addAction(&actionOpen);
+        }
+
+        QAction actionScan(tr("Scan"),this);
+        connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
+        contextMenu.addAction(&actionScan);
+
+        QAction actionHex(QString("Hex"),this);
+        connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
+        contextMenu.addAction(&actionHex);
+
+        QAction actionStrings(tr("Strings"),this);
+        connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
+        contextMenu.addAction(&actionStrings);
+
+        QAction actionEntropy(tr("Entropy"),this);
+        connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
+        contextMenu.addAction(&actionEntropy);
+
+        QAction actionHash(tr("Hash"),this);
+        connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
+        contextMenu.addAction(&actionHash);
+
+        QMenu menuCopy(tr("Copy"),this);
+        QAction actionCopyFileName(tr("File name"),this);
+        connect(&actionCopyFileName, SIGNAL(triggered()), this, SLOT(copyFileName()));
+        menuCopy.addAction(&actionCopyFileName);
+        contextMenu.addMenu(&menuCopy);
+
+        QAction actionDump(tr("Dump"),this);
+
+        if(!bIsRoot)
+        {
+            connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
+            contextMenu.addAction(&actionDump);
+        }
+
+        contextMenu.exec(point);
     }
 }
 
@@ -186,16 +237,39 @@ void Archive_widget::dumpRecord()
 
 void Archive_widget::handleAction(Archive_widget::ACTION action)
 {
-    QModelIndexList listIndexes=ui->treeViewArchive->selectionModel()->selectedIndexes();
+    qint64 nSize=0;
+    bool bIsRoot=false;
+    QString sRecordFileName;
 
-    if(listIndexes.size()>0)
+    if(ui->stackedWidgetArchive->currentIndex()==0)
     {
-        QModelIndex index=listIndexes.at(0);
+        QModelIndexList listIndexes=ui->treeViewArchive->selectionModel()->selectedIndexes();
 
-        qint64 nSize=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_SIZE).toLongLong();
-        bool bIsRoot=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
-        QString sRecordFileName=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
+        if(listIndexes.size()>0)
+        {
+            QModelIndex index=listIndexes.at(0);
 
+            nSize=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_SIZE).toLongLong();
+            bIsRoot=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
+            sRecordFileName=ui->treeViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
+        }
+    }
+    else if(ui->stackedWidgetArchive->currentIndex()==1)
+    {
+        QModelIndexList listIndexes=ui->tableViewArchive->selectionModel()->selectedIndexes();
+
+        if(listIndexes.size()>0)
+        {
+            QModelIndex index=listIndexes.at(0);
+
+            nSize=ui->tableViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_SIZE).toLongLong();
+            bIsRoot=ui->tableViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
+            sRecordFileName=ui->tableViewArchive->model()->data(index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
+        }
+    }
+
+    if(sRecordFileName!="")
+    {
         if(bIsRoot)
         {
             if(action==ACTION_OPEN)
@@ -469,4 +543,16 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
             file.close();
         }
     }
+}
+
+void Archive_widget::on_comboBoxType_currentIndexChanged(int nIndex)
+{
+    ui->stackedWidgetArchive->setCurrentIndex(nIndex);
+}
+
+void Archive_widget::on_lineEditFilter_textChanged(const QString &sString)
+{
+    pFilterTable->setFilterRegExp(sString);
+    pFilterTable->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    pFilterTable->setFilterKeyColumn(1);
 }

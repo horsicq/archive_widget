@@ -25,11 +25,12 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
     bIsStop=false;
 }
 
-void CreateViewModelProcess::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppModel)
+void CreateViewModelProcess::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel)
 {
     this->sFileName=sFileName;
     this->pListArchiveRecords=pListArchiveRecords;
-    this->ppModel=ppModel;
+    this->ppTreeModel=ppTreeModel;
+    this->ppTableModel=ppTableModel;
 }
 
 void CreateViewModelProcess::stop()
@@ -48,8 +49,11 @@ void CreateViewModelProcess::process()
 
     int nNumberOfRecords=pListArchiveRecords->count();
 
-    *ppModel=new QStandardItemModel;
-    (*ppModel)->setColumnCount(2);
+    *ppTreeModel=new QStandardItemModel;
+    (*ppTreeModel)->setColumnCount(2);
+
+    *ppTableModel=new QStandardItemModel;
+    (*ppTableModel)->setColumnCount(2);
 
     QString sBaseName=QFileInfo(sFileName).fileName();
 
@@ -59,13 +63,13 @@ void CreateViewModelProcess::process()
     pRootItemName->setData(nFileSize,Qt::UserRole+UR_SIZE);
     pRootItemName->setData(true,Qt::UserRole+UR_ISROOT);
 
-    (*ppModel)->setItem(0,0,pRootItemName);
+    (*ppTreeModel)->setItem(0,0,pRootItemName);
 
     QStandardItem *pRootItemSize=new QStandardItem;
     pRootItemSize->setText(QString::number(nFileSize));
     pRootItemSize->setTextAlignment(Qt::AlignRight);
 
-    (*ppModel)->setItem(0,1,pRootItemSize);
+    (*ppTreeModel)->setItem(0,1,pRootItemSize);
 
     QMap<QString,QStandardItem *> mapItems;
 
@@ -98,8 +102,6 @@ void CreateViewModelProcess::process()
 
                 if(j==(nNumberOfParts))
                 {
-                    pItemName->setData(Qt::UserRole+1);
-
                     pItemName->setData(sRecordFileName,Qt::UserRole+UR_PATH);
                     pItemName->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
                     pItemName->setData(false,Qt::UserRole+UR_ISROOT);
@@ -123,7 +125,7 @@ void CreateViewModelProcess::process()
                 if(j==(nNumberOfParts))
                 {
                     QStandardItem *pItemSize=new QStandardItem;
-                    pItemSize->setText(QString::number(record.nUncompressedSize));
+                    pItemSize->setData(record.nUncompressedSize,Qt::DisplayRole);
                     pItemSize->setTextAlignment(Qt::AlignRight);
 
                     listItems.append(pItemSize);
@@ -134,10 +136,35 @@ void CreateViewModelProcess::process()
                 mapItems.insert(sRelPart,pItemName);
             }
         }
+
+        QList<QStandardItem *> listItems;
+
+        QStandardItem *pItemNumber=new QStandardItem;
+        pItemNumber->setData(i,Qt::DisplayRole);
+        pItemNumber->setTextAlignment(Qt::AlignRight);
+        pItemNumber->setData(sRecordFileName,Qt::UserRole+UR_PATH);
+        pItemNumber->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
+        pItemNumber->setData(false,Qt::UserRole+UR_ISROOT);
+        listItems.append(pItemNumber);
+
+        QStandardItem *pItemName=new QStandardItem;
+        pItemName->setText(sRecordFileName);
+        listItems.append(pItemName);
+
+        QStandardItem *pItemSize=new QStandardItem;
+        pItemSize->setData(record.nUncompressedSize,Qt::DisplayRole);
+        pItemSize->setTextAlignment(Qt::AlignRight);
+        listItems.append(pItemSize);
+
+        (*ppTableModel)->appendRow(listItems);
     }
 
-    (*ppModel)->setHeaderData(0,Qt::Horizontal,tr("File"));
-    (*ppModel)->setHeaderData(1,Qt::Horizontal,tr("Size"));
+    (*ppTreeModel)->setHeaderData(0,Qt::Horizontal,tr("File"));
+    (*ppTreeModel)->setHeaderData(1,Qt::Horizontal,tr("Size"));
+
+    (*ppTableModel)->setHeaderData(0,Qt::Horizontal,"");
+    (*ppTableModel)->setHeaderData(1,Qt::Horizontal,tr("File"));
+    (*ppTableModel)->setHeaderData(2,Qt::Horizontal,tr("Size"));
 
     bIsStop=false;
 

@@ -49,9 +49,9 @@ DialogCreateViewModel::~DialogCreateViewModel()
     delete pCreateViewModelProcess;
 }
 
-void DialogCreateViewModel::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppModel)
+void DialogCreateViewModel::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel)
 {
-    pCreateViewModelProcess->setData(sFileName,pListArchiveRecords,ppModel);
+    pCreateViewModelProcess->setData(sFileName,pListArchiveRecords,ppTreeModel,ppTableModel);
     pThread->start();
 }
 

@@ -38,7 +38,7 @@ public:
     };
 
     explicit CreateViewModelProcess(QObject *pParent=nullptr);
-    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppModel);
+    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppListModel);
 
 signals:
     void errorMessage(QString sText);
@@ -52,7 +52,8 @@ private:
     QIODevice *pDevice;
     QString sFileName;
     QList<XArchive::RECORD> *pListArchiveRecords;
-    QStandardItemModel **ppModel;
+    QStandardItemModel **ppTreeModel;
+    QStandardItemModel **ppTableModel;
     bool bIsStop;
 };
 
