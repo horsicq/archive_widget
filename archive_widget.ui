@@ -1,182 +1,162 @@
-// Copyright (c) 2020 hors<horsicq@gmail.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-//
-#include "formatswidget.h"
-#include "ui_formatswidget.h"
-
-FormatsWidget::FormatsWidget(QWidget *pParent) :
-    QWidget(pParent),
-    ui(new Ui::FormatsWidget)
-{
-    ui->setupUi(this);
-
-    const QSignalBlocker blocker(ui->comboBoxScanEngine);
-
-    ui->comboBoxScanEngine->addItem(QString("Detect It Easy(DiE)"),TABSE_DIE);
-    ui->comboBoxScanEngine->addItem(QString("Nauz File Detector(NFD)"),TABSE_NFD);
-
-    ui->stackedWidgetMain->setCurrentIndex(TABINFO_BINARY);
-    ui->stackedWidgetScan->setCurrentIndex(TABSE_DIE);
-}
-
-void FormatsWidget::setData(QString sFileName, bool bScan)
-{
-    const QSignalBlocker blocker(ui->comboBoxFileType);
-
-    this->sFileName=sFileName;
-    this->bScan=bScan;
-
-    ui->comboBoxFileType->clear();
-
-    QSet<XBinary::FT> stFileTypes=XBinary::getFileTypes(sFileName,true);
-
-    XBinary::filterFileTypes(&stFileTypes);
-
-    QList<XBinary::FT> listFileTypes=XBinary::_getFileTypeListFromSet(stFileTypes);
-
-    int nNumberOfFileTypes=listFileTypes.count();
-
-    for(int i=0;i<nNumberOfFileTypes;i++)
-    {
-        XBinary::FT fileType=listFileTypes.at(i);
-        ui->comboBoxFileType->addItem(XBinary::fileTypeIdToString(fileType),fileType);
-    }
-
-    if(nNumberOfFileTypes)
-    {
-        if(listFileTypes.at(0)==XBinary::FT_BINARY)
-        {
-            ui->comboBoxFileType->setCurrentIndex(0);
-        }
-        else
-        {
-            ui->comboBoxFileType->setCurrentIndex(nNumberOfFileTypes-1);
-        }
-
-        reload();
-    }
-}
-
-void FormatsWidget::setScanEngine(QString sScanEngine)
-{
-    if(sScanEngine=="die")
-    {
-        ui->comboBoxScanEngine->setCurrentIndex(TABSE_DIE);
-    }
-    else if(sScanEngine=="nfd")
-    {
-        ui->comboBoxScanEngine->setCurrentIndex(TABSE_NFD);
-    }
-}
-
-void FormatsWidget::setBackupFileName(QString sBackupFileName)
-{
-    this->sBackupFilename=sBackupFileName;
-}
-
-FormatsWidget::~FormatsWidget()
-{
-    delete ui;
-}
-
-void FormatsWidget::setDIEDatabasePath(QString sDatabasePath)
-{
-    ui->pageScanDIE->setDatabasePath(sDatabasePath);
-}
-
-void FormatsWidget::setDIEInfoPath(QString sDatabasePath)
-{
-    ui->pageScanDIE->setInfoPath(sDatabasePath);
-}
-
-void FormatsWidget::on_comboBoxFileType_currentIndexChanged(int nIndex)
-{
-    Q_UNUSED(nIndex)
-
-    reload();
-}
-
-void FormatsWidget::reload()
-{
-    XBinary::FT fileType=getCurrentFileType();
-
-    QFile file;
-    file.setFileName(sFileName);
-
-    if(file.open(QIODevice::ReadOnly))
-    {
-        if( (fileType==XBinary::FT_BINARY)||
-            (fileType==XBinary::FT_DEX)||
-            (fileType==XBinary::FT_ZIP))
-        {
-            ui->groupBoxEntryPoint->hide();
-            ui->groupBoxBaseAddress->hide();
-        }
-        else
-        {
-            ui->groupBoxEntryPoint->show();
-            ui->groupBoxBaseAddress->show();
-        }
-
-        XBinary::_MEMORY_MAP memoryMap=XFormats::getMemoryMap(fileType,&file);
-
-        if(memoryMap.mode==XBinary::MODE_16)
-        {
-            ui->lineEditBaseAddress->setValue((quint16)memoryMap.nBaseAddress);
-        }
-        else if((memoryMap.mode==XBinary::MODE_16SEG)||(memoryMap.mode==XBinary::MODE_32))
-        {
-            ui->lineEditBaseAddress->setValue((quint32)memoryMap.nBaseAddress);
-        }
-        else if(memoryMap.mode==XBinary::MODE_64)
-        {
-            ui->lineEditBaseAddress->setValue((quint64)memoryMap.nBaseAddress);
-        }
-
-        ui->labelEndianness->setText(XBinary::endiannessToString(memoryMap.bIsBigEndian));
-        ui->labelArch->setText(memoryMap.sArch);
-        ui->labelMode->setText(XBinary::modeIdToString(memoryMap.mode));
-        ui->labelType->setText(memoryMap.sType);
-
-        ui->pushButtonDisasm->setEnabled(XBinary::isX86asm(memoryMap.sArch));
-
-        if(fileType==XBinary::FT_BINARY)
-        {
-            ui->stackedWidgetMain->setCurrentIndex(TABINFO_BINARY);
-        }
-        else if(fileType==XBinary::FT_COM)
-        {
-            ui->stackedWidgetMain->setCurrentIndex(TABINFO_COM);
-
-            XCOM com(&file);
-
-            if(com.isValid())
-            {
-                ui->lineEditEntryPoint->setValue((quint16)com.getEntryPointAddress());
-            }
-        }
-        else if(fileType==XBinary::FT_ZIP)
-        {
-            ui->stackedWidgetMain->setCurrentIndex(TABINFO_ZIP);
-        }
-        else if(fileType==XBinary::FT_DEX)
-        {
-            ui->stackedWidgetMain->setCurrentIndex(TABINFO_DEX);
-       
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Archive_widget</class>
+ <widget class="QWidget" name="Archive_widget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>564</width>
+    <height>394</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_5">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QGroupBox" name="groupBoxType">
+       <property name="title">
+        <string>Type</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QComboBox" name="comboBoxType"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="groupBoxFilter">
+       <property name="title">
+        <string>Filter</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLineEdit" name="lineEditFilter"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidgetArchive">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="pageTree">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTreeView" name="treeViewArchive">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <attribute name="headerStretchLastSection">
+          <bool>false</bool>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageTable">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QTableView" name="tableViewArchive">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>20</number>
+         </attribute>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>20</number>
+         </attribute>
+         <attribute name="verticalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

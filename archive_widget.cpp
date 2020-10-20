@@ -32,6 +32,8 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui->comboBoxType->addItem(tr("Tree"));
     ui->comboBoxType->addItem(tr("Table"));
 
+    ui->groupBoxFilter->setEnabled(false);
+
     ui->comboBoxType->setCurrentIndex(0);
 }
 
@@ -548,6 +550,8 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 void Archive_widget::on_comboBoxType_currentIndexChanged(int nIndex)
 {
     ui->stackedWidgetArchive->setCurrentIndex(nIndex);
+
+    ui->groupBoxFilter->setEnabled(nIndex);
 }
 
 void Archive_widget::on_lineEditFilter_textChanged(const QString &sString)

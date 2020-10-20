@@ -53,7 +53,7 @@ void CreateViewModelProcess::process()
     (*ppTreeModel)->setColumnCount(2);
 
     *ppTableModel=new QStandardItemModel;
-    (*ppTableModel)->setColumnCount(2);
+    (*ppTableModel)->setColumnCount(3);
 
     QString sBaseName=QFileInfo(sFileName).fileName();
 
