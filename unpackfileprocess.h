@@ -29,7 +29,7 @@ class UnpackFileProcess : public QObject
     Q_OBJECT
 public:
     explicit UnpackFileProcess(QObject *pParent=nullptr);
-    void setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName);
+    void setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName);
 
 signals:
     void errorMessage(QString sText);

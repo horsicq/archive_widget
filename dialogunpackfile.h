@@ -36,11 +36,11 @@ class DialogUnpackFile : public QDialog
 public:
     explicit DialogUnpackFile(QWidget *pParent=nullptr);
     ~DialogUnpackFile();
-    void setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName);
+    void setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName);
 
 private slots:
     void on_pushButtonCancel_clicked();
-    void onCompleted(bool bResult, qint64 nElapsed);
+    void onCompleted(bool bResult,qint64 nElapsed);
 
 private:
     Ui::DialogUnpackFile *ui;
