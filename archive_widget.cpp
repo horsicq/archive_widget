@@ -468,7 +468,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
         if(file.open(QIODevice::ReadOnly))
         {
-            FW_DEF::OPTIONS options={};
+            FW_DEF::OPTIONS options={}; // TODO options from setData
             options.sTitle=sTitle;
 
             if(stFileTypes.contains(XBinary::FT_PE))
