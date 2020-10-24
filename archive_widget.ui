@@ -81,7 +81,7 @@
    <item>
     <widget class="QStackedWidget" name="stackedWidgetArchive">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="pageTree">
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -143,14 +143,14 @@
          <attribute name="verticalHeaderVisible">
           <bool>false</bool>
          </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>20</number>
-         </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>20</number>
          </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>20</number>
+         </attribute>
          <attribute name="verticalHeaderStretchLastSection">
-          <bool>true</bool>
+          <bool>false</bool>
          </attribute>
         </widget>
        </item>
