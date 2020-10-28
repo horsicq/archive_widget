@@ -37,7 +37,7 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui->comboBoxType->setCurrentIndex(0);
 }
 
-void Archive_widget::setData(QString sFileName)
+void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
 {
     this->g_sFileName=sFileName;
 

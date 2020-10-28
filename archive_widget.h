@@ -67,7 +67,7 @@ class Archive_widget : public QWidget
 
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
-    void setData(QString sFileName); // TODO options for Viewers
+    void setData(QString sFileName,FW_DEF::OPTIONS *pOptions); // TODO options for Viewers
     ~Archive_widget();
 
 private slots:
