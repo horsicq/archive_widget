@@ -94,6 +94,7 @@ private slots:
 private:
     Ui::Archive_widget *ui;
     QString g_sFileName;
+    FW_DEF::OPTIONS *g_pOptions;
     QList<XArchive::RECORD> g_listRecords;
     QSortFilterProxyModel *pFilterTable;
 };

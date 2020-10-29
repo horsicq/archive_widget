@@ -40,6 +40,7 @@ Archive_widget::Archive_widget(QWidget *pParent) :
 void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
 {
     this->g_sFileName=sFileName;
+    this->g_pOptions=pOptions;
 
     ui->tableViewArchive->setSortingEnabled(false);
 
@@ -468,7 +469,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
         if(file.open(QIODevice::ReadOnly))
         {
-            FW_DEF::OPTIONS options={}; // TODO options from setData
+            FW_DEF::OPTIONS options=*g_pOptions; // TODO options from setData
             options.sTitle=sTitle;
 
             if(stFileTypes.contains(XBinary::FT_PE))
