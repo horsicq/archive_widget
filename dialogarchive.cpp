@@ -35,9 +35,22 @@ DialogArchive::~DialogArchive()
     delete ui;
 }
 
+void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
+{
+    if(pOptions->sTitle!="")
+    {
+        setWindowTitle(pOptions->sTitle);
+    }
+
+    ui->widget->setData(sFileName,pOptions);
+}
+
 void DialogArchive::setData(QIODevice *pDevice, FW_DEF::OPTIONS *pOptions)
 {
-    setWindowTitle(pOptions->sTitle);
+    if(pOptions->sTitle!="")
+    {
+        setWindowTitle(pOptions->sTitle);
+    }
 
     // TODO setData device
 }
