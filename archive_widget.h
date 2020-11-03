@@ -74,6 +74,7 @@ private slots:
     void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
     void on_tableViewArchive_customContextMenuRequested(const QPoint &pos);
     void showContext(QString sRecordFileName,bool bIsRoot,QPoint point);
+    bool isOpenAvailable(QString sRecordFileName,bool bIsRoot);
 
     void openRecord();
     void scanRecord();
@@ -88,8 +89,9 @@ private slots:
     void _handleActionDevice(ACTION action,QIODevice *pDevice);
     void _handleActionOpenFile(QString sFileName,QString sTitle);
     void on_comboBoxType_currentIndexChanged(int nIndex);
-
     void on_lineEditFilter_textChanged(const QString &sString);
+    void on_treeViewArchive_doubleClicked(const QModelIndex &index);
+    void on_tableViewArchive_doubleClicked(const QModelIndex &index);
 
 private:
     Ui::Archive_widget *ui;

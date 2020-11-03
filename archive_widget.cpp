@@ -120,41 +120,15 @@ void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint
     }
 }
 
-void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot,QPoint point)
+void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint point)
 {
     if(sRecordFileName!="")
     {
-        QSet<XBinary::FT> stFileTypes;
-
-        if(bIsRoot)
-        {
-            stFileTypes=XBinary::getFileTypes(sRecordFileName,true);
-        }
-        else
-        {
-            XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
-
-            QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
-            stFileTypes=XBinary::getFileTypes(&baData,true);
-        }
-
         QMenu contextMenu(this);
 
         QAction actionOpen(tr("Open"),this);
 
-        if( stFileTypes.contains(XBinary::FT_MSDOS)||
-            stFileTypes.contains(XBinary::FT_NE)||
-            stFileTypes.contains(XBinary::FT_LE)||
-            stFileTypes.contains(XBinary::FT_PE)||
-            stFileTypes.contains(XBinary::FT_ELF)||
-            stFileTypes.contains(XBinary::FT_DEX)||
-            stFileTypes.contains(XBinary::FT_MACH)||
-            stFileTypes.contains(XBinary::FT_PNG)||
-            stFileTypes.contains(XBinary::FT_JPEG)||
-            stFileTypes.contains(XBinary::FT_GIF)||
-            stFileTypes.contains(XBinary::FT_TIFF)||
-            stFileTypes.contains(XBinary::FT_TEXT)||
-            stFileTypes.contains(XBinary::FT_ANDROIDXML))
+        if(isOpenAvailable(sRecordFileName,bIsRoot))
         {
             connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
             contextMenu.addAction(&actionOpen);
@@ -196,6 +170,44 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot,QPoint po
 
         contextMenu.exec(point);
     }
+}
+
+bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
+{
+    bool bResult=false;
+
+    QSet<XBinary::FT> stFileTypes;
+
+    if(bIsRoot)
+    {
+        stFileTypes=XBinary::getFileTypes(sRecordFileName,true);
+    }
+    else
+    {
+        XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
+
+        QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
+        stFileTypes=XBinary::getFileTypes(&baData,true);
+    }
+
+    if( stFileTypes.contains(XBinary::FT_MSDOS)||
+        stFileTypes.contains(XBinary::FT_NE)||
+        stFileTypes.contains(XBinary::FT_LE)||
+        stFileTypes.contains(XBinary::FT_PE)||
+        stFileTypes.contains(XBinary::FT_ELF)||
+        stFileTypes.contains(XBinary::FT_DEX)||
+        stFileTypes.contains(XBinary::FT_MACH)||
+        stFileTypes.contains(XBinary::FT_PNG)||
+        stFileTypes.contains(XBinary::FT_JPEG)||
+        stFileTypes.contains(XBinary::FT_GIF)||
+        stFileTypes.contains(XBinary::FT_TIFF)||
+        stFileTypes.contains(XBinary::FT_TEXT)||
+        stFileTypes.contains(XBinary::FT_ANDROIDXML))
+    {
+        bResult=true;
+    }
+
+    return bResult;
 }
 
 void Archive_widget::openRecord()
@@ -560,4 +572,52 @@ void Archive_widget::on_lineEditFilter_textChanged(const QString &sString)
     pFilterTable->setFilterRegExp(sString);
     pFilterTable->setFilterCaseSensitivity(Qt::CaseInsensitive);
     pFilterTable->setFilterKeyColumn(1);
+}
+
+void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index)
+{
+    Q_UNUSED(index)
+
+    QModelIndexList listIndexes=ui->treeViewArchive->selectionModel()->selectedIndexes();
+
+    if(listIndexes.size()>0)
+    {
+        QModelIndex _index=listIndexes.at(0);
+
+        bool bIsRoot=ui->treeViewArchive->model()->data(_index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
+        QString sRecordFileName=ui->treeViewArchive->model()->data(_index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
+
+        if(isOpenAvailable(sRecordFileName,bIsRoot))
+        {
+            handleAction(ACTION_OPEN);
+        }
+        else
+        {
+            handleAction(ACTION_HEX);
+        }
+    }
+}
+
+void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
+{
+    Q_UNUSED(index)
+
+    QModelIndexList listIndexes=ui->tableViewArchive->selectionModel()->selectedIndexes();
+
+    if(listIndexes.size()>0)
+    {
+        QModelIndex _index=listIndexes.at(0);
+
+        bool bIsRoot=ui->tableViewArchive->model()->data(_index,Qt::UserRole+CreateViewModelProcess::UR_ISROOT).toBool();
+        QString sRecordFileName=ui->tableViewArchive->model()->data(_index,Qt::UserRole+CreateViewModelProcess::UR_PATH).toString();
+
+        if(isOpenAvailable(sRecordFileName,bIsRoot))
+        {
+            handleAction(ACTION_OPEN);
+        }
+        else
+        {
+            handleAction(ACTION_HEX);
+        }
+    }
 }
