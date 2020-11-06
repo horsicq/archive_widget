@@ -47,7 +47,7 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
     QAbstractItemModel *pOldTreeModel=ui->treeViewArchive->model();
     QStandardItemModel *pNewTreeModel=0;
 
-    QAbstractItemModel *pOldTableModel=pFilterTable->sourceModel();;
+    QAbstractItemModel *pOldTableModel=pFilterTable->sourceModel();
     QStandardItemModel *pNewTableModel=0;
 
     pFilterTable->setSourceModel(0);
