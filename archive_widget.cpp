@@ -196,7 +196,7 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
         stFileTypes.contains(XBinary::FT_PE)||
         stFileTypes.contains(XBinary::FT_ELF)||
         stFileTypes.contains(XBinary::FT_DEX)||
-        stFileTypes.contains(XBinary::FT_MACH)||
+        stFileTypes.contains(XBinary::FT_MACHO)||
         stFileTypes.contains(XBinary::FT_PNG)||
         stFileTypes.contains(XBinary::FT_JPEG)||
         stFileTypes.contains(XBinary::FT_GIF)||
@@ -472,7 +472,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
              stFileTypes.contains(XBinary::FT_LE)||
              stFileTypes.contains(XBinary::FT_PE)||
              stFileTypes.contains(XBinary::FT_ELF)||
-             stFileTypes.contains(XBinary::FT_MACH)||
+             stFileTypes.contains(XBinary::FT_MACHO)||
              stFileTypes.contains(XBinary::FT_DEX))
     {
         QFile file;
@@ -534,7 +534,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 dialogELF.exec();
             }
-            else if(stFileTypes.contains(XBinary::FT_MACH))
+            else if(stFileTypes.contains(XBinary::FT_MACHO))
             {
                 options.nStartType=SMACH::TYPE_mach_header;
 
