@@ -3,6 +3,13 @@ QT       += concurrent
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
+!contains(XCONFIG, use_dex) {
+    XCONFIG += use_dex
+}
+
+!contains(XCONFIG, use_archive) {
+    XCONFIG += use_archive
+}
 FORMS += \
     $$PWD/archive_widget.ui \
     $$PWD/dialogarchive.ui \
@@ -31,7 +38,8 @@ SOURCES += \
     $$PWD/dialogunpackfile.cpp \
     $$PWD/unpackfileprocess.cpp
 
-!contains(XCONFIG, xarchives) {
-    XCONFIG += xarchives
-    include($$PWD/../XArchive/xarchives.pri)
+!contains(XCONFIG, allformatwidgets) {
+    XCONFIG += allformatwidgets
+    include($$PWD/../FormatWidgets/allformatwidgets.pri)
 }
+
