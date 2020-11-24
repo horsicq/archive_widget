@@ -98,7 +98,7 @@ private:
     QString g_sFileName;
     FW_DEF::OPTIONS *g_pOptions;
     QList<XArchive::RECORD> g_listRecords;
-    QSortFilterProxyModel *pFilterTable;
+    QSortFilterProxyModel *g_pFilterTable;
 };
 
 #endif // ARCHIVE_WIDGET_H

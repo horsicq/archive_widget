@@ -27,7 +27,7 @@ Archive_widget::Archive_widget(QWidget *pParent) :
 {
     ui->setupUi(this);
 
-    pFilterTable=new QSortFilterProxyModel(this);
+    g_pFilterTable=new QSortFilterProxyModel(this);
 
     ui->comboBoxType->addItem(tr("Tree"));
     ui->comboBoxType->addItem(tr("Table"));
@@ -47,10 +47,10 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
     QAbstractItemModel *pOldTreeModel=ui->treeViewArchive->model();
     QStandardItemModel *pNewTreeModel=0;
 
-    QAbstractItemModel *pOldTableModel=pFilterTable->sourceModel();
+    QAbstractItemModel *pOldTableModel=g_pFilterTable->sourceModel();
     QStandardItemModel *pNewTableModel=0;
 
-    pFilterTable->setSourceModel(0);
+    g_pFilterTable->setSourceModel(0);
     ui->tableViewArchive->setModel(0);
 
     ui->comboBoxType->setCurrentIndex(0);
@@ -67,8 +67,8 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
     ui->treeViewArchive->header()->setSectionResizeMode(0,QHeaderView::Stretch);
     ui->treeViewArchive->header()->setSectionResizeMode(1,QHeaderView::Interactive);
 
-    pFilterTable->setSourceModel(pNewTableModel);
-    ui->tableViewArchive->setModel(pFilterTable);
+    g_pFilterTable->setSourceModel(pNewTableModel);
+    ui->tableViewArchive->setModel(g_pFilterTable);
 
     ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
     ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
@@ -569,9 +569,9 @@ void Archive_widget::on_comboBoxType_currentIndexChanged(int nIndex)
 
 void Archive_widget::on_lineEditFilter_textChanged(const QString &sString)
 {
-    pFilterTable->setFilterRegExp(sString);
-    pFilterTable->setFilterCaseSensitivity(Qt::CaseInsensitive);
-    pFilterTable->setFilterKeyColumn(1);
+    g_pFilterTable->setFilterRegExp(sString);
+    g_pFilterTable->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    g_pFilterTable->setFilterKeyColumn(1);
 }
 
 void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index)
