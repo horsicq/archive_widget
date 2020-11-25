@@ -10,6 +10,7 @@ DEPENDPATH += $$PWD
 !contains(XCONFIG, use_archive) {
     XCONFIG += use_archive
 }
+
 FORMS += \
     $$PWD/archive_widget.ui \
     $$PWD/dialogarchive.ui \
