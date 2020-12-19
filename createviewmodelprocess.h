@@ -21,7 +21,6 @@
 #ifndef CREATEVIEWMODELPROCESS_H
 #define CREATEVIEWMODELPROCESS_H
 
-#include <QObject>
 #include <QElapsedTimer>
 #include <QStandardItemModel>
 #include "xarchives.h"
