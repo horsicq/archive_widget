@@ -21,7 +21,6 @@
 #ifndef UNPACKFILEPROCESS_H
 #define UNPACKFILEPROCESS_H
 
-#include <QObject>
 #include "xarchives.h"
 
 class UnpackFileProcess : public QObject
