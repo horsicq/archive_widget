@@ -412,9 +412,9 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     }
     else if(action==ACTION_HEX)
     {
-        DialogHex dialogHex(this,pDevice);
+        DialogHexView dialogHexView(this,pDevice);
 
-        dialogHex.exec();
+        dialogHexView.exec();
     }
     else if(action==ACTION_STRINGS)
     {

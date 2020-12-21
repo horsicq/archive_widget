@@ -30,7 +30,7 @@
 #include "dialogentropy.h"
 #include "dialoghash.h"
 #include "dialogsearchstrings.h"
-#include "dialoghex.h"
+#include "dialoghexview.h"
 #include "dialogstaticscan.h"
 #include "dialogcreateviewmodel.h"
 #include "dialogunpackfile.h"
