@@ -37,7 +37,7 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui->comboBoxType->setCurrentIndex(0);
 }
 
-void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
+void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions, QWidget *pParent)
 {
     this->g_sFileName=sFileName;
     this->g_pOptions=pOptions;
@@ -56,7 +56,7 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
     ui->comboBoxType->setCurrentIndex(0);
     ui->lineEditFilter->clear();
 
-    DialogCreateViewModel dialogCreateViewModel(this);
+    DialogCreateViewModel dialogCreateViewModel(pParent);
 
     dialogCreateViewModel.setData(sFileName,&g_listRecords,&pNewTreeModel,&pNewTableModel);
 
