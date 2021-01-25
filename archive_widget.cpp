@@ -138,7 +138,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
         connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
         contextMenu.addAction(&actionScan);
 
-        QAction actionHex(QString("Hex"),this);
+        QAction actionHex(tr("Hex"),this);
         connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
         contextMenu.addAction(&actionHex);
 
