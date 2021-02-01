@@ -37,6 +37,7 @@ public:
     ~DialogArchive();
     void setData(QString sFileName,FW_DEF::OPTIONS *pOptions);
     void setData(QIODevice *pDevice,FW_DEF::OPTIONS *pOptions);
+    void setShortcuts(XShortcuts *pShortcuts);
 
 private:
     Ui::DialogArchive *ui;

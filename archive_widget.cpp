@@ -83,6 +83,8 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions, QWidg
     ui->tableViewArchive->setColumnWidth(0,20);
 
     ui->treeViewArchive->expand(pNewTreeModel->index(0,0));
+
+    // mb TODO registerShortcuts
 }
 
 Archive_widget::~Archive_widget()
