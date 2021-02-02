@@ -57,5 +57,5 @@ void DialogArchive::setData(QIODevice *pDevice, FW_DEF::OPTIONS *pOptions)
 
 void DialogArchive::setShortcuts(XShortcuts *pShortcuts)
 {
-    // TODO
+    ui->widget->setShortcuts(pShortcuts);
 }

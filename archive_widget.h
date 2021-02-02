@@ -68,6 +68,7 @@ class Archive_widget : public QWidget
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
     void setData(QString sFileName,FW_DEF::OPTIONS *pOptions,QWidget *pParent=nullptr); // TODO options for Viewers
+    void setShortcuts(XShortcuts *pShortcuts);
     ~Archive_widget();
 
 private slots:
@@ -99,6 +100,8 @@ private:
     FW_DEF::OPTIONS *g_pOptions;
     QList<XArchive::RECORD> g_listRecords;
     QSortFilterProxyModel *g_pFilterTable;
+    XShortcuts *g_pShortcuts;
+    XShortcuts g_scEmpty;
 };
 
 #endif // ARCHIVE_WIDGET_H

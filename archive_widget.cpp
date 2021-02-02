@@ -35,6 +35,9 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui->groupBoxFilter->setEnabled(false);
 
     ui->comboBoxType->setCurrentIndex(0);
+
+    setShortcuts(&g_scEmpty);
+    // mb TODO registerShortcuts
 }
 
 void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions, QWidget *pParent)
@@ -83,8 +86,11 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions, QWidg
     ui->tableViewArchive->setColumnWidth(0,20);
 
     ui->treeViewArchive->expand(pNewTreeModel->index(0,0));
+}
 
-    // mb TODO registerShortcuts
+void Archive_widget::setShortcuts(XShortcuts *pShortcuts)
+{
+    g_pShortcuts=pShortcuts;
 }
 
 Archive_widget::~Archive_widget()
@@ -132,40 +138,48 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         if(isOpenAvailable(sRecordFileName,bIsRoot))
         {
+            actionOpen.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_OPEN));
             connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
             contextMenu.addAction(&actionOpen);
         }
 
         QAction actionScan(tr("Scan"),this);
+        actionScan.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_SCAN));
         connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
         contextMenu.addAction(&actionScan);
 
         QAction actionHex(tr("Hex"),this);
+        actionHex.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_HEX));
         connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
         contextMenu.addAction(&actionHex);
 
         QAction actionStrings(tr("Strings"),this);
+        actionStrings.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_STRINGS));
         connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
         contextMenu.addAction(&actionStrings);
 
         QAction actionEntropy(tr("Entropy"),this);
+        actionEntropy.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_ENTROPY));
         connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
         contextMenu.addAction(&actionEntropy);
 
         QAction actionHash(tr("Hash"),this);
+        actionHash.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_HASH));
         connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
         contextMenu.addAction(&actionHash);
 
         QMenu menuCopy(tr("Copy"),this);
-        QAction actionCopyFileName(tr("File name"),this);
-        connect(&actionCopyFileName, SIGNAL(triggered()), this, SLOT(copyFileName()));
-        menuCopy.addAction(&actionCopyFileName);
+        QAction actionCopyFilename(tr("Filename"),this);
+        actionCopyFilename.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_COPYFILENAME));
+        connect(&actionCopyFilename, SIGNAL(triggered()), this, SLOT(copyFileName()));
+        menuCopy.addAction(&actionCopyFilename);
         contextMenu.addMenu(&menuCopy);
 
-        QAction actionDump(tr("Dump"),this);
+        QAction actionDump(tr("Dump to file"),this);
 
         if(!bIsRoot)
         {
+            actionDump.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_DUMPTOFILE));
             connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
             contextMenu.addAction(&actionDump);
         }
@@ -415,24 +429,28 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     else if(action==ACTION_HEX)
     {
         DialogHexView dialogHexView(this,pDevice);
+        dialogHexView.setShortcuts(g_pShortcuts);
 
         dialogHexView.exec();
     }
     else if(action==ACTION_STRINGS)
     {
         DialogSearchStrings dialogSearchStrings(this,pDevice,nullptr,true);
+        dialogSearchStrings.setShortcuts(g_pShortcuts);
 
         dialogSearchStrings.exec();
     }
     else if(action==ACTION_ENTROPY)
     {
         DialogEntropy dialogEntropy(this,pDevice);
+        dialogEntropy.setShortcuts(g_pShortcuts);
 
         dialogEntropy.exec();
     }
     else if(action==ACTION_HASH)
     {
         DialogHash dialogHash(this,pDevice);
+        dialogHash.setShortcuts(g_pShortcuts);
 
         dialogHash.exec();
     }
