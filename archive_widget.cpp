@@ -435,7 +435,12 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     }
     else if(action==ACTION_STRINGS)
     {
-        DialogSearchStrings dialogSearchStrings(this,pDevice,nullptr,true);
+        MultiSearch::OPTIONS stringsOptions={};
+        stringsOptions.bMenu_Hex=true;
+        stringsOptions.bAnsi=true;
+        stringsOptions.bUnicode=true;
+
+        DialogSearchStrings dialogSearchStrings(this,pDevice,stringsOptions,true);
         dialogSearchStrings.setShortcuts(g_pShortcuts);
 
         dialogSearchStrings.exec();
@@ -510,7 +515,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 DialogPE dialogPE(this);
 
-                dialogPE.setData(&file,&options);
+                dialogPE.setData(&file,options);
 
                 dialogPE.exec();
             }
@@ -520,7 +525,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 DialogLE dialogLE(this);
 
-                dialogLE.setData(&file,&options);
+                dialogLE.setData(&file,options);
 
                 dialogLE.exec();
             }
@@ -530,7 +535,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 DialogNE dialogNE(this);
 
-                dialogNE.setData(&file,&options);
+                dialogNE.setData(&file,options);
 
                 dialogNE.exec();
             }
@@ -540,7 +545,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 DialogMSDOS dialogMSDOS(this);
 
-                dialogMSDOS.setData(&file,&options);
+                dialogMSDOS.setData(&file,options);
 
                 dialogMSDOS.exec();
             }
@@ -550,7 +555,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 DialogELF dialogELF(this);
 
-                dialogELF.setData(&file,&options);
+                dialogELF.setData(&file,options);
 
                 dialogELF.exec();
             }
@@ -560,7 +565,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 DialogMACH dialogMACH(this);
 
-                dialogMACH.setData(&file,&options);
+                dialogMACH.setData(&file,options);
 
                 dialogMACH.exec();
             }
@@ -570,7 +575,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
                 DialogDEX dialogDEX(this);
 
-                dialogDEX.setData(&file,&options);
+                dialogDEX.setData(&file,options);
 
                 dialogDEX.exec();
             }
