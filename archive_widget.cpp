@@ -435,7 +435,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     }
     else if(action==ACTION_STRINGS)
     {
-        MultiSearch::OPTIONS stringsOptions={};
+        SearchStringsWidget::OPTIONS stringsOptions={};
         stringsOptions.bMenu_Hex=true;
         stringsOptions.bAnsi=true;
         stringsOptions.bUnicode=true;
