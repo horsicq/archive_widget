@@ -40,10 +40,10 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     // mb TODO registerShortcuts
 }
 
-void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS *pOptions, QWidget *pParent)
+void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget *pParent)
 {
     this->g_sFileName=sFileName;
-    this->g_pOptions=pOptions;
+    this->g_options=options;
 
     ui->tableViewArchive->setSortingEnabled(false);
 
@@ -506,7 +506,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
         if(file.open(QIODevice::ReadOnly))
         {
-            FW_DEF::OPTIONS options=*g_pOptions; // TODO options from setData
+            FW_DEF::OPTIONS options=g_options; // TODO options from setData
             options.sTitle=sTitle;
 
             if(stFileTypes.contains(XBinary::FT_PE))

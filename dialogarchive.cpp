@@ -35,21 +35,21 @@ DialogArchive::~DialogArchive()
     delete ui;
 }
 
-void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS *pOptions)
+void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS options)
 {
-    if(pOptions->sTitle!="")
+    if(options.sTitle!="")
     {
-        setWindowTitle(pOptions->sTitle);
+        setWindowTitle(options.sTitle);
     }
 
-    ui->widget->setData(sFileName,pOptions);
+    ui->widget->setData(sFileName,options);
 }
 
-void DialogArchive::setData(QIODevice *pDevice, FW_DEF::OPTIONS *pOptions)
+void DialogArchive::setData(QIODevice *pDevice, FW_DEF::OPTIONS options)
 {
-    if(pOptions->sTitle!="")
+    if(options.sTitle!="")
     {
-        setWindowTitle(pOptions->sTitle);
+        setWindowTitle(options.sTitle);
     }
 
     // TODO setData device
