@@ -49,7 +49,7 @@ namespace Ui {
 class Archive_widget;
 }
 
-class Archive_widget : public QWidget
+class Archive_widget : public XShortcutsWidget
 {
     Q_OBJECT
 
@@ -94,14 +94,15 @@ private slots:
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
     void on_tableViewArchive_doubleClicked(const QModelIndex &index);
 
+protected:
+    virtual void registerShortcuts(bool bState);
+
 private:
     Ui::Archive_widget *ui;
     QString g_sFileName;
     FW_DEF::OPTIONS g_options;
     QList<XArchive::RECORD> g_listRecords;
     QSortFilterProxyModel *g_pFilterTable;
-    XShortcuts *g_pShortcuts;
-    XShortcuts g_scEmpty;
 };
 
 #endif // ARCHIVE_WIDGET_H

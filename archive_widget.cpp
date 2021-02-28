@@ -22,7 +22,7 @@
 #include "ui_archive_widget.h"
 
 Archive_widget::Archive_widget(QWidget *pParent) :
-    QWidget(pParent),
+    XShortcutsWidget(pParent),
     ui(new Ui::Archive_widget)
 {
     ui->setupUi(this);
@@ -35,9 +35,6 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui->groupBoxFilter->setEnabled(false);
 
     ui->comboBoxType->setCurrentIndex(0);
-
-    setShortcuts(&g_scEmpty);
-    // mb TODO registerShortcuts
 }
 
 void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget *pParent)
@@ -90,7 +87,7 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget
 
 void Archive_widget::setShortcuts(XShortcuts *pShortcuts)
 {
-    g_pShortcuts=pShortcuts;
+    XShortcutsWidget::setShortcuts(pShortcuts);
 }
 
 Archive_widget::~Archive_widget()
@@ -138,39 +135,39 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         if(isOpenAvailable(sRecordFileName,bIsRoot))
         {
-            actionOpen.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_OPEN));
+            actionOpen.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_OPEN));
             connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
             contextMenu.addAction(&actionOpen);
         }
 
         QAction actionScan(tr("Scan"),this);
-        actionScan.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_SCAN));
+        actionScan.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_SCAN));
         connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
         contextMenu.addAction(&actionScan);
 
         QAction actionHex(tr("Hex"),this);
-        actionHex.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_HEX));
+        actionHex.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_HEX));
         connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
         contextMenu.addAction(&actionHex);
 
         QAction actionStrings(tr("Strings"),this);
-        actionStrings.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_STRINGS));
+        actionStrings.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_STRINGS));
         connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
         contextMenu.addAction(&actionStrings);
 
         QAction actionEntropy(tr("Entropy"),this);
-        actionEntropy.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_ENTROPY));
+        actionEntropy.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_ENTROPY));
         connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
         contextMenu.addAction(&actionEntropy);
 
         QAction actionHash(tr("Hash"),this);
-        actionHash.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_HASH));
+        actionHash.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_HASH));
         connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
         contextMenu.addAction(&actionHash);
 
         QMenu menuCopy(tr("Copy"),this);
         QAction actionCopyFilename(tr("Filename"),this);
-        actionCopyFilename.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_COPYFILENAME));
+        actionCopyFilename.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_COPYFILENAME));
         connect(&actionCopyFilename, SIGNAL(triggered()), this, SLOT(copyFileName()));
         menuCopy.addAction(&actionCopyFilename);
         contextMenu.addMenu(&menuCopy);
@@ -179,7 +176,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         if(!bIsRoot)
         {
-            actionDump.setShortcut(g_pShortcuts->getShortcut(XShortcuts::ID_ARCHIVE_DUMPTOFILE));
+            actionDump.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_DUMPTOFILE));
             connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
             contextMenu.addAction(&actionDump);
         }
@@ -432,7 +429,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         options.sSignaturesPath=g_options.sSearchSignaturesPath;
 
         DialogHexView dialogHexView(this,pDevice,options);
-        dialogHexView.setShortcuts(g_pShortcuts);
+        dialogHexView.setShortcuts(getShortcuts());
 
         dialogHexView.exec();
     }
@@ -444,21 +441,21 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         stringsOptions.bUnicode=true;
 
         DialogSearchStrings dialogSearchStrings(this,pDevice,stringsOptions,true);
-        dialogSearchStrings.setShortcuts(g_pShortcuts);
+        dialogSearchStrings.setShortcuts(getShortcuts());
 
         dialogSearchStrings.exec();
     }
     else if(action==ACTION_ENTROPY)
     {
         DialogEntropy dialogEntropy(this,pDevice);
-        dialogEntropy.setShortcuts(g_pShortcuts);
+        dialogEntropy.setShortcuts(getShortcuts());
 
         dialogEntropy.exec();
     }
     else if(action==ACTION_HASH)
     {
         DialogHash dialogHash(this,pDevice);
-        dialogHash.setShortcuts(g_pShortcuts);
+        dialogHash.setShortcuts(getShortcuts());
 
         dialogHash.exec();
     }
@@ -648,4 +645,9 @@ void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
             handleAction(ACTION_HEX);
         }
     }
+}
+
+void Archive_widget::registerShortcuts(bool bState)
+{
+    Q_UNUSED(bState)
 }
