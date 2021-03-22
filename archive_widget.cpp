@@ -437,6 +437,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     {
         SearchStringsWidget::OPTIONS stringsOptions={};
         stringsOptions.bMenu_Hex=true;
+        stringsOptions.bMenu_Demangle=true;
         stringsOptions.bAnsi=true;
         stringsOptions.bUnicode=true;
 
