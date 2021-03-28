@@ -33,7 +33,7 @@ class DialogArchive : public QDialog
     Q_OBJECT
 
 public:
-    explicit DialogArchive(QWidget *parent = nullptr);
+    explicit DialogArchive(QWidget *pParent=nullptr);
     ~DialogArchive();
     void setData(QString sFileName,FW_DEF::OPTIONS options);
     void setData(QIODevice *pDevice,FW_DEF::OPTIONS options);
