@@ -39,6 +39,9 @@ public:
     void setData(QIODevice *pDevice,FW_DEF::OPTIONS options);
     void setShortcuts(XShortcuts *pShortcuts);
 
+private slots:
+    void on_pushButtonClose_clicked();
+
 private:
     Ui::DialogArchive *ui;
 };

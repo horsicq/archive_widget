@@ -68,6 +68,7 @@ class Archive_widget : public XShortcutsWidget
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
     void setData(QString sFileName,FW_DEF::OPTIONS options,QWidget *pParent=nullptr); // TODO options for Viewers
+    void setAvailableFileTypes(QSet<XBinary::FT> stAvailableFileTypes);
     void setShortcuts(XShortcuts *pShortcuts);
     ~Archive_widget();
 

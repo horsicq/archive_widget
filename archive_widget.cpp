@@ -85,6 +85,11 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget
     ui->treeViewArchive->expand(pNewTreeModel->index(0,0));
 }
 
+void Archive_widget::setAvailableFileTypes(QSet<XBinary::FT> stAvailableFileTypes)
+{
+    g_stAvailableFileTypes=stAvailableFileTypes;
+}
+
 void Archive_widget::setShortcuts(XShortcuts *pShortcuts)
 {
     XShortcutsWidget::setShortcuts(pShortcuts);

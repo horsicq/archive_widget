@@ -59,3 +59,8 @@ void DialogArchive::setShortcuts(XShortcuts *pShortcuts)
 {
     ui->widget->setShortcuts(pShortcuts);
 }
+
+void DialogArchive::on_pushButtonClose_clicked()
+{
+    this->close();
+}
