@@ -72,13 +72,15 @@ public:
     void setShortcuts(XShortcuts *pShortcuts);
     ~Archive_widget();
 
+public slots:
+    void openRecord();
+
 private slots:
     void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
     void on_tableViewArchive_customContextMenuRequested(const QPoint &pos);
     void showContext(QString sRecordFileName,bool bIsRoot,QPoint point);
     bool isOpenAvailable(QString sRecordFileName,bool bIsRoot);
 
-    void openRecord();
     void scanRecord();
     void hexRecord();
     void stringsRecord();
@@ -95,8 +97,13 @@ private slots:
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
     void on_tableViewArchive_doubleClicked(const QModelIndex &index);
 
+    void onTreeViewArchive_selected(const QModelIndex &selected,const QModelIndex &prev);
+
 protected:
     virtual void registerShortcuts(bool bState);
+
+signals:
+    void openAvailable(bool bState);
 
 private:
     Ui::Archive_widget *ui;

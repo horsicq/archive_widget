@@ -41,6 +41,7 @@ public:
 
 private slots:
     void on_pushButtonClose_clicked();
+    void on_pushButtonOpen_clicked();
 
 private:
     Ui::DialogArchive *ui;

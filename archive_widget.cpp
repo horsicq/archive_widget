@@ -35,6 +35,8 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui->groupBoxFilter->setEnabled(false);
 
     ui->comboBoxType->setCurrentIndex(0);
+
+    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onTreeViewArchive_selected(const QItemSelection&,const QItemSelection&)));
 }
 
 void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget *pParent)
@@ -667,4 +669,9 @@ void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
 void Archive_widget::registerShortcuts(bool bState)
 {
     Q_UNUSED(bState)
+}
+
+void Archive_widget::onTreeViewArchive_selected(const QModelIndex &selected, const QModelIndex &prev)
+{
+    qDebug("void Archive_widget::on_treeViewArchive_entered(const QModelIndex &index)");
 }

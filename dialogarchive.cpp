@@ -64,3 +64,8 @@ void DialogArchive::on_pushButtonClose_clicked()
 {
     this->close();
 }
+
+void DialogArchive::on_pushButtonOpen_clicked()
+{
+    // TODO
+}
