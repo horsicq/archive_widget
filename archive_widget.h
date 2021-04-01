@@ -97,7 +97,7 @@ private slots:
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
     void on_tableViewArchive_doubleClicked(const QModelIndex &index);
 
-    void onTreeViewArchive_selected(const QModelIndex &selected,const QModelIndex &prev);
+    void onElement_selected(const QItemSelection &selected,const QItemSelection &prev);
 
 protected:
     virtual void registerShortcuts(bool bState);

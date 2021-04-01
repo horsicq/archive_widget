@@ -35,8 +35,6 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     ui->groupBoxFilter->setEnabled(false);
 
     ui->comboBoxType->setCurrentIndex(0);
-
-    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onTreeViewArchive_selected(const QItemSelection&,const QItemSelection&)));
 }
 
 void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget *pParent)
@@ -85,6 +83,9 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget
     ui->tableViewArchive->setColumnWidth(0,20);
 
     ui->treeViewArchive->expand(pNewTreeModel->index(0,0));
+
+    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onElement_selected(const QItemSelection&,const QItemSelection&)));
+    connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onElement_selected(const QItemSelection&,const QItemSelection&)));
 }
 
 void Archive_widget::setAvailableFileTypes(QSet<XBinary::FT> stAvailableFileTypes)
@@ -671,7 +672,7 @@ void Archive_widget::registerShortcuts(bool bState)
     Q_UNUSED(bState)
 }
 
-void Archive_widget::onTreeViewArchive_selected(const QModelIndex &selected, const QModelIndex &prev)
+void Archive_widget::onElement_selected(const QItemSelection &selected, const QItemSelection &prev)
 {
     qDebug("void Archive_widget::on_treeViewArchive_entered(const QModelIndex &index)");
 }
