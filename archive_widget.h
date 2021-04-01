@@ -68,6 +68,7 @@ class Archive_widget : public XShortcutsWidget
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
     void setData(QString sFileName,FW_DEF::OPTIONS options,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
+    void setTrackSelection(bool bState);
     void setAvailableFileTypes(QSet<XBinary::FT> stAvailableFileTypes);
     void setShortcuts(XShortcuts *pShortcuts);
     ~Archive_widget();
@@ -112,6 +113,7 @@ private:
     QList<XArchive::RECORD> g_listRecords;
     QSortFilterProxyModel *g_pFilterTable;
     QSet<XBinary::FT> g_stAvailableFileTypes;
+    bool g_bTrackSelection;
 };
 
 #endif // ARCHIVE_WIDGET_H
