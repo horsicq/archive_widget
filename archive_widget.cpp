@@ -189,6 +189,29 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
 {
     bool bResult=false;
 
+    QSet<XBinary::FT> stAvailableFileTypes;
+
+    if(g_stAvailableFileTypes.count())
+    {
+        stAvailableFileTypes=g_stAvailableFileTypes;
+    }
+    else
+    {
+        stAvailableFileTypes.insert(XBinary::FT_MSDOS);
+        stAvailableFileTypes.insert(XBinary::FT_NE);
+        stAvailableFileTypes.insert(XBinary::FT_LE);
+        stAvailableFileTypes.insert(XBinary::FT_PE);
+        stAvailableFileTypes.insert(XBinary::FT_ELF);
+        stAvailableFileTypes.insert(XBinary::FT_DEX);
+        stAvailableFileTypes.insert(XBinary::FT_MACHO);
+        stAvailableFileTypes.insert(XBinary::FT_PNG);
+        stAvailableFileTypes.insert(XBinary::FT_JPEG);
+        stAvailableFileTypes.insert(XBinary::FT_GIF);
+        stAvailableFileTypes.insert(XBinary::FT_TIFF);
+        stAvailableFileTypes.insert(XBinary::FT_TEXT);
+        stAvailableFileTypes.insert(XBinary::FT_ANDROIDXML);
+    }
+
     QSet<XBinary::FT> stFileTypes;
 
     if(bIsRoot)
@@ -203,19 +226,7 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
         stFileTypes=XBinary::getFileTypes(&baData,true);
     }
 
-    if( stFileTypes.contains(XBinary::FT_MSDOS)||
-        stFileTypes.contains(XBinary::FT_NE)||
-        stFileTypes.contains(XBinary::FT_LE)||
-        stFileTypes.contains(XBinary::FT_PE)||
-        stFileTypes.contains(XBinary::FT_ELF)||
-        stFileTypes.contains(XBinary::FT_DEX)||
-        stFileTypes.contains(XBinary::FT_MACHO)||
-        stFileTypes.contains(XBinary::FT_PNG)||
-        stFileTypes.contains(XBinary::FT_JPEG)||
-        stFileTypes.contains(XBinary::FT_GIF)||
-        stFileTypes.contains(XBinary::FT_TIFF)||
-        stFileTypes.contains(XBinary::FT_TEXT)||
-        stFileTypes.contains(XBinary::FT_ANDROIDXML))
+    if(XBinary::isFileTypePresent(&stFileTypes,&stAvailableFileTypes))
     {
         bResult=true;
     }

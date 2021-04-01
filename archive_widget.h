@@ -103,6 +103,7 @@ private:
     FW_DEF::OPTIONS g_options;
     QList<XArchive::RECORD> g_listRecords;
     QSortFilterProxyModel *g_pFilterTable;
+    QSet<XBinary::FT> g_stAvailableFileTypes;
 };
 
 #endif // ARCHIVE_WIDGET_H
