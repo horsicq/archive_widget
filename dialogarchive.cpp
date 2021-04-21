@@ -28,6 +28,8 @@ DialogArchive::DialogArchive(QWidget *pParent) :
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
+
+    ui->widget->setTrackSelection(true);
 }
 
 DialogArchive::~DialogArchive()
@@ -35,24 +37,19 @@ DialogArchive::~DialogArchive()
     delete ui;
 }
 
-void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS options)
+void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
 {
     if(options.sTitle!="")
     {
         setWindowTitle(options.sTitle);
     }
 
-    ui->widget->setData(sFileName,options);
+    ui->widget->setData(sFileName,options,stAvailableFileTypes);
 }
 
-void DialogArchive::setData(QIODevice *pDevice, FW_DEF::OPTIONS options)
+void DialogArchive::setData(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
 {
-    if(options.sTitle!="")
-    {
-        setWindowTitle(options.sTitle);
-    }
-
-    // TODO setData device
+    setData(XBinary::getDeviceFileName(pDevice),options,stAvailableFileTypes);
 }
 
 void DialogArchive::setShortcuts(XShortcuts *pShortcuts)
@@ -62,10 +59,10 @@ void DialogArchive::setShortcuts(XShortcuts *pShortcuts)
 
 void DialogArchive::on_pushButtonClose_clicked()
 {
-    this->close();
+    reject();
 }
 
 void DialogArchive::on_pushButtonOpen_clicked()
 {
-    // TODO
+    accept();
 }

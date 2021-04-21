@@ -67,10 +67,9 @@ class Archive_widget : public XShortcutsWidget
 
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
-    void setData(QString sFileName,FW_DEF::OPTIONS options,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
-    void setTrackSelection(bool bState);
-    void setAvailableFileTypes(QSet<XBinary::FT> stAvailableFileTypes);
+    void setData(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
     void setShortcuts(XShortcuts *pShortcuts);
+    void setTrackSelection(bool bState);
     ~Archive_widget();
 
 public slots:
@@ -98,7 +97,7 @@ private slots:
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
     void on_tableViewArchive_doubleClicked(const QModelIndex &index);
 
-    void onElement_selected(const QItemSelection &selected,const QItemSelection &prev);
+    void onElement_selected(const QItemSelection &selected,const QItemSelection &prev); // TrackSelection
 
 protected:
     virtual void registerShortcuts(bool bState);

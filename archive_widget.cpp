@@ -39,10 +39,29 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     g_bTrackSelection=false;
 }
 
-void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget *pParent)
+void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes, QWidget *pParent)
 {
-    this->g_sFileName=sFileName;
-    this->g_options=options;
+    g_stAvailableFileTypes=stAvailableFileTypes;
+
+    if(!g_stAvailableFileTypes.count())
+    {
+        g_stAvailableFileTypes.insert(XBinary::FT_MSDOS);
+        g_stAvailableFileTypes.insert(XBinary::FT_NE);
+        g_stAvailableFileTypes.insert(XBinary::FT_LE);
+        g_stAvailableFileTypes.insert(XBinary::FT_PE);
+        g_stAvailableFileTypes.insert(XBinary::FT_ELF);
+        g_stAvailableFileTypes.insert(XBinary::FT_DEX);
+        g_stAvailableFileTypes.insert(XBinary::FT_MACHO);
+        g_stAvailableFileTypes.insert(XBinary::FT_PNG);
+        g_stAvailableFileTypes.insert(XBinary::FT_JPEG);
+        g_stAvailableFileTypes.insert(XBinary::FT_GIF);
+        g_stAvailableFileTypes.insert(XBinary::FT_TIFF);
+        g_stAvailableFileTypes.insert(XBinary::FT_TEXT);
+        g_stAvailableFileTypes.insert(XBinary::FT_ANDROIDXML);
+    }
+
+    g_sFileName=sFileName;
+    g_options=options;
 
     ui->tableViewArchive->setSortingEnabled(false);
 
@@ -95,12 +114,7 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QWidget
 
 void Archive_widget::setTrackSelection(bool bState)
 {
-    g_bTrackSelection=false;
-}
-
-void Archive_widget::setAvailableFileTypes(QSet<XBinary::FT> stAvailableFileTypes)
-{
-    g_stAvailableFileTypes=stAvailableFileTypes;
+    g_bTrackSelection=bState;
 }
 
 void Archive_widget::setShortcuts(XShortcuts *pShortcuts)
@@ -207,29 +221,6 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
 {
     bool bResult=false;
 
-    QSet<XBinary::FT> stAvailableFileTypes;
-
-    if(g_stAvailableFileTypes.count())
-    {
-        stAvailableFileTypes=g_stAvailableFileTypes;
-    }
-    else
-    {
-        stAvailableFileTypes.insert(XBinary::FT_MSDOS);
-        stAvailableFileTypes.insert(XBinary::FT_NE);
-        stAvailableFileTypes.insert(XBinary::FT_LE);
-        stAvailableFileTypes.insert(XBinary::FT_PE);
-        stAvailableFileTypes.insert(XBinary::FT_ELF);
-        stAvailableFileTypes.insert(XBinary::FT_DEX);
-        stAvailableFileTypes.insert(XBinary::FT_MACHO);
-        stAvailableFileTypes.insert(XBinary::FT_PNG);
-        stAvailableFileTypes.insert(XBinary::FT_JPEG);
-        stAvailableFileTypes.insert(XBinary::FT_GIF);
-        stAvailableFileTypes.insert(XBinary::FT_TIFF);
-        stAvailableFileTypes.insert(XBinary::FT_TEXT);
-        stAvailableFileTypes.insert(XBinary::FT_ANDROIDXML);
-    }
-
     QSet<XBinary::FT> stFileTypes;
 
     if(bIsRoot)
@@ -244,7 +235,7 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
         stFileTypes=XBinary::getFileTypes(&baData,true);
     }
 
-    if(XBinary::isFileTypePresent(&stFileTypes,&stAvailableFileTypes))
+    if(XBinary::isFileTypePresent(&stFileTypes,&g_stAvailableFileTypes))
     {
         bResult=true;
     }
@@ -484,7 +475,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     }
     else if(action==ACTION_HASH)
     {
-        DialogHash dialogHash(this,pDevice);
+        DialogHash dialogHash(this,pDevice,XBinary::FT_UNKNOWN);
         dialogHash.setShortcuts(getShortcuts());
 
         dialogHash.exec();

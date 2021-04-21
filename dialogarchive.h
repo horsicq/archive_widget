@@ -35,8 +35,8 @@ class DialogArchive : public QDialog
 public:
     explicit DialogArchive(QWidget *pParent=nullptr);
     ~DialogArchive();
-    void setData(QString sFileName,FW_DEF::OPTIONS options);
-    void setData(QIODevice *pDevice,FW_DEF::OPTIONS options);
+    void setData(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
+    void setData(QIODevice *pDevice,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
     void setShortcuts(XShortcuts *pShortcuts);
 
 private slots:

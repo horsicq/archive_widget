@@ -22,20 +22,20 @@
 
 CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent)
 {
-    bIsStop=false;
+    g_bIsStop=false;
 }
 
 void CreateViewModelProcess::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel)
 {
-    this->sFileName=sFileName;
-    this->pListArchiveRecords=pListArchiveRecords;
-    this->ppTreeModel=ppTreeModel;
-    this->ppTableModel=ppTableModel;
+    this->g_sFileName=sFileName;
+    this->g_pListArchiveRecords=pListArchiveRecords;
+    this->g_ppTreeModel=ppTreeModel;
+    this->g_ppTableModel=ppTableModel;
 }
 
 void CreateViewModelProcess::stop()
 {
-     bIsStop=true;
+     g_bIsStop=true;
 }
 
 void CreateViewModelProcess::process()
@@ -43,39 +43,39 @@ void CreateViewModelProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    *pListArchiveRecords=XArchives::getRecords(sFileName);
+    *g_pListArchiveRecords=XArchives::getRecords(g_sFileName);
 
-    qint64 nFileSize=XBinary::getSize(sFileName);
+    qint64 nFileSize=XBinary::getSize(g_sFileName);
 
-    int nNumberOfRecords=pListArchiveRecords->count();
+    int nNumberOfRecords=g_pListArchiveRecords->count();
 
-    *ppTreeModel=new QStandardItemModel;
-    (*ppTreeModel)->setColumnCount(2);
+    *g_ppTreeModel=new QStandardItemModel;
+    (*g_ppTreeModel)->setColumnCount(2);
 
-    *ppTableModel=new QStandardItemModel;
-    (*ppTableModel)->setColumnCount(3);
+    *g_ppTableModel=new QStandardItemModel;
+    (*g_ppTableModel)->setColumnCount(3);
 
-    QString sBaseName=QFileInfo(sFileName).fileName();
+    QString sBaseName=QFileInfo(g_sFileName).fileName();
 
     QStandardItem *pRootItemName=new QStandardItem;
     pRootItemName->setText(sBaseName);
-    pRootItemName->setData(sFileName,Qt::UserRole+UR_PATH);
+    pRootItemName->setData(g_sFileName,Qt::UserRole+UR_PATH);
     pRootItemName->setData(nFileSize,Qt::UserRole+UR_SIZE);
     pRootItemName->setData(true,Qt::UserRole+UR_ISROOT);
 
-    (*ppTreeModel)->setItem(0,0,pRootItemName);
+    (*g_ppTreeModel)->setItem(0,0,pRootItemName);
 
     QStandardItem *pRootItemSize=new QStandardItem;
     pRootItemSize->setText(QString::number(nFileSize));
     pRootItemSize->setTextAlignment(Qt::AlignRight);
 
-    (*ppTreeModel)->setItem(0,1,pRootItemSize);
+    (*g_ppTreeModel)->setItem(0,1,pRootItemSize);
 
     QMap<QString,QStandardItem *> mapItems;
 
     for(int i=0;i<nNumberOfRecords;i++)
     {
-        XArchive::RECORD record=pListArchiveRecords->at(i);
+        XArchive::RECORD record=g_pListArchiveRecords->at(i);
 
         QString sRecordFileName=record.sFileName;
 
@@ -159,17 +159,17 @@ void CreateViewModelProcess::process()
         pItemSize->setTextAlignment(Qt::AlignRight);
         listItems.append(pItemSize);
 
-        (*ppTableModel)->appendRow(listItems);
+        (*g_ppTableModel)->appendRow(listItems);
     }
 
-    (*ppTreeModel)->setHeaderData(0,Qt::Horizontal,tr("File"));
-    (*ppTreeModel)->setHeaderData(1,Qt::Horizontal,tr("Size"));
+    (*g_ppTreeModel)->setHeaderData(0,Qt::Horizontal,tr("File"));
+    (*g_ppTreeModel)->setHeaderData(1,Qt::Horizontal,tr("Size"));
 
-    (*ppTableModel)->setHeaderData(0,Qt::Horizontal,"");
-    (*ppTableModel)->setHeaderData(1,Qt::Horizontal,tr("File"));
-    (*ppTableModel)->setHeaderData(2,Qt::Horizontal,tr("Size"));
+    (*g_ppTableModel)->setHeaderData(0,Qt::Horizontal,"");
+    (*g_ppTableModel)->setHeaderData(1,Qt::Horizontal,tr("File"));
+    (*g_ppTableModel)->setHeaderData(2,Qt::Horizontal,tr("Size"));
 
-    bIsStop=false;
+    g_bIsStop=false;
 
     emit completed(scanTimer.elapsed());
 }
