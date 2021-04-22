@@ -38,6 +38,7 @@ public:
     void setData(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
     void setData(QIODevice *pDevice,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
     void setShortcuts(XShortcuts *pShortcuts);
+    QString getCurrentRecordFileName();
 
 private slots:
     void on_pushButtonClose_clicked();
@@ -45,6 +46,8 @@ private slots:
 
 private:
     Ui::DialogArchive *ui;
+    QString g_sCurrentRecordFileName;
+    FW_DEF::OPTIONS g_options;
 };
 
 #endif // DIALOGARCHIVE_H

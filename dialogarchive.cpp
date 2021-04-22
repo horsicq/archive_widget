@@ -28,8 +28,6 @@ DialogArchive::DialogArchive(QWidget *pParent) :
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
-
-    ui->widget->setTrackSelection(true);
 }
 
 DialogArchive::~DialogArchive()
@@ -44,6 +42,7 @@ void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XBi
         setWindowTitle(options.sTitle);
     }
 
+    g_options=options;
     ui->widget->setData(sFileName,options,stAvailableFileTypes);
 }
 
@@ -57,6 +56,11 @@ void DialogArchive::setShortcuts(XShortcuts *pShortcuts)
     ui->widget->setShortcuts(pShortcuts);
 }
 
+QString DialogArchive::getCurrentRecordFileName()
+{
+    return g_sCurrentRecordFileName;
+}
+
 void DialogArchive::on_pushButtonClose_clicked()
 {
     reject();
@@ -64,5 +68,14 @@ void DialogArchive::on_pushButtonClose_clicked()
 
 void DialogArchive::on_pushButtonOpen_clicked()
 {
-    accept();
+    g_sCurrentRecordFileName=ui->widget->getCurrentRecordFileName();
+
+    if(!g_options.bNoWindowOpen)
+    {
+        ui->widget->openRecord();
+    }
+    else
+    {
+        accept();
+    }
 }

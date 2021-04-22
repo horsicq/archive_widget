@@ -67,9 +67,9 @@ class Archive_widget : public XShortcutsWidget
 
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
-    void setData(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
+    void setData(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
     void setShortcuts(XShortcuts *pShortcuts);
-    void setTrackSelection(bool bState);
+    QString getCurrentRecordFileName();
     ~Archive_widget();
 
 public slots:
@@ -97,7 +97,8 @@ private slots:
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
     void on_tableViewArchive_doubleClicked(const QModelIndex &index);
 
-    void onElement_selected(const QItemSelection &selected,const QItemSelection &prev); // TrackSelection
+    void onTreeElement_selected(const QItemSelection &selected,const QItemSelection &prev); // TrackSelection
+    void onTableElement_selected(const QItemSelection &selected,const QItemSelection &prev); // TrackSelection
 
 protected:
     virtual void registerShortcuts(bool bState);
@@ -111,8 +112,10 @@ private:
     FW_DEF::OPTIONS g_options;
     QList<XArchive::RECORD> g_listRecords;
     QSortFilterProxyModel *g_pFilterTable;
-    QSet<XBinary::FT> g_stAvailableFileTypes;
-    bool g_bTrackSelection;
+    QSet<XBinary::FT> g_stAvailableOpenFileTypes;
+    qint64 g_nCurrentFileSize;
+    bool g_bCurrentFileIsRoot;
+    QString g_sCurrentRecordFileName;
 };
 
 #endif // ARCHIVE_WIDGET_H

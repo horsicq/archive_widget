@@ -37,7 +37,7 @@ public:
     };
 
     explicit CreateViewModelProcess(QObject *pParent=nullptr);
-    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel);
+    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes);
 
 signals:
     void errorMessage(QString sText);
@@ -52,6 +52,7 @@ private:
     QList<XArchive::RECORD> *g_pListArchiveRecords;
     QStandardItemModel **g_ppTreeModel;
     QStandardItemModel **g_ppTableModel;
+    QSet<XBinary::FT> g_stFilterFileTypes;
     bool g_bIsStop;
 };
 

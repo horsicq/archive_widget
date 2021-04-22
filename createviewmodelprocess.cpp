@@ -25,12 +25,13 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
     g_bIsStop=false;
 }
 
-void CreateViewModelProcess::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel)
+void CreateViewModelProcess::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes)
 {
     this->g_sFileName=sFileName;
     this->g_pListArchiveRecords=pListArchiveRecords;
     this->g_ppTreeModel=ppTreeModel;
     this->g_ppTableModel=ppTableModel;
+    this->g_stFilterFileTypes=stFilterFileTypes;
 }
 
 void CreateViewModelProcess::stop()
@@ -71,95 +72,112 @@ void CreateViewModelProcess::process()
 
     (*g_ppTreeModel)->setItem(0,1,pRootItemSize);
 
+    bool bFilter=g_stFilterFileTypes.count();
+
     QMap<QString,QStandardItem *> mapItems;
 
-    for(int i=0;i<nNumberOfRecords;i++)
+    for(int i=0,j=0;(i<nNumberOfRecords)&&(!g_bIsStop);i++)
     {
         XArchive::RECORD record=g_pListArchiveRecords->at(i);
-
         QString sRecordFileName=record.sFileName;
 
-        int nNumberOfParts=sRecordFileName.count("/");
+        bool bAdd=true;
 
-        for(int j=0;j<=nNumberOfParts;j++)
+        if(bFilter)
         {
-            QString sPart=sRecordFileName.section("/",j,j);
-            QString sRelPart;
+            QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
 
-            if(sPart!="")
+            QSet<XBinary::FT> stFT=XBinary::getFileTypes(&baData,true);
+
+            bAdd=XBinary::isFileTypePresent(&stFT,&g_stFilterFileTypes);
+        }
+
+        if(bAdd)
+        {
+            int nNumberOfParts=sRecordFileName.count("/");
+
+            for(int j=0;j<=nNumberOfParts;j++)
             {
-                if(j!=nNumberOfParts)
-                {
-                    sRelPart=sRecordFileName.section("/",0,j);
-                }
-                else
-                {
-                    sRelPart=sRecordFileName;
-                }
+                QString sPart=sRecordFileName.section("/",j,j);
+                QString sRelPart;
 
-                if(!mapItems.contains(sRelPart))
+                if(sPart!="")
                 {
-                    QStandardItem *pItemName=new QStandardItem;
-                    pItemName->setText(sPart);
-
-                    if(j==(nNumberOfParts))
+                    if(j!=nNumberOfParts)
                     {
-                        pItemName->setData(sRecordFileName,Qt::UserRole+UR_PATH);
-                        pItemName->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
-                        pItemName->setData(false,Qt::UserRole+UR_ISROOT);
-                    }
-
-                    QStandardItem *pParent=0;
-
-                    if(j==0)
-                    {
-                        pParent=pRootItemName;
+                        sRelPart=sRecordFileName.section("/",0,j);
                     }
                     else
                     {
-                        pParent=mapItems.value(sRecordFileName.section("/",0,j-1));
+                        sRelPart=sRecordFileName;
                     }
 
-                    QList<QStandardItem *> listItems;
-
-                    listItems.append(pItemName);
-
-                    if(j==(nNumberOfParts))
+                    if(!mapItems.contains(sRelPart))
                     {
-                        QStandardItem *pItemSize=new QStandardItem;
-                        pItemSize->setData(record.nUncompressedSize,Qt::DisplayRole);
-                        pItemSize->setTextAlignment(Qt::AlignRight);
+                        QStandardItem *pItemName=new QStandardItem;
+                        pItemName->setText(sPart);
 
-                        listItems.append(pItemSize);
+                        if(j==(nNumberOfParts))
+                        {
+                            pItemName->setData(sRecordFileName,Qt::UserRole+UR_PATH);
+                            pItemName->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
+                            pItemName->setData(false,Qt::UserRole+UR_ISROOT);
+                        }
+
+                        QStandardItem *pParent=0;
+
+                        if(j==0)
+                        {
+                            pParent=pRootItemName;
+                        }
+                        else
+                        {
+                            pParent=mapItems.value(sRecordFileName.section("/",0,j-1));
+                        }
+
+                        QList<QStandardItem *> listItems;
+
+                        listItems.append(pItemName);
+
+                        if(j==(nNumberOfParts))
+                        {
+                            QStandardItem *pItemSize=new QStandardItem;
+                            pItemSize->setData(record.nUncompressedSize,Qt::DisplayRole);
+                            pItemSize->setTextAlignment(Qt::AlignRight);
+
+                            listItems.append(pItemSize);
+                        }
+
+                        pParent->appendRow(listItems);
+
+                        mapItems.insert(sRelPart,pItemName);
                     }
-
-                    pParent->appendRow(listItems);
-
-                    mapItems.insert(sRelPart,pItemName);
                 }
             }
+
+            QList<QStandardItem *> listItems;
+
+            QStandardItem *pItemNumber=new QStandardItem;
+            pItemNumber->setData(j,Qt::DisplayRole);
+            pItemNumber->setTextAlignment(Qt::AlignRight);
+            pItemNumber->setData(sRecordFileName,Qt::UserRole+UR_PATH);
+            pItemNumber->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
+            pItemNumber->setData(false,Qt::UserRole+UR_ISROOT);
+            listItems.append(pItemNumber);
+
+            QStandardItem *pItemName=new QStandardItem;
+            pItemName->setText(sRecordFileName);
+            listItems.append(pItemName);
+
+            QStandardItem *pItemSize=new QStandardItem;
+            pItemSize->setData(record.nUncompressedSize,Qt::DisplayRole);
+            pItemSize->setTextAlignment(Qt::AlignRight);
+            listItems.append(pItemSize);
+
+            (*g_ppTableModel)->appendRow(listItems);
+
+            j++;
         }
-
-        QList<QStandardItem *> listItems;
-
-        QStandardItem *pItemNumber=new QStandardItem;
-        pItemNumber->setData(i,Qt::DisplayRole);
-        pItemNumber->setTextAlignment(Qt::AlignRight);
-        pItemNumber->setData(sRecordFileName,Qt::UserRole+UR_PATH);
-        pItemNumber->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
-        pItemNumber->setData(false,Qt::UserRole+UR_ISROOT);
-        listItems.append(pItemNumber);
-
-        QStandardItem *pItemName=new QStandardItem;
-        pItemName->setText(sRecordFileName);
-        listItems.append(pItemName);
-
-        QStandardItem *pItemSize=new QStandardItem;
-        pItemSize->setData(record.nUncompressedSize,Qt::DisplayRole);
-        pItemSize->setTextAlignment(Qt::AlignRight);
-        listItems.append(pItemSize);
-
-        (*g_ppTableModel)->appendRow(listItems);
     }
 
     (*g_ppTreeModel)->setHeaderData(0,Qt::Horizontal,tr("File"));
