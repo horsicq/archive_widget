@@ -265,6 +265,7 @@ void Archive_widget::openRecord()
             handleAction(ACTION_HEX);
         }
     }
+    // TODO open for g_options.bNoWindowOpen
 }
 
 void Archive_widget::scanRecord()
