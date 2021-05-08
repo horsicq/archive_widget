@@ -21,12 +21,8 @@
 #ifndef ARCHIVE_WIDGET_H
 #define ARCHIVE_WIDGET_H
 
-#include <QWidget>
-#include <QMenu>
 #include "xarchives.h"
-#include <QStandardItemModel>
-#include <QMessageBox>
-#include <QFileDialog>
+#include "xandroidbinary.h"
 #include "dialogentropy.h"
 #include "dialoghash.h"
 #include "dialogsearchstrings.h"
@@ -43,7 +39,6 @@
 #include "dialogelf.h"
 #include "dialogmach.h"
 #include "dialogdex.h"
-#include "xandroidbinary.h"
 
 namespace Ui {
 class Archive_widget;
