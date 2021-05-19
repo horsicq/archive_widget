@@ -37,7 +37,7 @@ class DialogCreateViewModel : public QDialog
 public:
     explicit DialogCreateViewModel(QWidget *pParent=nullptr);
     ~DialogCreateViewModel();
-    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes);
+    void setData(CreateViewModelProcess::TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes);
 
 private slots:
     void on_pushButtonCancel_clicked();

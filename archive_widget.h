@@ -62,7 +62,9 @@ class Archive_widget : public XShortcutsWidget
 
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
-    void setData(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
+    void setFileName(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
+    void setDirectoryName(QString sDirectoryName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
+    void setData(CreateViewModelProcess::TYPE type,QString sName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
     void setShortcuts(XShortcuts *pShortcuts);
     QString getCurrentRecordFileName();
     ~Archive_widget();
@@ -103,7 +105,8 @@ signals:
 
 private:
     Ui::Archive_widget *ui;
-    QString g_sFileName;
+    CreateViewModelProcess::TYPE g_type;
+    QString g_sName;
     FW_DEF::OPTIONS g_options;
     QList<XArchive::RECORD> g_listRecords;
     QSortFilterProxyModel *g_pFilterTable;

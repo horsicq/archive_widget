@@ -36,8 +36,15 @@ public:
         UR_ISROOT
     };
 
+    enum TYPE
+    {
+        TYPE_UNKNOWN=0,
+        TYPE_ARCHIVE,
+        TYPE_DIRECTORY
+    };
+
     explicit CreateViewModelProcess(QObject *pParent=nullptr);
-    void setData(QString sFileName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes);
+    void setData(CreateViewModelProcess::TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes);
 
 signals:
     void errorMessage(QString sText);
@@ -48,7 +55,8 @@ public slots:
     void process();
 
 private:
-    QString g_sFileName;
+    TYPE g_type;
+    QString g_sName;
     QList<XArchive::RECORD> *g_pListArchiveRecords;
     QStandardItemModel **g_ppTreeModel;
     QStandardItemModel **g_ppTableModel;

@@ -38,10 +38,25 @@ Archive_widget::Archive_widget(QWidget *pParent) :
 
     g_nCurrentFileSize=0;
     g_bCurrentFileIsRoot=false;
+    g_type=CreateViewModelProcess::TYPE_UNKNOWN;
 }
 
-void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
 {
+    setData(CreateViewModelProcess::TYPE_ARCHIVE,sFileName,options,stAvailableOpenFileTypes,pParent);
+}
+
+void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+{
+    setData(CreateViewModelProcess::TYPE_DIRECTORY,sDirectoryName,options,stAvailableOpenFileTypes,pParent);
+}
+
+void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+{
+    g_type=type;
+    g_sName=sName;
+    g_options=options;
+
     g_stAvailableOpenFileTypes=stAvailableOpenFileTypes;
 
     if(!g_stAvailableOpenFileTypes.count())
@@ -61,9 +76,6 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XB
         g_stAvailableOpenFileTypes.insert(XBinary::FT_TEXT);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_ANDROIDXML);
     }
-
-    g_sFileName=sFileName;
-    g_options=options;
 
     ui->tableViewArchive->setSortingEnabled(false);
 
@@ -88,7 +100,7 @@ void Archive_widget::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XB
 
     DialogCreateViewModel dialogCreateViewModel(pParent);
 
-    dialogCreateViewModel.setData(sFileName,&g_listRecords,&pNewTreeModel,&pNewTableModel,stFilterFileTypes);
+    dialogCreateViewModel.setData(type,sName,&g_listRecords,&pNewTreeModel,&pNewTableModel,stFilterFileTypes);
 
     dialogCreateViewModel.exec();
 
@@ -232,7 +244,7 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
 
     QSet<XBinary::FT> stFileTypes;
 
-    if(bIsRoot)
+    if(bIsRoot||(g_type==CreateViewModelProcess::TYPE_DIRECTORY))
     {
         stFileTypes=XBinary::getFileTypes(sRecordFileName,true);
     }
@@ -240,7 +252,7 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
     {
         XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
 
-        QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
+        QByteArray baData=XArchives::decompress(g_sName,&record,true);
         stFileTypes=XBinary::getFileTypes(&baData,true);
     }
 
@@ -311,7 +323,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
     if(sRecordFileName!="")
     {
-        if(bIsRoot)
+        if(bIsRoot||(g_type==CreateViewModelProcess::TYPE_DIRECTORY))
         {
             if(action==ACTION_OPEN)
             {
@@ -349,7 +361,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     DialogUnpackFile dialogUnpackFile(this);
 
-                    dialogUnpackFile.setData(g_sFileName,&record,sTempFileName);
+                    dialogUnpackFile.setData(g_sName,&record,sTempFileName);
 
                     if(dialogUnpackFile.exec()==QDialog::Accepted)
                     {
@@ -363,7 +375,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
             }
             else if(action==ACTION_DUMP)
             {
-                QString sSaveFileName=QFileInfo(g_sFileName).absolutePath()+QDir::separator()+QFileInfo(record.sFileName).fileName();
+                QString sSaveFileName=QFileInfo(g_sName).absolutePath()+QDir::separator()+QFileInfo(record.sFileName).fileName();
 
                 sSaveFileName=QFileDialog::getSaveFileName(this,tr("Save file"),sSaveFileName,QFileInfo(record.sFileName).completeSuffix());
 
@@ -371,7 +383,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
                 {
                     DialogUnpackFile dialogUnpackFile(this);
 
-                    dialogUnpackFile.setData(g_sFileName,&record,sSaveFileName);
+                    dialogUnpackFile.setData(g_sName,&record,sSaveFileName);
 
                     if(dialogUnpackFile.exec()!=QDialog::Accepted)
                     {
@@ -383,7 +395,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
             {
                 if(nSize<=XArchive::getCompressBufferSize())
                 {
-                    QByteArray baData=XArchives::decompress(g_sFileName,&record);
+                    QByteArray baData=XArchives::decompress(g_sName,&record);
 
                     QBuffer buffer;
 
@@ -406,7 +418,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                         DialogUnpackFile dialogUnpackFile(this);
 
-                        dialogUnpackFile.setData(g_sFileName,&record,sTempFileName);
+                        dialogUnpackFile.setData(g_sName,&record,sTempFileName);
 
                         if(dialogUnpackFile.exec()==QDialog::Accepted)
                         {

@@ -22,12 +22,14 @@
 
 CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent)
 {
+    g_type=TYPE_UNKNOWN;
     g_bIsStop=false;
 }
 
-void CreateViewModelProcess::setData(QString sFileName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes)
+void CreateViewModelProcess::setData(TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes)
 {
-    this->g_sFileName=sFileName;
+    this->g_type=type;
+    this->g_sName=sName;
     this->g_pListArchiveRecords=pListArchiveRecords;
     this->g_ppTreeModel=ppTreeModel;
     this->g_ppTableModel=ppTableModel;
@@ -44,9 +46,16 @@ void CreateViewModelProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    *g_pListArchiveRecords=XArchives::getRecords(g_sFileName);
+    if(g_type==TYPE_ARCHIVE)
+    {
+        *g_pListArchiveRecords=XArchives::getRecords(g_sName);
+    }
+    else if(g_type==TYPE_DIRECTORY)
+    {
+        *g_pListArchiveRecords=XArchives::getRecordsFromDirectory(g_sName);
+    }
 
-    qint64 nFileSize=XBinary::getSize(g_sFileName);
+    qint64 nFileSize=XBinary::getSize(g_sName);
 
     int nNumberOfRecords=g_pListArchiveRecords->count();
 
@@ -56,11 +65,11 @@ void CreateViewModelProcess::process()
     *g_ppTableModel=new QStandardItemModel;
     (*g_ppTableModel)->setColumnCount(3);
 
-    QString sBaseName=QFileInfo(g_sFileName).fileName();
+    QString sBaseName=QFileInfo(g_sName).fileName();
 
     QStandardItem *pRootItemName=new QStandardItem;
     pRootItemName->setText(sBaseName);
-    pRootItemName->setData(g_sFileName,Qt::UserRole+UR_PATH);
+    pRootItemName->setData(g_sName,Qt::UserRole+UR_PATH);
     pRootItemName->setData(nFileSize,Qt::UserRole+UR_SIZE);
     pRootItemName->setData(true,Qt::UserRole+UR_ISROOT);
 
@@ -85,9 +94,18 @@ void CreateViewModelProcess::process()
 
         if(bFilter)
         {
-            QByteArray baData=XArchives::decompress(g_sFileName,&record,true);
+            QSet<XBinary::FT> stFT;
 
-            QSet<XBinary::FT> stFT=XBinary::getFileTypes(&baData,true);
+            if(g_type==TYPE_ARCHIVE)
+            {
+                QByteArray baData=XArchives::decompress(g_sName,&record,true);
+
+                stFT=XBinary::getFileTypes(&baData,true);
+            }
+            else if(g_type==TYPE_DIRECTORY)
+            {
+                stFT=XBinary::getFileTypes(sRecordFileName,true);
+            }
 
             bAdd=XBinary::isFileTypePresent(&stFT,&g_stFilterFileTypes);
         }

@@ -35,7 +35,7 @@ DialogArchive::~DialogArchive()
     delete ui;
 }
 
-void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
 {
     if(options.sTitle!="")
     {
@@ -43,12 +43,23 @@ void DialogArchive::setData(QString sFileName, FW_DEF::OPTIONS options, QSet<XBi
     }
 
     g_options=options;
-    ui->widget->setData(sFileName,options,stAvailableFileTypes);
+    ui->widget->setFileName(sFileName,options,stAvailableFileTypes);
 }
 
-void DialogArchive::setData(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setDevice(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
 {
-    setData(XBinary::getDeviceFileName(pDevice),options,stAvailableFileTypes);
+    setFileName(XBinary::getDeviceFileName(pDevice),options,stAvailableFileTypes);
+}
+
+void DialogArchive::setDirectory(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+{
+    if(options.sTitle!="")
+    {
+        setWindowTitle(options.sTitle);
+    }
+
+    g_options=options;
+    ui->widget->setDirectoryName(sDirectoryName,options,stAvailableFileTypes);
 }
 
 void DialogArchive::setShortcuts(XShortcuts *pShortcuts)

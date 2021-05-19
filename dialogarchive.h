@@ -35,8 +35,9 @@ class DialogArchive : public QDialog
 public:
     explicit DialogArchive(QWidget *pParent=nullptr);
     ~DialogArchive();
-    void setData(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
-    void setData(QIODevice *pDevice,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
+    void setFileName(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
+    void setDevice(QIODevice *pDevice,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
+    void setDirectory(QString sDirectoryName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes);
     void setShortcuts(XShortcuts *pShortcuts);
     QString getCurrentRecordFileName();
 
