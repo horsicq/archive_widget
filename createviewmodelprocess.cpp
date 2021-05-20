@@ -112,22 +112,36 @@ void CreateViewModelProcess::process()
 
         if(bAdd)
         {
-            int nNumberOfParts=sRecordFileName.count("/");
+            QString _sRecordFileName=sRecordFileName;
+
+            while(_sRecordFileName.size()>1)
+            {
+                if(_sRecordFileName.at(0)==QChar('/'))
+                {
+                    _sRecordFileName=_sRecordFileName.mid(1,-1);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            int nNumberOfParts=_sRecordFileName.count("/");
 
             for(int j=0;j<=nNumberOfParts;j++)
             {
-                QString sPart=sRecordFileName.section("/",j,j);
+                QString sPart=_sRecordFileName.section("/",j,j);
                 QString sRelPart;
 
                 if(sPart!="")
                 {
                     if(j!=nNumberOfParts)
                     {
-                        sRelPart=sRecordFileName.section("/",0,j);
+                        sRelPart=_sRecordFileName.section("/",0,j);
                     }
                     else
                     {
-                        sRelPart=sRecordFileName;
+                        sRelPart=_sRecordFileName;
                     }
 
                     if(!mapItems.contains(sRelPart))
@@ -150,7 +164,7 @@ void CreateViewModelProcess::process()
                         }
                         else
                         {
-                            pParent=mapItems.value(sRecordFileName.section("/",0,j-1));
+                            pParent=mapItems.value(_sRecordFileName.section("/",0,j-1));
                         }
 
                         QList<QStandardItem *> listItems;
