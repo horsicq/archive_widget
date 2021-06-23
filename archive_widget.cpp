@@ -327,7 +327,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
         {
             if(action==ACTION_OPEN)
             {
-                _handleActionOpenFile(sRecordFileName,sRecordFileName);
+                _handleActionOpenFile(sRecordFileName,sRecordFileName,true);
             }
             else if(action==ACTION_COPYFILENAME)
             {
@@ -339,7 +339,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                 file.setFileName(sRecordFileName);
 
-                if(file.open(QIODevice::ReadOnly))
+                if(XBinary::tryToOpen(&file))
                 {
                     _handleActionDevice(action,&file);
 
@@ -365,7 +365,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     if(dialogUnpackFile.exec()==QDialog::Accepted)
                     {
-                        _handleActionOpenFile(sTempFileName,record.sFileName);
+                        _handleActionOpenFile(sTempFileName,record.sFileName,false);
                     }
                 }
             }
@@ -487,7 +487,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     }
 }
 
-void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
+void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite)
 {
     QSet<XBinary::FT> stFileTypes=XBinary::getFileTypes(sFileName,true);
 
@@ -530,7 +530,18 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle)
 
         file.setFileName(sFileName);
 
-        if(file.open(QIODevice::ReadOnly))
+        bool bOpen=false;
+
+        if(bReadWrite)
+        {
+            bOpen=XBinary::tryToOpen(&file);
+        }
+        else
+        {
+            bOpen=file.open(QIODevice::ReadOnly);
+        }
+
+        if(bOpen)
         {
             FW_DEF::OPTIONS options=g_options; // TODO options from setData
             options.sTitle=sTitle;
