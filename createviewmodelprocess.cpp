@@ -128,16 +128,16 @@ void CreateViewModelProcess::process()
 
             int nNumberOfParts=_sRecordFileName.count("/");
 
-            for(int j=0;j<=nNumberOfParts;j++)
+            for(int k=0;k<=nNumberOfParts;k++)
             {
-                QString sPart=_sRecordFileName.section("/",j,j);
+                QString sPart=_sRecordFileName.section("/",k,k);
                 QString sRelPart;
 
                 if(sPart!="")
                 {
-                    if(j!=nNumberOfParts)
+                    if(k!=nNumberOfParts)
                     {
-                        sRelPart=_sRecordFileName.section("/",0,j);
+                        sRelPart=_sRecordFileName.section("/",0,k);
                     }
                     else
                     {
@@ -149,7 +149,7 @@ void CreateViewModelProcess::process()
                         QStandardItem *pItemName=new QStandardItem;
                         pItemName->setText(sPart);
 
-                        if(j==(nNumberOfParts))
+                        if(k==(nNumberOfParts))
                         {
                             pItemName->setData(sRecordFileName,Qt::UserRole+UR_PATH);
                             pItemName->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
@@ -158,20 +158,20 @@ void CreateViewModelProcess::process()
 
                         QStandardItem *pParent=0;
 
-                        if(j==0)
+                        if(k==0)
                         {
                             pParent=pRootItemName;
                         }
                         else
                         {
-                            pParent=mapItems.value(_sRecordFileName.section("/",0,j-1));
+                            pParent=mapItems.value(_sRecordFileName.section("/",0,k-1));
                         }
 
                         QList<QStandardItem *> listItems;
 
                         listItems.append(pItemName);
 
-                        if(j==(nNumberOfParts))
+                        if(k==(nNumberOfParts))
                         {
                             QStandardItem *pItemSize=new QStandardItem;
                             pItemSize->setData(record.nUncompressedSize,Qt::DisplayRole);
