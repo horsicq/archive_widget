@@ -444,7 +444,8 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
 {
     if(action==ACTION_SCAN)
     {
-        DialogStaticScan dialogStaticScan(this,pDevice,true);
+        DialogStaticScan dialogStaticScan(this);
+        dialogStaticScan.setData(pDevice,true);
 
         dialogStaticScan.exec();
     }
@@ -466,21 +467,24 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         stringsOptions.bAnsi=true;
         stringsOptions.bUnicode=true;
 
-        DialogSearchStrings dialogSearchStrings(this,pDevice,stringsOptions,true);
+        DialogSearchStrings dialogSearchStrings(this);
+        dialogSearchStrings.setData(pDevice,stringsOptions,true);
         dialogSearchStrings.setShortcuts(getShortcuts());
 
         dialogSearchStrings.exec();
     }
     else if(action==ACTION_ENTROPY)
     {
-        DialogEntropy dialogEntropy(this,pDevice);
+        DialogEntropy dialogEntropy(this);
+        dialogEntropy.setData(pDevice);
         dialogEntropy.setShortcuts(getShortcuts());
 
         dialogEntropy.exec();
     }
     else if(action==ACTION_HASH)
     {
-        DialogHash dialogHash(this,pDevice,XBinary::FT_UNKNOWN);
+        DialogHash dialogHash(this);
+        dialogHash.setData(pDevice,XBinary::FT_UNKNOWN);
         dialogHash.setShortcuts(getShortcuts());
 
         dialogHash.exec();
@@ -553,6 +557,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogPE dialogPE(this);
 
                 dialogPE.setData(&file,options);
+                dialogPE.setShortcuts(getShortcuts());
 
                 dialogPE.exec();
             }
@@ -563,6 +568,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogLE dialogLE(this);
 
                 dialogLE.setData(&file,options);
+                dialogLE.setShortcuts(getShortcuts());
 
                 dialogLE.exec();
             }
@@ -573,6 +579,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogNE dialogNE(this);
 
                 dialogNE.setData(&file,options);
+                dialogNE.setShortcuts(getShortcuts());
 
                 dialogNE.exec();
             }
@@ -583,6 +590,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogMSDOS dialogMSDOS(this);
 
                 dialogMSDOS.setData(&file,options);
+                dialogMSDOS.setShortcuts(getShortcuts());
 
                 dialogMSDOS.exec();
             }
@@ -593,6 +601,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogELF dialogELF(this);
 
                 dialogELF.setData(&file,options);
+                dialogELF.setShortcuts(getShortcuts());
 
                 dialogELF.exec();
             }
@@ -603,6 +612,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogMACH dialogMACH(this);
 
                 dialogMACH.setData(&file,options);
+                dialogMACH.setShortcuts(getShortcuts());
 
                 dialogMACH.exec();
             }
@@ -613,6 +623,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogDEX dialogDEX(this);
 
                 dialogDEX.setData(&file,options);
+                dialogDEX.setShortcuts(getShortcuts());
 
                 dialogDEX.exec();
             }
