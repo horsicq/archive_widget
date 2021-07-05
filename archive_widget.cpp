@@ -465,6 +465,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         stringsOptions.bMenu_Hex=true;
         stringsOptions.bMenu_Demangle=true;
         stringsOptions.bAnsi=true;
+        stringsOptions.bUTF8=true;
         stringsOptions.bUnicode=true;
 
         DialogSearchStrings dialogSearchStrings(this);
