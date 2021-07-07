@@ -3,7 +3,7 @@
  <class>DialogShowImage</class>
  <widget class="QDialog" name="DialogShowImage">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::ApplicationModal</enum>
   </property>
   <property name="geometry">
    <rect>
