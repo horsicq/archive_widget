@@ -62,6 +62,7 @@ class Archive_widget : public XShortcutsWidget
 
 public:
     explicit Archive_widget(QWidget *pParent=nullptr);
+    // TODO setOptions
     void setFileName(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
     void setDirectoryName(QString sDirectoryName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
     void setData(CreateViewModelProcess::TYPE type,QString sName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
