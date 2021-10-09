@@ -80,7 +80,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
     ui->tableViewArchive->setSortingEnabled(false);
 
     QAbstractItemModel *pOldTreeModel=ui->treeViewArchive->model();
-    QStandardItemModel *pNewTreeModel=0;
+    QStandardItemModel *pNewTreeModel=nullptr;
 
     QAbstractItemModel *pOldTableModel=g_pFilterTable->sourceModel();
     QStandardItemModel *pNewTableModel=0;
