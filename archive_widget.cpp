@@ -83,7 +83,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
     QStandardItemModel *pNewTreeModel=nullptr;
 
     QAbstractItemModel *pOldTableModel=g_pFilterTable->sourceModel();
-    QStandardItemModel *pNewTableModel=0;
+    QStandardItemModel *pNewTableModel=nullptr;
 
     g_pFilterTable->setSourceModel(0);
     ui->tableViewArchive->setModel(0);
