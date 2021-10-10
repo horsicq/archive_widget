@@ -387,7 +387,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     if(dialogUnpackFile.exec()!=QDialog::Accepted)
                     {
-                        QMessageBox::critical(this,tr("Error"),tr("Cannot save file"));
+                        QMessageBox::critical(XOptions::getMainWidget(this),tr("Error"),tr("Cannot save file"));
                     }
                 }
             }
@@ -467,6 +467,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         stringsOptions.bAnsi=true;
         stringsOptions.bUTF8=false;
         stringsOptions.bUnicode=true;
+        stringsOptions.bCStrings=true;
 
         DialogSearchStrings dialogSearchStrings(this);
         dialogSearchStrings.setData(pDevice,stringsOptions,true);
