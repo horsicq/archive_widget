@@ -156,7 +156,7 @@ void CreateViewModelProcess::process()
                             pItemName->setData(false,Qt::UserRole+UR_ISROOT);
                         }
 
-                        QStandardItem *pParent=0;
+                        QStandardItem *pParent=nullptr;
 
                         if(k==0)
                         {
