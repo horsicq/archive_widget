@@ -44,3 +44,7 @@ SOURCES += \
     include($$PWD/../FormatWidgets/allformatwidgets.pri)
 }
 
+DISTFILES += \
+    $$PWD/LICENSE \
+    $$PWD/README.md
+
