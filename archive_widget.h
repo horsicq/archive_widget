@@ -21,24 +21,24 @@
 #ifndef ARCHIVE_WIDGET_H
 #define ARCHIVE_WIDGET_H
 
-#include "xarchives.h"
-#include "xandroidbinary.h"
+#include "dialogcreateviewmodel.h"
+#include "dialogdex.h"
+#include "dialogelf.h"
 #include "dialogentropy.h"
 #include "dialoghash.h"
-#include "dialogsearchstrings.h"
 #include "dialoghexview.h"
-#include "dialogstaticscan.h"
-#include "dialogcreateviewmodel.h"
-#include "dialogunpackfile.h"
-#include "dialogshowimage.h"
-#include "dialogshowtext.h"
+#include "dialogle.h"
+#include "dialogmach.h"
 #include "dialogmsdos.h"
 #include "dialogne.h"
-#include "dialogle.h"
 #include "dialogpe.h"
-#include "dialogelf.h"
-#include "dialogmach.h"
-#include "dialogdex.h"
+#include "dialogsearchstrings.h"
+#include "dialogshowimage.h"
+#include "dialogshowtext.h"
+#include "dialogstaticscan.h"
+#include "dialogunpackfile.h"
+#include "xandroidbinary.h"
+#include "xarchives.h"
 
 namespace Ui {
 class Archive_widget;
