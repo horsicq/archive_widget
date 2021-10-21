@@ -85,7 +85,7 @@ void CreateViewModelProcess::process()
 
     QMap<QString,QStandardItem *> mapItems;
 
-    for(int i=0,j=0;(i<nNumberOfRecords)&&(!g_bIsStop);i++)
+    for(qint32 i=0,j=0;(i<nNumberOfRecords)&&(!g_bIsStop);i++)
     {
         XArchive::RECORD record=g_pListArchiveRecords->at(i);
         QString sRecordFileName=record.sFileName;
