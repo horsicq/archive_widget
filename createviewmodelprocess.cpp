@@ -57,7 +57,7 @@ void CreateViewModelProcess::process()
 
     qint64 nFileSize=XBinary::getSize(g_sName);
 
-    int nNumberOfRecords=g_pListArchiveRecords->count();
+    qint32 nNumberOfRecords=g_pListArchiveRecords->count();
 
     *g_ppTreeModel=new QStandardItemModel;
     (*g_ppTreeModel)->setColumnCount(2);
@@ -126,9 +126,9 @@ void CreateViewModelProcess::process()
                 }
             }
 
-            int nNumberOfParts=_sRecordFileName.count("/");
+            qint32 nNumberOfParts=_sRecordFileName.count("/");
 
-            for(int k=0;k<=nNumberOfParts;k++)
+            for(qint32 k=0;k<=nNumberOfParts;k++)
             {
                 QString sPart=_sRecordFileName.section("/",k,k);
                 QString sRelPart;
