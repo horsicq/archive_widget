@@ -7,7 +7,6 @@ set(ARCHIVE_WIDGET_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/archive_widget.cpp
     ${CMAKE_CURRENT_LIST_DIR}/archive_widget.h
     ${CMAKE_CURRENT_LIST_DIR}/archive_widget.ui
-    ${CMAKE_CURRENT_LIST_DIR}/archive_widget.pri
     ${CMAKE_CURRENT_LIST_DIR}/archive_widget.cmake
     ${CMAKE_CURRENT_LIST_DIR}/createviewmodelprocess.cpp
     ${CMAKE_CURRENT_LIST_DIR}/createviewmodelprocess.h
