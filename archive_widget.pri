@@ -44,6 +44,11 @@ SOURCES += \
     include($$PWD/../FormatWidgets/allformatwidgets.pri)
 }
 
+!contains(XCONFIG, xarchives) {
+    XCONFIG += xarchives
+    include($$PWD/../XArchive/xarchives.pri)
+}
+
 DISTFILES += \
     $$PWD/LICENSE \
     $$PWD/README.md \
