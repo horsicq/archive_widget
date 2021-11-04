@@ -1,9 +1,8 @@
-# TODO guard
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-include(${CMAKE_CURRENT_LIST_DIR}/../FormatWidgets/allformatwidgets.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/../XArchive/xarchives.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/../XShortcuts/xshortcuts.cmake)
+include_guard(${CMAKE_CURRENT_LIST_DIR}/../FormatWidgets/allformatwidgets.cmake)
+include_guard(${CMAKE_CURRENT_LIST_DIR}/../XArchive/xarchives.cmake)
+include_guard(${CMAKE_CURRENT_LIST_DIR}/../XShortcuts/xshortcuts.cmake)
 
 set(ARCHIVE_WIDGET_SOURCES
     ${ALLFORMATWIDGETS_SOURCES}
