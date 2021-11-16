@@ -452,10 +452,12 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     else if(action==ACTION_HEX)
     {
         XHexView::OPTIONS options={};
-        options.sSignaturesPath=g_options.sSearchSignaturesPath;
+
+        // TODO options
 
         DialogHexView dialogHexView(this,pDevice,options);
         dialogHexView.setShortcuts(getShortcuts());
+        dialogHexView.setGlobalOptions(getGlobalOptions());
 
         dialogHexView.exec();
     }
