@@ -140,11 +140,6 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
     }
 }
 
-void Archive_widget::setShortcuts(XShortcuts *pShortcuts)
-{
-    XShortcutsWidget::setShortcuts(pShortcuts);
-}
-
 QString Archive_widget::getCurrentRecordFileName()
 {
     return g_sCurrentRecordFileName;
@@ -456,8 +451,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         // TODO options
 
         DialogHexView dialogHexView(this,pDevice,options);
-        dialogHexView.setShortcuts(getShortcuts());
-        dialogHexView.setGlobalOptions(getGlobalOptions());
+        dialogHexView.setGlobal(getShortcuts(),getGlobalOptions());
 
         dialogHexView.exec();
     }
@@ -473,7 +467,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
 
         DialogSearchStrings dialogSearchStrings(this);
         dialogSearchStrings.setData(pDevice,stringsOptions,true);
-        dialogSearchStrings.setShortcuts(getShortcuts());
+        dialogSearchStrings.setGlobal(getShortcuts(),getGlobalOptions());
 
         dialogSearchStrings.exec();
     }
@@ -481,7 +475,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     {
         DialogEntropy dialogEntropy(this);
         dialogEntropy.setData(pDevice);
-        dialogEntropy.setShortcuts(getShortcuts());
+        dialogEntropy.setGlobal(getShortcuts(),getGlobalOptions());
 
         dialogEntropy.exec();
     }
@@ -489,7 +483,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     {
         DialogHash dialogHash(this);
         dialogHash.setData(pDevice,XBinary::FT_UNKNOWN);
-        dialogHash.setShortcuts(getShortcuts());
+        dialogHash.setGlobal(getShortcuts(),getGlobalOptions());
 
         dialogHash.exec();
     }
@@ -561,7 +555,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogPE dialogPE(this);
 
                 dialogPE.setData(&file,options);
-                dialogPE.setShortcuts(getShortcuts());
+                dialogPE.setGlobal(getShortcuts(),getGlobalOptions());
 
                 dialogPE.exec();
             }
@@ -572,7 +566,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogLE dialogLE(this);
 
                 dialogLE.setData(&file,options);
-                dialogLE.setShortcuts(getShortcuts());
+                dialogLE.setGlobal(getShortcuts(),getGlobalOptions());
 
                 dialogLE.exec();
             }
@@ -583,7 +577,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogNE dialogNE(this);
 
                 dialogNE.setData(&file,options);
-                dialogNE.setShortcuts(getShortcuts());
+                dialogNE.setGlobal(getShortcuts(),getGlobalOptions());
 
                 dialogNE.exec();
             }
@@ -594,7 +588,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogMSDOS dialogMSDOS(this);
 
                 dialogMSDOS.setData(&file,options);
-                dialogMSDOS.setShortcuts(getShortcuts());
+                dialogMSDOS.setGlobal(getShortcuts(),getGlobalOptions());
 
                 dialogMSDOS.exec();
             }
@@ -605,7 +599,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogELF dialogELF(this);
 
                 dialogELF.setData(&file,options);
-                dialogELF.setShortcuts(getShortcuts());
+                dialogELF.setGlobal(getShortcuts(),getGlobalOptions());
 
                 dialogELF.exec();
             }
@@ -616,7 +610,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogMACH dialogMACH(this);
 
                 dialogMACH.setData(&file,options);
-                dialogMACH.setShortcuts(getShortcuts());
+                dialogMACH.setGlobal(getShortcuts(),getGlobalOptions());
 
                 dialogMACH.exec();
             }
@@ -627,7 +621,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
                 DialogDEX dialogDEX(this);
 
                 dialogDEX.setData(&file,options);
-                dialogDEX.setShortcuts(getShortcuts());
+                dialogDEX.setGlobal(getShortcuts(),getGlobalOptions());
 
                 dialogDEX.exec();
             }

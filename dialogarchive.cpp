@@ -62,9 +62,9 @@ void DialogArchive::setDirectory(QString sDirectoryName, FW_DEF::OPTIONS options
     ui->widget->setDirectoryName(sDirectoryName,options,stAvailableFileTypes);
 }
 
-void DialogArchive::setShortcuts(XShortcuts *pShortcuts)
+void DialogArchive::setGlobal(XShortcuts *pShortcuts,XOptions *pXOptions)
 {
-    ui->widget->setShortcuts(pShortcuts);
+    ui->widget->setGlobal(pShortcuts,pXOptions);
 }
 
 QString DialogArchive::getCurrentRecordFileName()

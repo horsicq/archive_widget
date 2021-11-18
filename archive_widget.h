@@ -66,7 +66,6 @@ public:
     void setFileName(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr); // TODO options for Viewers TODO Device
     void setDirectoryName(QString sDirectoryName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
     void setData(CreateViewModelProcess::TYPE type,QString sName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
-    void setShortcuts(XShortcuts *pShortcuts);
     QString getCurrentRecordFileName();
     ~Archive_widget();
 
