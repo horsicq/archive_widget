@@ -58,6 +58,7 @@ class Archive_widget : public XShortcutsWidget
         ACTION_HASH,
         ACTION_COPYFILENAME,
         ACTION_DUMP
+        // TODO more
     };
 
 public:
