@@ -64,6 +64,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
         g_stAvailableOpenFileTypes.insert(XBinary::FT_MSDOS);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_NE);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_LE);
+        g_stAvailableOpenFileTypes.insert(XBinary::FT_LX);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_PE);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_ELF);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_DEX);
@@ -523,6 +524,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
     else if( stFileTypes.contains(XBinary::FT_MSDOS)||
              stFileTypes.contains(XBinary::FT_NE)||
              stFileTypes.contains(XBinary::FT_LE)||
+             stFileTypes.contains(XBinary::FT_LX)||
              stFileTypes.contains(XBinary::FT_PE)||
              stFileTypes.contains(XBinary::FT_ELF)||
              stFileTypes.contains(XBinary::FT_MACHO)||
