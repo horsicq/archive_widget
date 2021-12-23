@@ -1,6 +1,6 @@
 # archive_widget
 
-For archives:
+Archive widget for archives:
 
 * ZIP
 * MACHOFAT
