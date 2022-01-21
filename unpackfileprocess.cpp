@@ -42,7 +42,7 @@ void UnpackFileProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    bool bResult=XArchives::decompressToFile(sFileName,pRecord,sResultFileName,&bIsStop); // TODO Errors
+    bool bResult=XArchives::decompressToFile(sFileName,pRecord,sResultFileName,&bIsStop); // TODO Errors !!!
 
     emit completed(bResult&&(!bIsStop),scanTimer.elapsed());
 
