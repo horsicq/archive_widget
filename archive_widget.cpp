@@ -132,7 +132,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
 
     if(g_options.bFilter)
     {
-        ui->comboBoxType->setCurrentIndex(1); // TODO enum
+        ui->comboBoxType->setCurrentIndex(1); // TODO enum !!!
 
         if(g_listRecords.count())
         {
