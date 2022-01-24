@@ -642,7 +642,11 @@ void Archive_widget::on_comboBoxType_currentIndexChanged(int nIndex)
 
 void Archive_widget::on_lineEditFilter_textChanged(const QString &sString)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5,12,0)
+    g_pFilterTable->setFilterRegularExpression(sString);
+#else
     g_pFilterTable->setFilterRegExp(sString);
+#endif
     g_pFilterTable->setFilterCaseSensitivity(Qt::CaseInsensitive);
     g_pFilterTable->setFilterKeyColumn(1);
 }

@@ -21,6 +21,7 @@
 #ifndef DIALOGSHOWTEXT_H
 #define DIALOGSHOWTEXT_H
 
+#include <QFile>
 #include <QDialog>
 #include <QTextStream>
 
