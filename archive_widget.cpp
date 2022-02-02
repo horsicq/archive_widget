@@ -191,7 +191,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         QAction actionScan(tr("Scan"),this);
         actionScan.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_SCAN));
-        connect(&actionScan, SIGNAL(triggered()), this, SLOT(scanRecord()));
+        connect(&actionScan,SIGNAL(triggered()),this,SLOT(scanRecord()));
         contextMenu.addAction(&actionScan);
 
         QAction actionHex(tr("Hex"),this);
