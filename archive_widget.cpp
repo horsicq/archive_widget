@@ -128,7 +128,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
     ui->treeViewArchive->expand(pNewTreeModel->index(0,0));
 
     connect(ui->treeViewArchive->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)),this,SLOT(onTreeElement_selected(const QItemSelection&,const QItemSelection&)));
-    connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)), this, SLOT(onTableElement_selected(const QItemSelection&,const QItemSelection&)));
+    connect(ui->tableViewArchive->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&,const QItemSelection&)),this,SLOT(onTableElement_selected(const QItemSelection&,const QItemSelection&)));
 
     if(g_options.bFilter)
     {
