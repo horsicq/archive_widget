@@ -196,7 +196,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         QAction actionHex(tr("Hex"),this);
         actionHex.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_HEX));
-        connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
+        connect(&actionHex,SIGNAL(triggered()),this,SLOT(hexRecord()));
         contextMenu.addAction(&actionHex);
 
         QAction actionStrings(tr("Strings"),this);
