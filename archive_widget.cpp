@@ -184,7 +184,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
             if(isOpenAvailable(sRecordFileName,bIsRoot))
             {
                 actionOpen.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_OPEN));
-                connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
+                connect(&actionOpen,SIGNAL(triggered()),this,SLOT(openRecord()));
                 contextMenu.addAction(&actionOpen);
             }
         }
