@@ -206,7 +206,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         QAction actionEntropy(tr("Entropy"),this);
         actionEntropy.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_ENTROPY));
-        connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
+        connect(&actionEntropy,SIGNAL(triggered()),this,SLOT(entropyRecord()));
         contextMenu.addAction(&actionEntropy);
 
         QAction actionHash(tr("Hash"),this);
