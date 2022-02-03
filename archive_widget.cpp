@@ -201,7 +201,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         QAction actionStrings(tr("Strings"),this);
         actionStrings.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_STRINGS));
-        connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
+        connect(&actionStrings,SIGNAL(triggered()),this,SLOT(stringsRecord()));
         contextMenu.addAction(&actionStrings);
 
         QAction actionEntropy(tr("Entropy"),this);
