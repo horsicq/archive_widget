@@ -211,7 +211,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
 
         QAction actionHash(tr("Hash"),this);
         actionHash.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_HASH));
-        connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
+        connect(&actionHash,SIGNAL(triggered()),this,SLOT(hashRecord()));
         contextMenu.addAction(&actionHash);
 
         QMenu menuCopy(tr("Copy"),this);
