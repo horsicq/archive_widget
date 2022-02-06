@@ -41,7 +41,7 @@ Archive_widget::Archive_widget(QWidget *pParent) :
     g_type=CreateViewModelProcess::TYPE_UNKNOWN;
 }
 
-void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+void Archive_widget::setFileName(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent)
 {
     setData(CreateViewModelProcess::TYPE_ARCHIVE,sFileName,options,stAvailableOpenFileTypes,pParent);
 }
