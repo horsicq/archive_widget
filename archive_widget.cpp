@@ -553,6 +553,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
             if(stFileTypes.contains(XBinary::FT_PE))
             {
                 options.nStartType=SPE::TYPE_IMAGE_FILE_HEADER;
+                options.nImageBase=-1;
 
                 DialogPE dialogPE(this);
 
@@ -564,6 +565,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
             else if(stFileTypes.contains(XBinary::FT_LE))
             {
                 options.nStartType=SLE::TYPE_VXD_HEADER;
+                options.nImageBase=-1;
 
                 DialogLE dialogLE(this);
 
@@ -575,6 +577,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
             else if(stFileTypes.contains(XBinary::FT_NE))
             {
                 options.nStartType=SNE::TYPE_OS2_HEADER;
+                options.nImageBase=-1;
 
                 DialogNE dialogNE(this);
 
@@ -586,6 +589,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
             else if(stFileTypes.contains(XBinary::FT_MSDOS))
             {
                 options.nStartType=SMSDOS::TYPE_DOS_HEADER;
+                options.nImageBase=-1;
 
                 DialogMSDOS dialogMSDOS(this);
 
@@ -597,6 +601,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
             else if(stFileTypes.contains(XBinary::FT_ELF))
             {
                 options.nStartType=SELF::TYPE_Elf_Ehdr;
+                options.nImageBase=-1;
 
                 DialogELF dialogELF(this);
 
@@ -608,6 +613,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
             else if(stFileTypes.contains(XBinary::FT_MACHO))
             {
                 options.nStartType=SMACH::TYPE_mach_header;
+                options.nImageBase=-1;
 
                 DialogMACH dialogMACH(this);
 
@@ -619,6 +625,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
             else if(stFileTypes.contains(XBinary::FT_DEX))
             {
                 options.nStartType=SDEX::TYPE_HEADER;
+                options.nImageBase=-1;
 
                 DialogDEX dialogDEX(this);
 
