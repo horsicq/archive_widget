@@ -490,7 +490,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     }
 }
 
-void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite)
+void Archive_widget::_handleActionOpenFile(QString sFileName,QString sTitle,bool bReadWrite)
 {
     QSet<XBinary::FT> stFileTypes=XBinary::getFileTypes(sFileName,true);
 
