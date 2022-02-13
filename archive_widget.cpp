@@ -234,7 +234,7 @@ void Archive_widget::showContext(QString sRecordFileName,bool bIsRoot,QPoint poi
     }
 }
 
-bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
+bool Archive_widget::isOpenAvailable(QString sRecordFileName,bool bIsRoot)
 {
     bool bResult=false;
 
