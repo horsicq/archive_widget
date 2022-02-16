@@ -436,7 +436,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
     }
 }
 
-void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevice *pDevice)
+void Archive_widget::_handleActionDevice(Archive_widget::ACTION action,QIODevice *pDevice)
 {
     if(action==ACTION_SCAN)
     {
