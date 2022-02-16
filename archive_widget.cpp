@@ -226,7 +226,7 @@ void Archive_widget::showContext(QString sRecordFileName,bool bIsRoot,QPoint poi
         if(!bIsRoot)
         {
             actionDump.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_DUMPTOFILE));
-            connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
+            connect(&actionDump,SIGNAL(triggered()),this,SLOT(dumpRecord()));
             contextMenu.addAction(&actionDump);
         }
 
