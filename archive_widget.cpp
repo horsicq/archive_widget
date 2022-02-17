@@ -217,7 +217,7 @@ void Archive_widget::showContext(QString sRecordFileName,bool bIsRoot,QPoint poi
         QMenu menuCopy(tr("Copy"),this);
         QAction actionCopyFilename(tr("Filename"),this);
         actionCopyFilename.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_COPYFILENAME));
-        connect(&actionCopyFilename, SIGNAL(triggered()), this, SLOT(copyFileName()));
+        connect(&actionCopyFilename,SIGNAL(triggered()),this,SLOT(copyFileName()));
         menuCopy.addAction(&actionCopyFilename);
         contextMenu.addMenu(&menuCopy);
 
