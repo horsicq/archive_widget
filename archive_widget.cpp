@@ -682,7 +682,7 @@ void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
     }
 }
 
-void Archive_widget::onTreeElement_selected(const QItemSelection &selected, const QItemSelection &prev)
+void Archive_widget::onTreeElement_selected(const QItemSelection &selected,const QItemSelection &prev)
 {
     Q_UNUSED(selected)
     Q_UNUSED(prev)
