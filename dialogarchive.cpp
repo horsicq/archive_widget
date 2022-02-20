@@ -35,7 +35,7 @@ DialogArchive::~DialogArchive()
     delete ui;
 }
 
-void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setFileName(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes)
 {
     if(options.sTitle!="")
     {
