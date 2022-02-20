@@ -704,7 +704,7 @@ void Archive_widget::registerShortcuts(bool bState)
     Q_UNUSED(bState)
 }
 
-void Archive_widget::onTableElement_selected(const QItemSelection &selected, const QItemSelection &prev)
+void Archive_widget::onTableElement_selected(const QItemSelection &selected,const QItemSelection &prev)
 {
     Q_UNUSED(selected)
     Q_UNUSED(prev)
