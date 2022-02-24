@@ -33,7 +33,7 @@ DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) :
     pCreateViewModelProcess->moveToThread(pThread);
 
     connect(pThread,SIGNAL(started()),pCreateViewModelProcess,SLOT(process()));
-    connect(pCreateViewModelProcess, SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
+    connect(pCreateViewModelProcess,SIGNAL(completed(qint64)),this,SLOT(onCompleted(qint64)));
 }
 
 DialogCreateViewModel::~DialogCreateViewModel()
