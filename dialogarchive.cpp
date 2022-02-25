@@ -51,7 +51,7 @@ void DialogArchive::setDevice(QIODevice *pDevice,FW_DEF::OPTIONS options,QSet<XB
     setFileName(XBinary::getDeviceFileName(pDevice),options,stAvailableFileTypes);
 }
 
-void DialogArchive::setDirectory(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setDirectory(QString sDirectoryName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableFileTypes)
 {
     if(options.sTitle!="")
     {
