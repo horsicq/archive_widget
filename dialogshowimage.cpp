@@ -21,7 +21,7 @@
 #include "dialogshowimage.h"
 #include "ui_dialogshowimage.h"
 
-DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName, QString sTitle) :
+DialogShowImage::DialogShowImage(QWidget *pParent,QString sFileName,QString sTitle) :
     QDialog(pParent),
     ui(new Ui::DialogShowImage)
 {
