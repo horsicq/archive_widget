@@ -21,7 +21,7 @@
 #include "dialogshowtext.h"
 #include "ui_dialogshowtext.h"
 
-DialogShowText::DialogShowText(QWidget *pParent, QString sTitle) :
+DialogShowText::DialogShowText(QWidget *pParent,QString sTitle) :
     QDialog(pParent),
     ui(new Ui::DialogShowText)
 {
