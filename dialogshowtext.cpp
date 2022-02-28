@@ -31,7 +31,7 @@ DialogShowText::DialogShowText(QWidget *pParent, QString sTitle) :
     setWindowTitle(sTitle);
 }
 
-void DialogShowText::setData(QString sString, DialogShowText::TYPE type)
+void DialogShowText::setData(QString sString,DialogShowText::TYPE type)
 {
     if(type==TYPE_FILECONTENT)
     {
