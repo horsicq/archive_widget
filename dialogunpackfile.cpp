@@ -49,7 +49,7 @@ DialogUnpackFile::~DialogUnpackFile()
     delete pUnpackFileProcess;
 }
 
-void DialogUnpackFile::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName)
+void DialogUnpackFile::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName)
 {
     pUnpackFileProcess->setData(sFileName,pRecord,sResultFileName);
     pThread->start();
