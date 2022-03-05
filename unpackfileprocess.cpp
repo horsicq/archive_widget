@@ -25,7 +25,7 @@ UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
     bIsStop=false;
 }
 
-void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName)
+void UnpackFileProcess::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName)
 {
     this->sFileName=sFileName;
     this->pRecord=pRecord;
