@@ -28,12 +28,14 @@
 class CreateViewModelProcess : public QObject
 {
     Q_OBJECT
+
 public:
     enum UR
     {
         UR_PATH=0,
         UR_SIZE,
-        UR_ISROOT
+        UR_ISROOT,
+        UR_FT
     };
 
     enum TYPE
@@ -43,9 +45,15 @@ public:
         TYPE_DIRECTORY
     };
 
+    struct RECORD
+    {
+        QString sRecordName;
+        XBinary::FT ft;
+    };
+
     explicit CreateViewModelProcess(QObject *pParent=nullptr);
 
-    void setData(CreateViewModelProcess::TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes);
+    void setData(CreateViewModelProcess::TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords);
 
 signals:
     void errorMessage(QString sText);
@@ -62,6 +70,7 @@ private:
     QStandardItemModel **g_ppTreeModel;
     QStandardItemModel **g_ppTableModel;
     QSet<XBinary::FT> g_stFilterFileTypes;
+    QList<RECORD> *g_pListViewRecords;
     bool g_bIsStop;
 };
 

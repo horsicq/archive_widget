@@ -99,9 +99,11 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type,QString sName,FW_
         stFilterFileTypes=g_stAvailableOpenFileTypes;
     }
 
+    g_listViewRecords.clear();
+
     DialogCreateViewModel dialogCreateViewModel(pParent);
 
-    dialogCreateViewModel.setData(type,sName,&g_listRecords,&pNewTreeModel,&pNewTableModel,stFilterFileTypes);
+    dialogCreateViewModel.setData(type,sName,&g_listRecords,&pNewTreeModel,&pNewTableModel,stFilterFileTypes,&g_listViewRecords);
 
     dialogCreateViewModel.exec();
 

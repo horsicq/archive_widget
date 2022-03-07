@@ -26,7 +26,7 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
     g_bIsStop=false;
 }
 
-void CreateViewModelProcess::setData(TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes)
+void CreateViewModelProcess::setData(TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes,QList<RECORD> *pListViewRecords)
 {
     this->g_type=type;
     this->g_sName=sName;
@@ -34,6 +34,7 @@ void CreateViewModelProcess::setData(TYPE type,QString sName,QList<XArchive::REC
     this->g_ppTreeModel=ppTreeModel;
     this->g_ppTableModel=ppTableModel;
     this->g_stFilterFileTypes=stFilterFileTypes;
+    this->g_pListViewRecords=pListViewRecords;
 }
 
 void CreateViewModelProcess::stop()
@@ -92,21 +93,29 @@ void CreateViewModelProcess::process()
 
         bool bAdd=true;
 
+        QSet<XBinary::FT> stFT;
+
+        if(g_type==TYPE_ARCHIVE)
+        {
+            QByteArray baData=XArchives::decompress(g_sName,&record,true);
+
+            stFT=XBinary::getFileTypes(&baData,true);
+        }
+        else if(g_type==TYPE_DIRECTORY)
+        {
+            stFT=XBinary::getFileTypes(sRecordFileName,true);
+        }
+
+        XBinary::FT ftPref=XBinary::_getPrefFileType(&stFT);
+
+        RECORD _record={};
+        _record.sRecordName=sRecordFileName;
+        _record.ft=ftPref;
+
+        g_pListViewRecords->append(_record);
+
         if(bFilter)
         {
-            QSet<XBinary::FT> stFT;
-
-            if(g_type==TYPE_ARCHIVE)
-            {
-                QByteArray baData=XArchives::decompress(g_sName,&record,true);
-
-                stFT=XBinary::getFileTypes(&baData,true);
-            }
-            else if(g_type==TYPE_DIRECTORY)
-            {
-                stFT=XBinary::getFileTypes(sRecordFileName,true);
-            }
-
             bAdd=XBinary::isFileTypePresent(&stFT,&g_stFilterFileTypes);
         }
 
@@ -154,6 +163,7 @@ void CreateViewModelProcess::process()
                             pItemName->setData(sRecordFileName,Qt::UserRole+UR_PATH);
                             pItemName->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
                             pItemName->setData(false,Qt::UserRole+UR_ISROOT);
+                            pItemName->setData(ftPref,Qt::UserRole+UR_FT);
                         }
 
                         QStandardItem *pParent=nullptr;
@@ -195,6 +205,7 @@ void CreateViewModelProcess::process()
             pItemNumber->setData(sRecordFileName,Qt::UserRole+UR_PATH);
             pItemNumber->setData(record.nUncompressedSize,Qt::UserRole+UR_SIZE);
             pItemNumber->setData(false,Qt::UserRole+UR_ISROOT);
+            pItemNumber->setData(ftPref,Qt::UserRole+UR_FT);
             listItems.append(pItemNumber);
 
             QStandardItem *pItemName=new QStandardItem;

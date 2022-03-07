@@ -115,6 +115,7 @@ private:
     qint64 g_nCurrentFileSize;
     bool g_bCurrentFileIsRoot;
     QString g_sCurrentRecordFileName;
+    QList<CreateViewModelProcess::RECORD> g_listViewRecords;
 };
 
 #endif // ARCHIVE_WIDGET_H
