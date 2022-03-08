@@ -18,8 +18,6 @@ set(ARCHIVE_WIDGET_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/dialogcreateviewmodel.ui
     ${CMAKE_CURRENT_LIST_DIR}/dialogshowimage.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dialogshowimage.ui
-    ${CMAKE_CURRENT_LIST_DIR}/dialogshowtext.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/dialogshowtext.ui
     ${CMAKE_CURRENT_LIST_DIR}/dialogunpackfile.cpp
     ${CMAKE_CURRENT_LIST_DIR}/dialogunpackfile.ui
     ${CMAKE_CURRENT_LIST_DIR}/unpackfileprocess.cpp

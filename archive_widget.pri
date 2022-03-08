@@ -16,7 +16,6 @@ FORMS += \
     $$PWD/dialogarchive.ui \
     $$PWD/dialogcreateviewmodel.ui \
     $$PWD/dialogshowimage.ui \
-    $$PWD/dialogshowtext.ui \
     $$PWD/dialogunpackfile.ui
 
 HEADERS += \
@@ -25,7 +24,6 @@ HEADERS += \
     $$PWD/dialogarchive.h \
     $$PWD/dialogcreateviewmodel.h \
     $$PWD/dialogshowimage.h \
-    $$PWD/dialogshowtext.h \
     $$PWD/dialogunpackfile.h \
     $$PWD/unpackfileprocess.h
 
@@ -35,7 +33,6 @@ SOURCES += \
     $$PWD/dialogarchive.cpp \
     $$PWD/dialogcreateviewmodel.cpp \
     $$PWD/dialogshowimage.cpp \
-    $$PWD/dialogshowtext.cpp \
     $$PWD/dialogunpackfile.cpp \
     $$PWD/unpackfileprocess.cpp
 

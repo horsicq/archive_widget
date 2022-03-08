@@ -34,11 +34,16 @@ DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) :
 
     connect(pThread,SIGNAL(started()),pCreateViewModelProcess,SLOT(process()));
     connect(pCreateViewModelProcess,SIGNAL(completed(qint64)),this,SLOT(onCompleted(qint64)));
+
+    g_pTimer=new QTimer(this);
+    connect(g_pTimer,SIGNAL(timeout()),this,SLOT(timerSlot()));
 }
 
 DialogCreateViewModel::~DialogCreateViewModel()
 {
     pCreateViewModelProcess->stop();
+
+    g_pTimer->stop();
 
     pThread->quit();
     pThread->wait();
@@ -53,6 +58,8 @@ void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, QString s
 {
     pCreateViewModelProcess->setData(type,sName,pListArchiveRecords,ppTreeModel,ppTableModel,stFilterFileTypes,pListViewRecords);
     pThread->start();
+    g_pTimer->start(N_REFRESH_DELAY);
+    ui->progressBarTotal->setMaximum(100);
 }
 
 void DialogCreateViewModel::on_pushButtonCancel_clicked()
@@ -65,4 +72,18 @@ void DialogCreateViewModel::onCompleted(qint64 nElapsed)
     Q_UNUSED(nElapsed)
 
     this->close();
+}
+
+void DialogCreateViewModel::timerSlot()
+{
+    CreateViewModelProcess::STATS stats=pCreateViewModelProcess->getCurrentStats();
+
+    ui->labelTotal->setText(QString::number(stats.nTotal));
+    ui->labelCurrent->setText(QString::number(stats.nCurrent));
+    ui->labelCurrentStatus->setText(stats.sStatus);
+
+    if(stats.nTotal)
+    {
+        ui->progressBarTotal->setValue((int)((stats.nCurrent*100)/stats.nTotal));
+    }
 }

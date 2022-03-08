@@ -24,6 +24,7 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
 {
     g_type=TYPE_UNKNOWN;
     g_bIsStop=false;
+    g_stats={};
 }
 
 void CreateViewModelProcess::setData(TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes,QList<RECORD> *pListViewRecords)
@@ -35,6 +36,11 @@ void CreateViewModelProcess::setData(TYPE type,QString sName,QList<XArchive::REC
     this->g_ppTableModel=ppTableModel;
     this->g_stFilterFileTypes=stFilterFileTypes;
     this->g_pListViewRecords=pListViewRecords;
+}
+
+CreateViewModelProcess::STATS CreateViewModelProcess::getCurrentStats()
+{
+    return g_stats;
 }
 
 void CreateViewModelProcess::stop()
@@ -59,6 +65,8 @@ void CreateViewModelProcess::process()
     qint64 nFileSize=XBinary::getSize(g_sName);
 
     qint32 nNumberOfRecords=g_pListArchiveRecords->count();
+
+    g_stats.nTotal=nNumberOfRecords;
 
     *g_ppTreeModel=new QStandardItemModel;
     (*g_ppTreeModel)->setColumnCount(2);
@@ -99,11 +107,11 @@ void CreateViewModelProcess::process()
         {
             QByteArray baData=XArchives::decompress(g_sName,&record,true);
 
-            stFT=XBinary::getFileTypes(&baData,true);
+            stFT=XFormats::getFileTypes(&baData,true);
         }
         else if(g_type==TYPE_DIRECTORY)
         {
-            stFT=XBinary::getFileTypes(sRecordFileName,true);
+            stFT=XFormats::getFileTypes(sRecordFileName,true);
         }
 
         XBinary::FT ftPref=XBinary::_getPrefFileType(&stFT);
@@ -221,6 +229,9 @@ void CreateViewModelProcess::process()
 
             j++;
         }
+
+        g_stats.nCurrent=i;
+        g_stats.sStatus=g_pListArchiveRecords->at(i).sFileName;
     }
 
     (*g_ppTreeModel)->setHeaderData(0,Qt::Horizontal,tr("File"));

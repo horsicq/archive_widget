@@ -23,7 +23,7 @@
 
 #include <QElapsedTimer>
 #include <QStandardItemModel>
-#include "xarchives.h"
+#include "xformats.h"
 
 class CreateViewModelProcess : public QObject
 {
@@ -51,9 +51,17 @@ public:
         XBinary::FT ft;
     };
 
+    struct STATS
+    {
+        qint32 nTotal;
+        qint32 nCurrent;
+        QString sStatus;
+    };
+
     explicit CreateViewModelProcess(QObject *pParent=nullptr);
 
     void setData(CreateViewModelProcess::TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords);
+    STATS getCurrentStats();
 
 signals:
     void errorMessage(QString sText);
@@ -72,6 +80,7 @@ private:
     QSet<XBinary::FT> g_stFilterFileTypes;
     QList<RECORD> *g_pListViewRecords;
     bool g_bIsStop;
+    STATS g_stats;
 };
 
 #endif // CREATEVIEWMODELPROCESS_H

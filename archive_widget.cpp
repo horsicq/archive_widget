@@ -148,6 +148,23 @@ QString Archive_widget::getCurrentRecordFileName()
     return g_sCurrentRecordFileName;
 }
 
+QList<QString> Archive_widget::getRecordsByFileType(XBinary::FT fileType)
+{
+    QList<QString> listResult;
+
+    qint32 nNumberOfRecords=g_listViewRecords.count();
+
+    for(qint32 i=0;i<nNumberOfRecords;i++)
+    {
+        if(XBinary::checkFileType(fileType,g_listViewRecords.at(i).ft))
+        {
+            listResult.append(g_listViewRecords.at(i).sRecordName);
+        }
+    }
+
+    return listResult;
+}
+
 Archive_widget::~Archive_widget()
 {
     delete ui;
@@ -244,14 +261,14 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName,bool bIsRoot)
 
     if(bIsRoot||(g_type==CreateViewModelProcess::TYPE_DIRECTORY))
     {
-        stFileTypes=XBinary::getFileTypes(sRecordFileName,true);
+        stFileTypes=XFormats::getFileTypes(sRecordFileName,true);
     }
     else
     {
         XArchive::RECORD record=XArchive::getArchiveRecord(sRecordFileName,&g_listRecords);
 
         QByteArray baData=XArchives::decompress(g_sName,&record,true);
-        stFileTypes=XBinary::getFileTypes(&baData,true);
+        stFileTypes=XFormats::getFileTypes(&baData,true);
     }
 
     if(XBinary::isFileTypePresent(&stFileTypes,&g_stAvailableOpenFileTypes))
@@ -494,7 +511,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action,QIODevice
 
 void Archive_widget::_handleActionOpenFile(QString sFileName,QString sTitle,bool bReadWrite)
 {
-    QSet<XBinary::FT> stFileTypes=XBinary::getFileTypes(sFileName,true);
+    QSet<XBinary::FT> stFileTypes=XFormats::getFileTypes(sFileName,true);
 
     if( stFileTypes.contains(XBinary::FT_PNG)||
         stFileTypes.contains(XBinary::FT_JPEG)||
@@ -507,21 +524,25 @@ void Archive_widget::_handleActionOpenFile(QString sFileName,QString sTitle,bool
     }
     else if(stFileTypes.contains(XBinary::FT_TEXT))
     {
-        DialogShowText dialogShowText(this,sTitle);
+        DialogTextInfo dialogTextInfo(this);
+        dialogTextInfo.setTitle(sTitle);
+        dialogTextInfo.setWrap(false);
 
-        dialogShowText.setData(sFileName,DialogShowText::TYPE_FILECONTENT);
+        dialogTextInfo.setFile(sFileName);
 
-        dialogShowText.exec();
+        dialogTextInfo.exec();
     }
     else if(stFileTypes.contains(XBinary::FT_ANDROIDXML))
     {
         QString sString=XAndroidBinary::getDecoded(sFileName);
 
-        DialogShowText dialogShowText(this,sTitle);
+        DialogTextInfo dialogTextInfo(this);
+        dialogTextInfo.setTitle(sTitle);
+        dialogTextInfo.setWrap(false);
 
-        dialogShowText.setData(sString,DialogShowText::TYPE_PLAINTEXT);
+        dialogTextInfo.setText(sString);
 
-        dialogShowText.exec();
+        dialogTextInfo.exec();
     }
     else if( stFileTypes.contains(XBinary::FT_MSDOS)||
              stFileTypes.contains(XBinary::FT_NE)||

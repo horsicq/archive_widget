@@ -34,7 +34,7 @@
 #include "dialogpe.h"
 #include "dialogsearchstrings.h"
 #include "dialogshowimage.h"
-#include "dialogshowtext.h"
+#include "dialogtextinfo.h"
 #include "dialogstaticscan.h"
 #include "dialogunpackfile.h"
 #include "xandroidbinary.h"
@@ -70,6 +70,7 @@ public:
     void setDirectoryName(QString sDirectoryName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
     void setData(CreateViewModelProcess::TYPE type,QString sName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent=nullptr);
     QString getCurrentRecordFileName();
+    QList<QString> getRecordsByFileType(XBinary::FT fileType);
 
 public slots:
     void openRecord();

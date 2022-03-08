@@ -24,6 +24,7 @@
 #include <QDialog>
 #include <QStandardItemModel>
 #include <QThread>
+#include <QTimer>
 #include "createviewmodelprocess.h"
 
 namespace Ui {
@@ -37,17 +38,20 @@ class DialogCreateViewModel : public QDialog
 public:
     explicit DialogCreateViewModel(QWidget *pParent=nullptr);
     ~DialogCreateViewModel();
+
     void setData(CreateViewModelProcess::TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes,QList<CreateViewModelProcess::RECORD> *pListViewRecords);
 
 private slots:
     void on_pushButtonCancel_clicked();
     void onCompleted(qint64 nElapsed);
+    void timerSlot();
 
 private:
+    static const qint32 N_REFRESH_DELAY=1000;
     Ui::DialogCreateViewModel *ui;
-
     CreateViewModelProcess *pCreateViewModelProcess;
     QThread *pThread;
+    QTimer *g_pTimer;
 };
 
 #endif // DIALOGCREATEVIEWMODEL_H
