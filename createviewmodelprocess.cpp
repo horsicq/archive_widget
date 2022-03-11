@@ -53,7 +53,7 @@ void CreateViewModelProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    if(g_type==TYPE_ARCHIVE)
+    if(g_type==TYPE_FILE)
     {
         *g_pListArchiveRecords=XArchives::getRecords(g_sName);
     }
@@ -65,6 +65,20 @@ void CreateViewModelProcess::process()
     qint64 nFileSize=XBinary::getSize(g_sName);
 
     qint32 nNumberOfRecords=g_pListArchiveRecords->count();
+
+    if(nNumberOfRecords==0)
+    {
+        QSet<XBinary::FT> stFT=XFormats::getFileTypes(g_sName,true);
+
+        XBinary::FT ftPref=XBinary::_getPrefFileType(&stFT);
+
+        RECORD _record={};
+        _record.sRecordName=g_sName;
+        _record.ft=ftPref;
+        _record.bIsVirtual=false;
+
+        g_pListViewRecords->append(_record);
+    }
 
     g_stats.nTotal=nNumberOfRecords;
 
@@ -103,7 +117,7 @@ void CreateViewModelProcess::process()
 
         QSet<XBinary::FT> stFT;
 
-        if(g_type==TYPE_ARCHIVE)
+        if(g_type==TYPE_FILE)
         {
             QByteArray baData=XArchives::decompress(g_sName,&record,true);
 
@@ -119,6 +133,7 @@ void CreateViewModelProcess::process()
         RECORD _record={};
         _record.sRecordName=sRecordFileName;
         _record.ft=ftPref;
+        _record.bIsVirtual=true;
 
         g_pListViewRecords->append(_record);
 

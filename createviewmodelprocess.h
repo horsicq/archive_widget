@@ -41,7 +41,7 @@ public:
     enum TYPE
     {
         TYPE_UNKNOWN=0,
-        TYPE_ARCHIVE,
+        TYPE_FILE,
         TYPE_DIRECTORY
     };
 
@@ -49,6 +49,7 @@ public:
     {
         QString sRecordName;
         XBinary::FT ft;
+        bool bIsVirtual;
     };
 
     struct STATS

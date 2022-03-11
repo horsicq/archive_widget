@@ -43,7 +43,7 @@ Archive_widget::Archive_widget(QWidget *pParent) :
 
 void Archive_widget::setFileName(QString sFileName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent)
 {
-    setData(CreateViewModelProcess::TYPE_ARCHIVE,sFileName,options,stAvailableOpenFileTypes,pParent);
+    setData(CreateViewModelProcess::TYPE_FILE,sFileName,options,stAvailableOpenFileTypes,pParent);
 }
 
 void Archive_widget::setDirectoryName(QString sDirectoryName,FW_DEF::OPTIONS options,QSet<XBinary::FT> stAvailableOpenFileTypes,QWidget *pParent)
@@ -148,9 +148,9 @@ QString Archive_widget::getCurrentRecordFileName()
     return g_sCurrentRecordFileName;
 }
 
-QList<QString> Archive_widget::getRecordsByFileType(XBinary::FT fileType)
+QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(XBinary::FT fileType)
 {
-    QList<QString> listResult;
+    QList<CreateViewModelProcess::RECORD> listResult;
 
     qint32 nNumberOfRecords=g_listViewRecords.count();
 
@@ -158,7 +158,7 @@ QList<QString> Archive_widget::getRecordsByFileType(XBinary::FT fileType)
     {
         if(XBinary::checkFileType(fileType,g_listViewRecords.at(i).ft))
         {
-            listResult.append(g_listViewRecords.at(i).sRecordName);
+            listResult.append(g_listViewRecords.at(i));
         }
     }
 
