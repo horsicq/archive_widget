@@ -47,7 +47,7 @@ private slots:
     void timerSlot();
 
 private:
-    static const qint32 N_REFRESH_DELAY=1000;
+    static const qint32 N_REFRESH_DELAY=1000; // TODO check
     Ui::DialogCreateViewModel *ui;
     CreateViewModelProcess *pCreateViewModelProcess;
     QThread *pThread;
