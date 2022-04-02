@@ -29,6 +29,7 @@ class UnpackFileProcess : public QObject
 
 public:
     explicit UnpackFileProcess(QObject *pParent=nullptr);
+
     void setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName);
 
 signals:
