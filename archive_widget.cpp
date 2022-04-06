@@ -483,7 +483,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action,QIODevice
         stringsOptions.bAnsi=true;
         stringsOptions.bUTF8=false;
         stringsOptions.bUnicode=true;
-        stringsOptions.bCStrings=true;
+        stringsOptions.bCStrings=false;
 
         DialogSearchStrings dialogSearchStrings(this);
         dialogSearchStrings.setData(pDevice,stringsOptions,true);
