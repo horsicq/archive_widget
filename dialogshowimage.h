@@ -27,6 +27,7 @@ namespace Ui {
 class DialogShowImage;
 }
 
+// TODO move to FormatDialogs
 class DialogShowImage : public QDialog
 {
     Q_OBJECT
