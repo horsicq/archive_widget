@@ -24,7 +24,7 @@
 #include <QDialog>
 #include "archive_widget.h"
 
-// TODO DialogShortcuts
+// TODO DialogShortcuts !!!
 namespace Ui {
 class DialogArchive;
 }
