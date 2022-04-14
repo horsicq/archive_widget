@@ -28,6 +28,8 @@ DialogArchive::DialogArchive(QWidget *pParent) :
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
+
+    g_options={};
 }
 
 DialogArchive::~DialogArchive()
