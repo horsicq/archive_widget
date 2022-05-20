@@ -202,40 +202,40 @@ void Archive_widget::showContext(QString sRecordFileName,bool bIsRoot,QPoint poi
         {
             if(isOpenAvailable(sRecordFileName,bIsRoot))
             {
-                actionOpen.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_OPEN));
+                actionOpen.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_OPEN));
                 connect(&actionOpen,SIGNAL(triggered()),this,SLOT(openRecord()));
                 contextMenu.addAction(&actionOpen);
             }
         }
 
         QAction actionScan(tr("Scan"),this);
-        actionScan.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_SCAN));
+        actionScan.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_SCAN));
         connect(&actionScan,SIGNAL(triggered()),this,SLOT(scanRecord()));
         contextMenu.addAction(&actionScan);
 
         QAction actionHex(tr("Hex"),this);
-        actionHex.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_HEX));
+        actionHex.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_HEX));
         connect(&actionHex,SIGNAL(triggered()),this,SLOT(hexRecord()));
         contextMenu.addAction(&actionHex);
 
         QAction actionStrings(tr("Strings"),this);
-        actionStrings.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_STRINGS));
+        actionStrings.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_STRINGS));
         connect(&actionStrings,SIGNAL(triggered()),this,SLOT(stringsRecord()));
         contextMenu.addAction(&actionStrings);
 
         QAction actionEntropy(tr("Entropy"),this);
-        actionEntropy.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_ENTROPY));
+        actionEntropy.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_ENTROPY));
         connect(&actionEntropy,SIGNAL(triggered()),this,SLOT(entropyRecord()));
         contextMenu.addAction(&actionEntropy);
 
         QAction actionHash(tr("Hash"),this);
-        actionHash.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_HASH));
+        actionHash.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_HASH));
         connect(&actionHash,SIGNAL(triggered()),this,SLOT(hashRecord()));
         contextMenu.addAction(&actionHash);
 
         QMenu menuCopy(tr("Copy"),this);
         QAction actionCopyFilename(tr("File name"),this);
-        actionCopyFilename.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_COPYFILENAME));
+        actionCopyFilename.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_COPY_FILENAME));
         connect(&actionCopyFilename,SIGNAL(triggered()),this,SLOT(copyFileName()));
         menuCopy.addAction(&actionCopyFilename);
         contextMenu.addMenu(&menuCopy);
@@ -244,7 +244,7 @@ void Archive_widget::showContext(QString sRecordFileName,bool bIsRoot,QPoint poi
 
         if(!bIsRoot)
         {
-            actionDump.setShortcut(getShortcuts()->getShortcut(XShortcuts::ID_ARCHIVE_DUMPTOFILE));
+            actionDump.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_DUMPTOFILE));
             connect(&actionDump,SIGNAL(triggered()),this,SLOT(dumpRecord()));
             contextMenu.addAction(&actionDump);
         }
@@ -725,6 +725,8 @@ void Archive_widget::onTreeElement_selected(const QItemSelection &selected,const
 void Archive_widget::registerShortcuts(bool bState)
 {
     Q_UNUSED(bState)
+
+    // TODO !!!
 }
 
 void Archive_widget::onTableElement_selected(const QItemSelection &selected,const QItemSelection &prev)
