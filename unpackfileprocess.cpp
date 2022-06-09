@@ -27,7 +27,7 @@ UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
 
 void UnpackFileProcess::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName)
 {
-    this->sFileName=sFileName;
+    this->g_sFileName=sFileName;
     this->pRecord=pRecord;
     this->sResultFileName=sResultFileName;
 }
@@ -42,7 +42,7 @@ void UnpackFileProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    bool bResult=XArchives::decompressToFile(sFileName,pRecord,sResultFileName,&bIsStop); // TODO Errors !!!
+    bool bResult=XArchives::decompressToFile(g_sFileName,pRecord,sResultFileName,&bIsStop); // TODO Errors !!!
 
     emit completed(bResult&&(!bIsStop),scanTimer.elapsed());
 

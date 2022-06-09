@@ -41,7 +41,7 @@ public slots:
     void process();
 
 private:
-    QString sFileName;
+    QString g_sFileName;
     XArchive::RECORD *pRecord;
     QString sResultFileName;
     bool bIsStop;
