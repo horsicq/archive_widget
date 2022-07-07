@@ -22,19 +22,16 @@
 
 UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
 {
-    bIsStop=false;
+    g_pRecord=nullptr;
+    g_pPdStruct=nullptr;
 }
 
-void UnpackFileProcess::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName)
+void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_sFileName=sFileName;
-    this->pRecord=pRecord;
+    this->g_pRecord=pRecord;
     this->sResultFileName=sResultFileName;
-}
-
-void UnpackFileProcess::stop()
-{
-    bIsStop=true;
+    this->g_pPdStruct=pPdStruct;
 }
 
 void UnpackFileProcess::process()
@@ -42,9 +39,16 @@ void UnpackFileProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    bool bResult=XArchives::decompressToFile(g_sFileName,pRecord,sResultFileName,&bIsStop); // TODO Errors !!!
+    g_pPdStruct->pdRecordOpt.bIsValid=true;
 
-    emit completed(bResult&&(!bIsStop),scanTimer.elapsed());
+    bool bResult=XArchives::decompressToFile(g_sFileName,g_pRecord,sResultFileName,g_pPdStruct); // TODO Errors !!!
 
-    bIsStop=false;
+    if(!(g_pPdStruct->bIsStop))
+    {
+        g_pPdStruct->pdRecordOpt.bSuccess=bResult;
+    }
+
+    g_pPdStruct->pdRecordOpt.bFinished=true;
+
+    emit completed(scanTimer.elapsed());
 }

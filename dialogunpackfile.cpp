@@ -22,11 +22,8 @@
 #include "ui_dialogunpackfile.h"
 
 DialogUnpackFile::DialogUnpackFile(QWidget *pParent) :
-    QDialog(pParent),
-    ui(new Ui::DialogUnpackFile)
+    XDialogProcess(pParent)
 {
-    ui->setupUi(this);
-
     pUnpackFileProcess=new UnpackFileProcess;
     pThread=new QThread;
 
@@ -38,12 +35,11 @@ DialogUnpackFile::DialogUnpackFile(QWidget *pParent) :
 
 DialogUnpackFile::~DialogUnpackFile()
 {
-    pUnpackFileProcess->stop();
+    stop();
+    waitForFinished();
 
     pThread->quit();
     pThread->wait();
-
-    delete ui;
 
     delete pThread;
     delete pUnpackFileProcess;
@@ -51,24 +47,6 @@ DialogUnpackFile::~DialogUnpackFile()
 
 void DialogUnpackFile::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName)
 {
-    pUnpackFileProcess->setData(sFileName,pRecord,sResultFileName);
+    pUnpackFileProcess->setData(sFileName,pRecord,sResultFileName,getPdStruct());
     pThread->start();
-}
-void DialogUnpackFile::on_pushButtonCancel_clicked()
-{
-    pUnpackFileProcess->stop();
-}
-
-void DialogUnpackFile::onCompleted(bool bResult,qint64 nElapsed) // TODO errors
-{
-    Q_UNUSED(nElapsed)
-
-    if(bResult)
-    {
-        accept();
-    }
-    else
-    {
-        reject();
-    }
 }

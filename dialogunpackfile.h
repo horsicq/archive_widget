@@ -24,12 +24,9 @@
 #include <QDialog>
 #include <QThread>
 #include "unpackfileprocess.h"
+#include "xdialogprocess.h"
 
-namespace Ui {
-class DialogUnpackFile;
-}
-
-class DialogUnpackFile : public QDialog
+class DialogUnpackFile : public XDialogProcess
 {
     Q_OBJECT
 
@@ -38,13 +35,7 @@ public:
     ~DialogUnpackFile();
     void setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName);
 
-private slots:
-    void on_pushButtonCancel_clicked();
-    void onCompleted(bool bResult,qint64 nElapsed);
-
 private:
-    Ui::DialogUnpackFile *ui;
-
     UnpackFileProcess *pUnpackFileProcess;
     QThread *pThread;
 };
