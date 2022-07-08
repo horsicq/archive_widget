@@ -26,7 +26,7 @@ UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
     g_pPdStruct=nullptr;
 }
 
-void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct)
+void UnpackFileProcess::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName,XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_sFileName=sFileName;
     this->g_pRecord=pRecord;
