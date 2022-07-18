@@ -30,7 +30,7 @@ DialogUnpackFile::DialogUnpackFile(QWidget *pParent) :
     pUnpackFileProcess->moveToThread(pThread);
 
     connect(pThread,SIGNAL(started()),pUnpackFileProcess,SLOT(process()));
-    connect(pUnpackFileProcess,SIGNAL(completed(bool,qint64)),this,SLOT(onCompleted(bool,qint64)));
+    connect(pUnpackFileProcess,SIGNAL(completed(qint64)),this,SLOT(onCompleted(qint64)));
 }
 
 DialogUnpackFile::~DialogUnpackFile()
