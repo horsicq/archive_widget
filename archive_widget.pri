@@ -15,13 +15,6 @@ DEPENDPATH += $$PWD
     XCONFIG += use_archive
 }
 
-FORMS += \
-    $$PWD/archive_widget.ui \
-    $$PWD/dialogarchive.ui \
-    $$PWD/dialogcreateviewmodel.ui \
-    $$PWD/dialogshowimage.ui \
-    $$PWD/dialogunpackfile.ui
-
 HEADERS += \
     $$PWD/archive_widget.h \
     $$PWD/createviewmodelprocess.h \
@@ -39,6 +32,13 @@ SOURCES += \
     $$PWD/dialogshowimage.cpp \
     $$PWD/dialogunpackfile.cpp \
     $$PWD/unpackfileprocess.cpp
+
+FORMS += \
+    $$PWD/archive_widget.ui \
+    $$PWD/dialogarchive.ui \
+    $$PWD/dialogcreateviewmodel.ui \
+    $$PWD/dialogshowimage.ui \
+    $$PWD/dialogunpackfile.ui
 
 !contains(XCONFIG, allformatwidgets) {
     XCONFIG += allformatwidgets
