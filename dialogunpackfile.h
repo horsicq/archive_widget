@@ -36,8 +36,8 @@ public:
     void setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName);
 
 private:
-    UnpackFileProcess *pUnpackFileProcess;
-    QThread *pThread;
+    UnpackFileProcess *g_pUnpackFileProcess;
+    QThread *g_pThread;
 };
 
 #endif // DIALOGUNPACKFILE_H

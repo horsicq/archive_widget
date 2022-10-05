@@ -24,13 +24,13 @@
 DialogUnpackFile::DialogUnpackFile(QWidget *pParent) :
     XDialogProcess(pParent)
 {
-    pUnpackFileProcess=new UnpackFileProcess;
-    pThread=new QThread;
+    g_pUnpackFileProcess=new UnpackFileProcess;
+    g_pThread=new QThread;
 
-    pUnpackFileProcess->moveToThread(pThread);
+    g_pUnpackFileProcess->moveToThread(g_pThread);
 
-    connect(pThread,SIGNAL(started()),pUnpackFileProcess,SLOT(process()));
-    connect(pUnpackFileProcess,SIGNAL(completed(qint64)),this,SLOT(onCompleted(qint64)));
+    connect(g_pThread,SIGNAL(started()),g_pUnpackFileProcess,SLOT(process()));
+    connect(g_pUnpackFileProcess,SIGNAL(completed(qint64)),this,SLOT(onCompleted(qint64)));
 }
 
 DialogUnpackFile::~DialogUnpackFile()
@@ -38,15 +38,15 @@ DialogUnpackFile::~DialogUnpackFile()
     stop();
     waitForFinished();
 
-    pThread->quit();
-    pThread->wait();
+    g_pThread->quit();
+    g_pThread->wait();
 
-    delete pThread;
-    delete pUnpackFileProcess;
+    delete g_pThread;
+    delete g_pUnpackFileProcess;
 }
 
 void DialogUnpackFile::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName)
 {
-    pUnpackFileProcess->setData(sFileName,pRecord,sResultFileName,getPdStruct());
-    pThread->start();
+    g_pUnpackFileProcess->setData(sFileName,pRecord,sResultFileName,getPdStruct());
+    g_pThread->start();
 }
