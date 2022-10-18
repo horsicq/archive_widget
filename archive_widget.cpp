@@ -120,8 +120,8 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type,QString sName,FW_
     ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
     ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Interactive);
 
-    delete pOldTreeModel; // TODO remove in Thread
-    delete pOldTableModel; // TODO remove in Thread
+    deleteOldAbstractModel(&pOldTreeModel);
+    deleteOldAbstractModel(&pOldTableModel);
 
     ui->tableViewArchive->setSortingEnabled(true);
     ui->tableViewArchive->sortByColumn(0,Qt::AscendingOrder);
