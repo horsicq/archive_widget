@@ -127,7 +127,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type,QString sName,FW_
     ui->tableViewArchive->setSortingEnabled(true);
     ui->tableViewArchive->sortByColumn(0,Qt::AscendingOrder);
 
-    ui->tableViewArchive->setColumnWidth(0,20);
+    ui->tableViewArchive->setColumnWidth(0,20);  // TODO consts
 
     ui->treeViewArchive->expand(pNewTreeModel->index(0,0));
 
