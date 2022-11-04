@@ -189,15 +189,15 @@ void CreateViewModelProcess::process()
                             pItemName->setData(ftPref,Qt::UserRole+UR_FT);
                         }
 
-                        QStandardItem *pParent=nullptr;
+                        QStandardItem *pItemParent=nullptr;
 
                         if(k==0)
                         {
-                            pParent=pRootItemName;
+                            pItemParent=pRootItemName;
                         }
                         else
                         {
-                            pParent=mapItems.value(_sRecordFileName.section("/",0,k-1));
+                            pItemParent=mapItems.value(_sRecordFileName.section("/",0,k-1));
                         }
 
                         QList<QStandardItem *> listItems;
@@ -213,7 +213,7 @@ void CreateViewModelProcess::process()
                             listItems.append(pItemSize);
                         }
 
-                        pParent->appendRow(listItems);
+                        pItemParent->appendRow(listItems);
 
                         mapItems.insert(sRelPart,pItemName);
                     }
