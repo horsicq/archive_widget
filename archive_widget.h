@@ -81,7 +81,6 @@ private slots:
     void on_tableViewArchive_customContextMenuRequested(const QPoint &pos);
     void showContext(QString sRecordFileName,bool bIsRoot,QPoint point);
     bool isOpenAvailable(QString sRecordFileName,bool bIsRoot);
-
     void scanRecord();
     void hexRecord();
     void stringsRecord();
@@ -89,7 +88,6 @@ private slots:
     void hashRecord();
     void copyFileName();
     void dumpRecord();
-
     void handleAction(ACTION action);
     void _handleActionDevice(ACTION action,QIODevice *pDevice);
     void _handleActionOpenFile(QString sFileName,QString sTitle,bool bReadWrite);
