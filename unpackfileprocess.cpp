@@ -42,7 +42,7 @@ void UnpackFileProcess::process()
     qint32 _nFreeIndex=XBinary::getFreeIndex(g_pPdStruct);
     XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,0);
 
-    bool bResult=XArchives::decompressToFile(g_sFileName,g_pRecord,sResultFileName,g_pPdStruct); // TODO Errors !!!
+    bool bResult=XArchives::decompressToFile(g_sFileName,g_pRecord,sResultFileName,g_pPdStruct); // TODO Error signals
 
     g_pPdStruct->bIsStop=!(bResult);
 
