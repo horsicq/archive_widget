@@ -62,7 +62,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type,QString sName,FW_
     if(!g_stAvailableOpenFileTypes.count())
     {
         // TODO more
-        // TODO Check
+        // TODO Check mb Archives
         g_stAvailableOpenFileTypes.insert(XBinary::FT_MSDOS);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_NE);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_LE);
