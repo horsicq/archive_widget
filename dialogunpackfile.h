@@ -7,8 +7,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,21 +23,22 @@
 
 #include <QDialog>
 #include <QThread>
+
 #include "unpackfileprocess.h"
 #include "xdialogprocess.h"
 
-class DialogUnpackFile : public XDialogProcess
-{
+class DialogUnpackFile : public XDialogProcess {
     Q_OBJECT
 
-public:
-    explicit DialogUnpackFile(QWidget *pParent=nullptr);
+   public:
+    explicit DialogUnpackFile(QWidget *pParent = nullptr);
     ~DialogUnpackFile();
-    void setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName);
+    void setData(QString sFileName, XArchive::RECORD *pRecord,
+                 QString sResultFileName);
 
-private:
+   private:
     UnpackFileProcess *g_pUnpackFileProcess;
     QThread *g_pThread;
 };
 
-#endif // DIALOGUNPACKFILE_H
+#endif  // DIALOGUNPACKFILE_H

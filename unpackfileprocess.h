@@ -7,8 +7,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,27 +23,27 @@
 
 #include "xarchives.h"
 
-class UnpackFileProcess : public QObject
-{
+class UnpackFileProcess : public QObject {
     Q_OBJECT
 
-public:
-    explicit UnpackFileProcess(QObject *pParent=nullptr);
+   public:
+    explicit UnpackFileProcess(QObject *pParent = nullptr);
 
-    void setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName,XBinary::PDSTRUCT *pPdStruct);
+    void setData(QString sFileName, XArchive::RECORD *pRecord,
+                 QString sResultFileName, XBinary::PDSTRUCT *pPdStruct);
 
-signals:
+   signals:
     void errorMessage(QString sText);
     void completed(qint64 nElapsed);
 
-public slots:
+   public slots:
     void process();
 
-private:
+   private:
     QString g_sFileName;
     XArchive::RECORD *g_pRecord;
     QString sResultFileName;
     XBinary::PDSTRUCT *g_pPdStruct;
 };
 
-#endif // UNPACKFILEPROCESS_H
+#endif  // UNPACKFILEPROCESS_H

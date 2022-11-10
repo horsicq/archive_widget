@@ -7,8 +7,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -19,28 +19,28 @@
  * SOFTWARE.
  */
 #include "dialogcreateviewmodel.h"
+
 #include "ui_dialogcreateviewmodel.h"
 
-DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) :
-    QDialog(pParent),
-    ui(new Ui::DialogCreateViewModel)
-{
+DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent)
+    : QDialog(pParent), ui(new Ui::DialogCreateViewModel) {
     ui->setupUi(this);
 
-    pCreateViewModelProcess=new CreateViewModelProcess;
-    pThread=new QThread;
+    pCreateViewModelProcess = new CreateViewModelProcess;
+    pThread = new QThread;
 
     pCreateViewModelProcess->moveToThread(pThread);
 
-    connect(pThread,SIGNAL(started()),pCreateViewModelProcess,SLOT(process()));
-    connect(pCreateViewModelProcess,SIGNAL(completed(qint64)),this,SLOT(onCompleted(qint64)));
+    connect(pThread, SIGNAL(started()), pCreateViewModelProcess,
+            SLOT(process()));
+    connect(pCreateViewModelProcess, SIGNAL(completed(qint64)), this,
+            SLOT(onCompleted(qint64)));
 
-    g_pTimer=new QTimer(this);
-    connect(g_pTimer,SIGNAL(timeout()),this,SLOT(timerSlot()));
+    g_pTimer = new QTimer(this);
+    connect(g_pTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
 }
 
-DialogCreateViewModel::~DialogCreateViewModel()
-{
+DialogCreateViewModel::~DialogCreateViewModel() {
     pCreateViewModelProcess->stop();
 
     g_pTimer->stop();
@@ -54,36 +54,40 @@ DialogCreateViewModel::~DialogCreateViewModel()
     delete pCreateViewModelProcess;
 }
 
-void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes,QList<CreateViewModelProcess::RECORD> *pListViewRecords)
-{
-    pCreateViewModelProcess->setData(type,sName,pListArchiveRecords,ppTreeModel,ppTableModel,stFilterFileTypes,pListViewRecords);
+void DialogCreateViewModel::setData(
+    CreateViewModelProcess::TYPE type, QString sName,
+    QList<XArchive::RECORD> *pListArchiveRecords,
+    QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel,
+    QSet<XBinary::FT> stFilterFileTypes,
+    QList<CreateViewModelProcess::RECORD> *pListViewRecords) {
+    pCreateViewModelProcess->setData(type, sName, pListArchiveRecords,
+                                     ppTreeModel, ppTableModel,
+                                     stFilterFileTypes, pListViewRecords);
     pThread->start();
     g_pTimer->start(N_REFRESH_DELAY);
     ui->progressBarTotal->setMaximum(100);
 }
 
-void DialogCreateViewModel::on_pushButtonCancel_clicked()
-{
+void DialogCreateViewModel::on_pushButtonCancel_clicked() {
     pCreateViewModelProcess->stop();
 }
 
-void DialogCreateViewModel::onCompleted(qint64 nElapsed)
-{
+void DialogCreateViewModel::onCompleted(qint64 nElapsed) {
     Q_UNUSED(nElapsed)
 
     this->close();
 }
 
-void DialogCreateViewModel::timerSlot()
-{
-    CreateViewModelProcess::STATS stats=pCreateViewModelProcess->getCurrentStats();
+void DialogCreateViewModel::timerSlot() {
+    CreateViewModelProcess::STATS stats =
+        pCreateViewModelProcess->getCurrentStats();
 
     ui->labelTotal->setText(QString::number(stats.nTotal));
     ui->labelCurrent->setText(QString::number(stats.nCurrent));
     ui->labelCurrentStatus->setText(stats.sStatus);
 
-    if(stats.nTotal)
-    {
-        ui->progressBarTotal->setValue((int)((stats.nCurrent*100)/stats.nTotal));
+    if (stats.nTotal) {
+        ui->progressBarTotal->setValue(
+            (int)((stats.nCurrent * 100) / stats.nTotal));
     }
 }

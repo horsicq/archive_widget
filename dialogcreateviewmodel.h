@@ -7,8 +7,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,33 +25,38 @@
 #include <QStandardItemModel>
 #include <QThread>
 #include <QTimer>
+
 #include "createviewmodelprocess.h"
 
 namespace Ui {
 class DialogCreateViewModel;
 }
 
-class DialogCreateViewModel : public QDialog
-{
+class DialogCreateViewModel : public QDialog {
     Q_OBJECT
 
-public:
-    explicit DialogCreateViewModel(QWidget *pParent=nullptr);
+   public:
+    explicit DialogCreateViewModel(QWidget *pParent = nullptr);
     ~DialogCreateViewModel();
 
-    void setData(CreateViewModelProcess::TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes,QList<CreateViewModelProcess::RECORD> *pListViewRecords);
+    void setData(CreateViewModelProcess::TYPE type, QString sName,
+                 QList<XArchive::RECORD> *pListArchiveRecords,
+                 QStandardItemModel **ppTreeModel,
+                 QStandardItemModel **ppTableModel,
+                 QSet<XBinary::FT> stFilterFileTypes,
+                 QList<CreateViewModelProcess::RECORD> *pListViewRecords);
 
-private slots:
+   private slots:
     void on_pushButtonCancel_clicked();
     void onCompleted(qint64 nElapsed);
     void timerSlot();
 
-private:
-    static const qint32 N_REFRESH_DELAY=1000; // TODO check
+   private:
+    static const qint32 N_REFRESH_DELAY = 1000;  // TODO check
     Ui::DialogCreateViewModel *ui;
     CreateViewModelProcess *pCreateViewModelProcess;
     QThread *pThread;
     QTimer *g_pTimer;
 };
 
-#endif // DIALOGCREATEVIEWMODEL_H
+#endif  // DIALOGCREATEVIEWMODEL_H

@@ -7,8 +7,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,57 +23,49 @@
 
 #include <QElapsedTimer>
 #include <QStandardItemModel>
+
 #include "xformats.h"
 
 // TODO PDStruct
-class CreateViewModelProcess : public QObject
-{
+class CreateViewModelProcess : public QObject {
     Q_OBJECT
 
-public:
-    enum UR
-    {
-        UR_PATH=0,
-        UR_SIZE,
-        UR_ISROOT,
-        UR_FT
-    };
+   public:
+    enum UR { UR_PATH = 0, UR_SIZE, UR_ISROOT, UR_FT };
 
-    enum TYPE
-    {
-        TYPE_UNKNOWN=0,
-        TYPE_FILE,
-        TYPE_DIRECTORY
-    };
+    enum TYPE { TYPE_UNKNOWN = 0, TYPE_FILE, TYPE_DIRECTORY };
 
-    struct RECORD
-    {
+    struct RECORD {
         QString sRecordName;
         XBinary::FT ft;
         bool bIsVirtual;
     };
 
-    struct STATS
-    {
+    struct STATS {
         qint32 nTotal;
         qint32 nCurrent;
         QString sStatus;
     };
 
-    explicit CreateViewModelProcess(QObject *pParent=nullptr);
+    explicit CreateViewModelProcess(QObject *pParent = nullptr);
 
-    void setData(CreateViewModelProcess::TYPE type,QString sName,QList<XArchive::RECORD> *pListArchiveRecords,QStandardItemModel **ppTreeModel,QStandardItemModel **ppTableModel,QSet<XBinary::FT> stFilterFileTypes,QList<RECORD> *pListViewRecords);
+    void setData(CreateViewModelProcess::TYPE type, QString sName,
+                 QList<XArchive::RECORD> *pListArchiveRecords,
+                 QStandardItemModel **ppTreeModel,
+                 QStandardItemModel **ppTableModel,
+                 QSet<XBinary::FT> stFilterFileTypes,
+                 QList<RECORD> *pListViewRecords);
     STATS getCurrentStats();
 
-signals:
+   signals:
     void errorMessage(QString sText);
     void completed(qint64 nElapsed);
 
-public slots:
+   public slots:
     void stop();
     void process();
 
-private:
+   private:
     TYPE g_type;
     QString g_sName;
     QList<XArchive::RECORD> *g_pListArchiveRecords;
@@ -85,4 +77,4 @@ private:
     STATS g_stats;
 };
 
-#endif // CREATEVIEWMODELPROCESS_H
+#endif  // CREATEVIEWMODELPROCESS_H

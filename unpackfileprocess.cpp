@@ -7,8 +7,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,33 +20,34 @@
  */
 #include "unpackfileprocess.h"
 
-UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
-{
-    g_pRecord=nullptr;
-    g_pPdStruct=nullptr;
+UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent) {
+    g_pRecord = nullptr;
+    g_pPdStruct = nullptr;
 }
 
-void UnpackFileProcess::setData(QString sFileName,XArchive::RECORD *pRecord,QString sResultFileName,XBinary::PDSTRUCT *pPdStruct)
-{
-    this->g_sFileName=sFileName;
-    this->g_pRecord=pRecord;
-    this->sResultFileName=sResultFileName;
-    this->g_pPdStruct=pPdStruct;
+void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord,
+                                QString sResultFileName,
+                                XBinary::PDSTRUCT *pPdStruct) {
+    this->g_sFileName = sFileName;
+    this->g_pRecord = pRecord;
+    this->sResultFileName = sResultFileName;
+    this->g_pPdStruct = pPdStruct;
 }
 
-void UnpackFileProcess::process()
-{
+void UnpackFileProcess::process() {
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    qint32 _nFreeIndex=XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct,_nFreeIndex,0);
+    qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
+    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, 0);
 
-    bool bResult=XArchives::decompressToFile(g_sFileName,g_pRecord,sResultFileName,g_pPdStruct); // TODO Error signals
+    bool bResult =
+        XArchives::decompressToFile(g_sFileName, g_pRecord, sResultFileName,
+                                    g_pPdStruct);  // TODO Error signals
 
-    g_pPdStruct->bIsStop=!(bResult);
+    g_pPdStruct->bIsStop = !(bResult);
 
-    XBinary::setPdStructFinished(g_pPdStruct,_nFreeIndex);
+    XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
 
     emit completed(scanTimer.elapsed());
 }
