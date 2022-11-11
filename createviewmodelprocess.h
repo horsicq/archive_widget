@@ -30,10 +30,19 @@
 class CreateViewModelProcess : public QObject {
     Q_OBJECT
 
-   public:
-    enum UR { UR_PATH = 0, UR_SIZE, UR_ISROOT, UR_FT };
+public:
+    enum UR {
+        UR_PATH = 0,
+        UR_SIZE,
+        UR_ISROOT,
+        UR_FT
+    };
 
-    enum TYPE { TYPE_UNKNOWN = 0, TYPE_FILE, TYPE_DIRECTORY };
+    enum TYPE {
+        TYPE_UNKNOWN = 0,
+        TYPE_FILE,
+        TYPE_DIRECTORY
+    };
 
     struct RECORD {
         QString sRecordName;
@@ -49,23 +58,19 @@ class CreateViewModelProcess : public QObject {
 
     explicit CreateViewModelProcess(QObject *pParent = nullptr);
 
-    void setData(CreateViewModelProcess::TYPE type, QString sName,
-                 QList<XArchive::RECORD> *pListArchiveRecords,
-                 QStandardItemModel **ppTreeModel,
-                 QStandardItemModel **ppTableModel,
-                 QSet<XBinary::FT> stFilterFileTypes,
-                 QList<RECORD> *pListViewRecords);
+    void setData(CreateViewModelProcess::TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
+                 QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords);
     STATS getCurrentStats();
 
-   signals:
+signals:
     void errorMessage(QString sText);
     void completed(qint64 nElapsed);
 
-   public slots:
+public slots:
     void stop();
     void process();
 
-   private:
+private:
     TYPE g_type;
     QString g_sName;
     QList<XArchive::RECORD> *g_pListArchiveRecords;

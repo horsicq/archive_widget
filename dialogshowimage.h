@@ -31,15 +31,14 @@ class DialogShowImage;
 class DialogShowImage : public QDialog {
     Q_OBJECT
 
-   public:
-    explicit DialogShowImage(QWidget *pParent, QString sFileName,
-                             QString sTitle);
+public:
+    explicit DialogShowImage(QWidget *pParent, QString sFileName, QString sTitle);
     ~DialogShowImage();
 
-   private slots:
+private slots:
     void on_pushButtonClose_clicked();
 
-   private:
+private:
     Ui::DialogShowImage *ui;
 };
 

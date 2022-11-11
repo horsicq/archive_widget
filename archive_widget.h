@@ -60,30 +60,23 @@ class Archive_widget : public XShortcutsWidget {
         // TODO Check
     };
 
-   public:
+public:
     explicit Archive_widget(QWidget *pParent = nullptr);
     ~Archive_widget();
 
     // TODO setOptions
-    void setFileName(
-        QString sFileName, FW_DEF::OPTIONS options,
-        QSet<XBinary::FT> stAvailableOpenFileTypes,
-        QWidget *pParent = nullptr);  // TODO options for Viewers TODO Device
-    void setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options,
-                          QSet<XBinary::FT> stAvailableOpenFileTypes,
-                          QWidget *pParent = nullptr);
-    void setData(CreateViewModelProcess::TYPE type, QString sName,
-                 FW_DEF::OPTIONS options,
-                 QSet<XBinary::FT> stAvailableOpenFileTypes,
+    void setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes,
+                     QWidget *pParent = nullptr);  // TODO options for Viewers TODO Device
+    void setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent = nullptr);
+    void setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes,
                  QWidget *pParent = nullptr);
     QString getCurrentRecordFileName();
-    QList<CreateViewModelProcess::RECORD> getRecordsByFileType(
-        XBinary::FT fileType);
+    QList<CreateViewModelProcess::RECORD> getRecordsByFileType(XBinary::FT fileType);
 
-   public slots:
+public slots:
     void openRecord();
 
-   private slots:
+private slots:
     void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
     void on_tableViewArchive_customContextMenuRequested(const QPoint &pos);
     void showContext(QString sRecordFileName, bool bIsRoot, QPoint point);
@@ -97,8 +90,7 @@ class Archive_widget : public XShortcutsWidget {
     void dumpRecord();
     void handleAction(ACTION action);
     void _handleActionDevice(ACTION action, QIODevice *pDevice);
-    void _handleActionOpenFile(QString sFileName, QString sTitle,
-                               bool bReadWrite);
+    void _handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite);
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_lineEditFilter_textChanged(const QString &sString);
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
@@ -108,13 +100,13 @@ class Archive_widget : public XShortcutsWidget {
     void onTableElement_selected(const QItemSelection &selected,
                                  const QItemSelection &prev);  // TrackSelection
 
-   protected:
+protected:
     virtual void registerShortcuts(bool bState);
 
-   signals:
+signals:
     void openAvailable(bool bState);
 
-   private:
+private:
     Ui::Archive_widget *ui;
     CreateViewModelProcess::TYPE g_type;
     QString g_sName;

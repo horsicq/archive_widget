@@ -30,13 +30,12 @@
 class DialogUnpackFile : public XDialogProcess {
     Q_OBJECT
 
-   public:
+public:
     explicit DialogUnpackFile(QWidget *pParent = nullptr);
     ~DialogUnpackFile();
-    void setData(QString sFileName, XArchive::RECORD *pRecord,
-                 QString sResultFileName);
+    void setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName);
 
-   private:
+private:
     UnpackFileProcess *g_pUnpackFileProcess;
     QThread *g_pThread;
 };

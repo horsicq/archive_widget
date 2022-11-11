@@ -22,8 +22,7 @@
 
 #include "ui_dialogarchive.h"
 
-DialogArchive::DialogArchive(QWidget *pParent)
-    : QDialog(pParent), ui(new Ui::DialogArchive) {
+DialogArchive::DialogArchive(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogArchive) {
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
@@ -31,10 +30,11 @@ DialogArchive::DialogArchive(QWidget *pParent)
     g_options = {};
 }
 
-DialogArchive::~DialogArchive() { delete ui; }
+DialogArchive::~DialogArchive() {
+    delete ui;
+}
 
-void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options,
-                                QSet<XBinary::FT> stAvailableFileTypes) {
+void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes) {
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
     }
@@ -43,15 +43,11 @@ void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options,
     ui->widget->setFileName(sFileName, options, stAvailableFileTypes);
 }
 
-void DialogArchive::setDevice(QIODevice *pDevice, FW_DEF::OPTIONS options,
-                              QSet<XBinary::FT> stAvailableFileTypes) {
-    setFileName(XBinary::getDeviceFileName(pDevice), options,
-                stAvailableFileTypes);
+void DialogArchive::setDevice(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes) {
+    setFileName(XBinary::getDeviceFileName(pDevice), options, stAvailableFileTypes);
 }
 
-void DialogArchive::setDirectory(QString sDirectoryName,
-                                 FW_DEF::OPTIONS options,
-                                 QSet<XBinary::FT> stAvailableFileTypes) {
+void DialogArchive::setDirectory(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes) {
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
     }
@@ -68,7 +64,9 @@ QString DialogArchive::getCurrentRecordFileName() {
     return g_sCurrentRecordFileName;
 }
 
-void DialogArchive::on_pushButtonClose_clicked() { reject(); }
+void DialogArchive::on_pushButtonClose_clicked() {
+    reject();
+}
 
 void DialogArchive::on_pushButtonOpen_clicked() {
     g_sCurrentRecordFileName = ui->widget->getCurrentRecordFileName();

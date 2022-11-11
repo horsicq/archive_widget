@@ -35,23 +35,19 @@ class DialogCreateViewModel;
 class DialogCreateViewModel : public QDialog {
     Q_OBJECT
 
-   public:
+public:
     explicit DialogCreateViewModel(QWidget *pParent = nullptr);
     ~DialogCreateViewModel();
 
-    void setData(CreateViewModelProcess::TYPE type, QString sName,
-                 QList<XArchive::RECORD> *pListArchiveRecords,
-                 QStandardItemModel **ppTreeModel,
-                 QStandardItemModel **ppTableModel,
-                 QSet<XBinary::FT> stFilterFileTypes,
-                 QList<CreateViewModelProcess::RECORD> *pListViewRecords);
+    void setData(CreateViewModelProcess::TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
+                 QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<CreateViewModelProcess::RECORD> *pListViewRecords);
 
-   private slots:
+private slots:
     void on_pushButtonCancel_clicked();
     void onCompleted(qint64 nElapsed);
     void timerSlot();
 
-   private:
+private:
     static const qint32 N_REFRESH_DELAY = 1000;  // TODO check
     Ui::DialogCreateViewModel *ui;
     CreateViewModelProcess *pCreateViewModelProcess;

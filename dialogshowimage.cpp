@@ -22,9 +22,7 @@
 
 #include "ui_dialogshowimage.h"
 
-DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName,
-                                 QString sTitle)
-    : QDialog(pParent), ui(new Ui::DialogShowImage) {
+DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName, QString sTitle) : QDialog(pParent), ui(new Ui::DialogShowImage) {
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
@@ -36,6 +34,10 @@ DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName,
     ui->labelImage->setScaledContents(true);
 }
 
-DialogShowImage::~DialogShowImage() { delete ui; }
+DialogShowImage::~DialogShowImage() {
+    delete ui;
+}
 
-void DialogShowImage::on_pushButtonClose_clicked() { this->close(); }
+void DialogShowImage::on_pushButtonClose_clicked() {
+    this->close();
+}

@@ -22,8 +22,7 @@
 
 #include "ui_archive_widget.h"
 
-Archive_widget::Archive_widget(QWidget *pParent)
-    : XShortcutsWidget(pParent), ui(new Ui::Archive_widget) {
+Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::Archive_widget) {
     ui->setupUi(this);
 
     g_pFilterTable = new QSortFilterProxyModel(this);
@@ -40,23 +39,15 @@ Archive_widget::Archive_widget(QWidget *pParent)
     g_type = CreateViewModelProcess::TYPE_UNKNOWN;
 }
 
-void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options,
-                                 QSet<XBinary::FT> stAvailableOpenFileTypes,
-                                 QWidget *pParent) {
-    setData(CreateViewModelProcess::TYPE_FILE, sFileName, options,
-            stAvailableOpenFileTypes, pParent);
+void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent) {
+    setData(CreateViewModelProcess::TYPE_FILE, sFileName, options, stAvailableOpenFileTypes, pParent);
 }
 
-void Archive_widget::setDirectoryName(
-    QString sDirectoryName, FW_DEF::OPTIONS options,
-    QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent) {
-    setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options,
-            stAvailableOpenFileTypes, pParent);
+void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent) {
+    setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options, stAvailableOpenFileTypes, pParent);
 }
 
-void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName,
-                             FW_DEF::OPTIONS options,
-                             QSet<XBinary::FT> stAvailableOpenFileTypes,
+void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes,
                              QWidget *pParent) {
     g_type = type;
     g_sName = sName;
@@ -108,28 +99,21 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName,
 
     DialogCreateViewModel dialogCreateViewModel(pParent);
 
-    dialogCreateViewModel.setData(type, sName, &g_listRecords, &pNewTreeModel,
-                                  &pNewTableModel, stFilterFileTypes,
-                                  &g_listViewRecords);
+    dialogCreateViewModel.setData(type, sName, &g_listRecords, &pNewTreeModel, &pNewTableModel, stFilterFileTypes, &g_listViewRecords);
 
     dialogCreateViewModel.exec();
 
     ui->treeViewArchive->setModel(pNewTreeModel);
 
-    ui->treeViewArchive->header()->setSectionResizeMode(0,
-                                                        QHeaderView::Stretch);
-    ui->treeViewArchive->header()->setSectionResizeMode(
-        1, QHeaderView::Interactive);
+    ui->treeViewArchive->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    ui->treeViewArchive->header()->setSectionResizeMode(1, QHeaderView::Interactive);
 
     g_pFilterTable->setSourceModel(pNewTableModel);
     ui->tableViewArchive->setModel(g_pFilterTable);
 
-    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(
-        0, QHeaderView::Interactive);
-    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(
-        1, QHeaderView::Stretch);
-    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(
-        2, QHeaderView::Interactive);
+    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
+    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Interactive);
 
     deleteOldAbstractModel(&pOldTreeModel);
     deleteOldAbstractModel(&pOldTableModel);
@@ -141,19 +125,16 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName,
 
     ui->treeViewArchive->expand(pNewTreeModel->index(0, 0));
 
-    connect(ui->treeViewArchive->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(onTreeElement_selected(QItemSelection, QItemSelection)));
-    connect(ui->tableViewArchive->selectionModel(),
-            SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+    connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
 
     if (g_options.bFilter) {
         ui->comboBoxType->setCurrentIndex(1);  // TODO enum !!!
 
         if (g_listRecords.count()) {
-            ui->tableViewArchive->setCurrentIndex(
-                ui->tableViewArchive->model()->index(0, 0));
+            ui->tableViewArchive->setCurrentIndex(ui->tableViewArchive->model()->index(0, 0));
         }
     }
 }
@@ -162,8 +143,7 @@ QString Archive_widget::getCurrentRecordFileName() {
     return g_sCurrentRecordFileName;
 }
 
-QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(
-    XBinary::FT fileType) {
+QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(XBinary::FT fileType) {
     QList<CreateViewModelProcess::RECORD> listResult;
 
     qint32 nNumberOfRecords = g_listViewRecords.count();
@@ -177,32 +157,27 @@ QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(
     return listResult;
 }
 
-Archive_widget::~Archive_widget() { delete ui; }
+Archive_widget::~Archive_widget() {
+    delete ui;
+}
 
-void Archive_widget::on_treeViewArchive_customContextMenuRequested(
-    const QPoint &pos) {
-    QModelIndexList listIndexes =
-        ui->treeViewArchive->selectionModel()->selectedIndexes();
+void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint &pos) {
+    QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
-        showContext(g_sCurrentRecordFileName, g_bCurrentFileIsRoot,
-                    ui->treeViewArchive->viewport()->mapToGlobal(pos));
+        showContext(g_sCurrentRecordFileName, g_bCurrentFileIsRoot, ui->treeViewArchive->viewport()->mapToGlobal(pos));
     }
 }
 
-void Archive_widget::on_tableViewArchive_customContextMenuRequested(
-    const QPoint &pos) {
-    QModelIndexList listIndexes =
-        ui->tableViewArchive->selectionModel()->selectedIndexes();
+void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint &pos) {
+    QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
-        showContext(g_sCurrentRecordFileName, g_bCurrentFileIsRoot,
-                    ui->tableViewArchive->viewport()->mapToGlobal(pos));
+        showContext(g_sCurrentRecordFileName, g_bCurrentFileIsRoot, ui->tableViewArchive->viewport()->mapToGlobal(pos));
     }
 }
 
-void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot,
-                                 QPoint point) {
+void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint point) {
     if (sRecordFileName != "") {
         QMenu contextMenu(this);
 
@@ -210,10 +185,8 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot,
 
         if (!g_options.bNoWindowOpen) {
             if (isOpenAvailable(sRecordFileName, bIsRoot)) {
-                actionOpen.setShortcut(
-                    getShortcuts()->getShortcut(X_ID_ARCHIVE_OPEN));
-                connect(&actionOpen, SIGNAL(triggered()), this,
-                        SLOT(openRecord()));
+                actionOpen.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_OPEN));
+                connect(&actionOpen, SIGNAL(triggered()), this, SLOT(openRecord()));
                 contextMenu.addAction(&actionOpen);
             }
         }
@@ -229,17 +202,13 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot,
         contextMenu.addAction(&actionHex);
 
         QAction actionStrings(tr("Strings"), this);
-        actionStrings.setShortcut(
-            getShortcuts()->getShortcut(X_ID_ARCHIVE_STRINGS));
-        connect(&actionStrings, SIGNAL(triggered()), this,
-                SLOT(stringsRecord()));
+        actionStrings.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_STRINGS));
+        connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
         contextMenu.addAction(&actionStrings);
 
         QAction actionEntropy(tr("Entropy"), this);
-        actionEntropy.setShortcut(
-            getShortcuts()->getShortcut(X_ID_ARCHIVE_ENTROPY));
-        connect(&actionEntropy, SIGNAL(triggered()), this,
-                SLOT(entropyRecord()));
+        actionEntropy.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_ENTROPY));
+        connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
         contextMenu.addAction(&actionEntropy);
 
         QAction actionHash(tr("Hash"), this);
@@ -249,18 +218,15 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot,
 
         QMenu menuCopy(tr("Copy"), this);
         QAction actionCopyFilename(tr("File name"), this);
-        actionCopyFilename.setShortcut(
-            getShortcuts()->getShortcut(X_ID_ARCHIVE_COPY_FILENAME));
-        connect(&actionCopyFilename, SIGNAL(triggered()), this,
-                SLOT(copyFileName()));
+        actionCopyFilename.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_COPY_FILENAME));
+        connect(&actionCopyFilename, SIGNAL(triggered()), this, SLOT(copyFileName()));
         menuCopy.addAction(&actionCopyFilename);
         contextMenu.addMenu(&menuCopy);
 
         QAction actionDump(tr("Dump to file"), this);
 
         if (!bIsRoot) {
-            actionDump.setShortcut(
-                getShortcuts()->getShortcut(X_ID_ARCHIVE_DUMPTOFILE));
+            actionDump.setShortcut(getShortcuts()->getShortcut(X_ID_ARCHIVE_DUMPTOFILE));
             connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
             contextMenu.addAction(&actionDump);
         }
@@ -277,8 +243,7 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot) {
     if (bIsRoot || (g_type == CreateViewModelProcess::TYPE_DIRECTORY)) {
         stFileTypes = XFormats::getFileTypes(sRecordFileName, true);
     } else {
-        XArchive::RECORD record =
-            XArchive::getArchiveRecord(sRecordFileName, &g_listRecords);
+        XArchive::RECORD record = XArchive::getArchiveRecord(sRecordFileName, &g_listRecords);
 
         QByteArray baData = XArchives::decompress(g_sName, &record, true);
         stFileTypes = XFormats::getFileTypes(&baData, true);
@@ -302,19 +267,33 @@ void Archive_widget::openRecord() {
     // TODO open for g_options.bNoWindowOpen
 }
 
-void Archive_widget::scanRecord() { handleAction(ACTION_SCAN); }
+void Archive_widget::scanRecord() {
+    handleAction(ACTION_SCAN);
+}
 
-void Archive_widget::hexRecord() { handleAction(ACTION_HEX); }
+void Archive_widget::hexRecord() {
+    handleAction(ACTION_HEX);
+}
 
-void Archive_widget::stringsRecord() { handleAction(ACTION_STRINGS); }
+void Archive_widget::stringsRecord() {
+    handleAction(ACTION_STRINGS);
+}
 
-void Archive_widget::entropyRecord() { handleAction(ACTION_ENTROPY); }
+void Archive_widget::entropyRecord() {
+    handleAction(ACTION_ENTROPY);
+}
 
-void Archive_widget::hashRecord() { handleAction(ACTION_HASH); }
+void Archive_widget::hashRecord() {
+    handleAction(ACTION_HASH);
+}
 
-void Archive_widget::copyFileName() { handleAction(ACTION_COPYFILENAME); }
+void Archive_widget::copyFileName() {
+    handleAction(ACTION_COPYFILENAME);
+}
 
-void Archive_widget::dumpRecord() { handleAction(ACTION_DUMP); }
+void Archive_widget::dumpRecord() {
+    handleAction(ACTION_DUMP);
+}
 
 void Archive_widget::handleAction(Archive_widget::ACTION action) {
     qint64 nSize = g_nCurrentFileSize;
@@ -339,8 +318,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action) {
                 }
             }
         } else {
-            XArchive::RECORD record =
-                XArchive::getArchiveRecord(sRecordFileName, &g_listRecords);
+            XArchive::RECORD record = XArchive::getArchiveRecord(sRecordFileName, &g_listRecords);
 
             if (action == ACTION_OPEN) {
                 QTemporaryFile fileTemp;
@@ -353,20 +331,15 @@ void Archive_widget::handleAction(Archive_widget::ACTION action) {
                     dialogUnpackFile.setData(g_sName, &record, sTempFileName);
 
                     if (dialogUnpackFile.exec() == QDialog::Accepted) {
-                        _handleActionOpenFile(sTempFileName, record.sFileName,
-                                              false);
+                        _handleActionOpenFile(sTempFileName, record.sFileName, false);
                     }
                 }
             } else if (action == ACTION_COPYFILENAME) {
                 QGuiApplication::clipboard()->setText(record.sFileName);
             } else if (action == ACTION_DUMP) {
-                QString sSaveFileName = QFileInfo(g_sName).absolutePath() +
-                                        QDir::separator() +
-                                        QFileInfo(record.sFileName).fileName();
+                QString sSaveFileName = QFileInfo(g_sName).absolutePath() + QDir::separator() + QFileInfo(record.sFileName).fileName();
 
-                sSaveFileName = QFileDialog::getSaveFileName(
-                    this, tr("Save file"), sSaveFileName,
-                    QFileInfo(record.sFileName).completeSuffix());
+                sSaveFileName = QFileDialog::getSaveFileName(this, tr("Save file"), sSaveFileName, QFileInfo(record.sFileName).completeSuffix());
 
                 if (sSaveFileName != "") {
                     DialogUnpackFile dialogUnpackFile(this);
@@ -374,9 +347,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action) {
                     dialogUnpackFile.setData(g_sName, &record, sSaveFileName);
 
                     if (dialogUnpackFile.exec() != QDialog::Accepted) {
-                        QMessageBox::critical(XOptions::getMainWidget(this),
-                                              tr("Error"),
-                                              tr("Cannot save file"));
+                        QMessageBox::critical(XOptions::getMainWidget(this), tr("Error"), tr("Cannot save file"));
                     }
                 }
             } else {
@@ -400,8 +371,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action) {
 
                         DialogUnpackFile dialogUnpackFile(this);
 
-                        dialogUnpackFile.setData(g_sName, &record,
-                                                 sTempFileName);
+                        dialogUnpackFile.setData(g_sName, &record, sTempFileName);
 
                         if (dialogUnpackFile.exec() == QDialog::Accepted) {
                             QFile file;
@@ -421,8 +391,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action) {
     }
 }
 
-void Archive_widget::_handleActionDevice(Archive_widget::ACTION action,
-                                         QIODevice *pDevice) {
+void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevice *pDevice) {
     if (action == ACTION_SCAN) {
         DialogStaticScan dialogStaticScan(this);
         dialogStaticScan.setData(pDevice, true);
@@ -466,13 +435,10 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action,
     }
 }
 
-void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle,
-                                           bool bReadWrite) {
+void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite) {
     QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(sFileName, true);
 
-    if (stFileTypes.contains(XBinary::FT_PNG) ||
-        stFileTypes.contains(XBinary::FT_JPEG) ||
-        stFileTypes.contains(XBinary::FT_TIFF) ||
+    if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) ||
         stFileTypes.contains(XBinary::FT_GIF)) {
         DialogShowImage dialogShowImage(this, sFileName, sTitle);
 
@@ -495,14 +461,9 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle,
         dialogTextInfo.setText(sString);
 
         dialogTextInfo.exec();
-    } else if (stFileTypes.contains(XBinary::FT_MSDOS) ||
-               stFileTypes.contains(XBinary::FT_NE) ||
-               stFileTypes.contains(XBinary::FT_LE) ||
-               stFileTypes.contains(XBinary::FT_LX) ||
-               stFileTypes.contains(XBinary::FT_PE) ||
-               stFileTypes.contains(XBinary::FT_ELF) ||
-               stFileTypes.contains(XBinary::FT_MACHO) ||
-               stFileTypes.contains(XBinary::FT_DEX)) {
+    } else if (stFileTypes.contains(XBinary::FT_MSDOS) || stFileTypes.contains(XBinary::FT_NE) || stFileTypes.contains(XBinary::FT_LE) ||
+               stFileTypes.contains(XBinary::FT_LX) || stFileTypes.contains(XBinary::FT_PE) || stFileTypes.contains(XBinary::FT_ELF) ||
+               stFileTypes.contains(XBinary::FT_MACHO) || stFileTypes.contains(XBinary::FT_DEX)) {
         QFile file;
 
         file.setFileName(sFileName);
@@ -612,53 +573,38 @@ void Archive_widget::on_lineEditFilter_textChanged(const QString &sString) {
     g_pFilterTable->setFilterKeyColumn(1);
 }
 
-void Archive_widget::on_treeViewArchive_doubleClicked(
-    const QModelIndex &index) {
+void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index) {
     Q_UNUSED(index)
 
-    QModelIndexList listIndexes =
-        ui->treeViewArchive->selectionModel()->selectedIndexes();
+    QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
         openRecord();
     }
 }
 
-void Archive_widget::on_tableViewArchive_doubleClicked(
-    const QModelIndex &index) {
+void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index) {
     Q_UNUSED(index)
 
-    QModelIndexList listIndexes =
-        ui->tableViewArchive->selectionModel()->selectedIndexes();
+    QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
         openRecord();
     }
 }
 
-void Archive_widget::onTreeElement_selected(const QItemSelection &selected,
-                                            const QItemSelection &prev) {
+void Archive_widget::onTreeElement_selected(const QItemSelection &selected, const QItemSelection &prev) {
     Q_UNUSED(selected)
     Q_UNUSED(prev)
 
-    QModelIndexList listIndexes =
-        ui->treeViewArchive->selectionModel()->selectedIndexes();
+    QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.count() > 0) {
         QModelIndex _index = listIndexes.at(0);
 
-        g_sCurrentRecordFileName =
-            ui->treeViewArchive->model()
-                ->data(_index, Qt::UserRole + CreateViewModelProcess::UR_PATH)
-                .toString();
-        g_bCurrentFileIsRoot =
-            ui->treeViewArchive->model()
-                ->data(_index, Qt::UserRole + CreateViewModelProcess::UR_ISROOT)
-                .toBool();
-        g_nCurrentFileSize =
-            ui->treeViewArchive->model()
-                ->data(_index, Qt::UserRole + CreateViewModelProcess::UR_SIZE)
-                .toLongLong();
+        g_sCurrentRecordFileName = ui->treeViewArchive->model()->data(_index, Qt::UserRole + CreateViewModelProcess::UR_PATH).toString();
+        g_bCurrentFileIsRoot = ui->treeViewArchive->model()->data(_index, Qt::UserRole + CreateViewModelProcess::UR_ISROOT).toBool();
+        g_nCurrentFileSize = ui->treeViewArchive->model()->data(_index, Qt::UserRole + CreateViewModelProcess::UR_SIZE).toLongLong();
     }
 }
 
@@ -668,28 +614,17 @@ void Archive_widget::registerShortcuts(bool bState) {
     // TODO !!!
 }
 
-void Archive_widget::onTableElement_selected(const QItemSelection &selected,
-                                             const QItemSelection &prev) {
+void Archive_widget::onTableElement_selected(const QItemSelection &selected, const QItemSelection &prev) {
     Q_UNUSED(selected)
     Q_UNUSED(prev)
 
-    QModelIndexList listIndexes =
-        ui->tableViewArchive->selectionModel()->selectedIndexes();
+    QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.count() > 0) {
         QModelIndex _index = listIndexes.at(0);
 
-        g_sCurrentRecordFileName =
-            ui->tableViewArchive->model()
-                ->data(_index, Qt::UserRole + CreateViewModelProcess::UR_PATH)
-                .toString();
-        g_bCurrentFileIsRoot =
-            ui->tableViewArchive->model()
-                ->data(_index, Qt::UserRole + CreateViewModelProcess::UR_ISROOT)
-                .toBool();
-        g_nCurrentFileSize =
-            ui->tableViewArchive->model()
-                ->data(_index, Qt::UserRole + CreateViewModelProcess::UR_SIZE)
-                .toLongLong();
+        g_sCurrentRecordFileName = ui->tableViewArchive->model()->data(_index, Qt::UserRole + CreateViewModelProcess::UR_PATH).toString();
+        g_bCurrentFileIsRoot = ui->tableViewArchive->model()->data(_index, Qt::UserRole + CreateViewModelProcess::UR_ISROOT).toBool();
+        g_nCurrentFileSize = ui->tableViewArchive->model()->data(_index, Qt::UserRole + CreateViewModelProcess::UR_SIZE).toLongLong();
     }
 }

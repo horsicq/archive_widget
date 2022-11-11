@@ -20,17 +20,14 @@
  */
 #include "createviewmodelprocess.h"
 
-CreateViewModelProcess::CreateViewModelProcess(QObject *pParent)
-    : QObject(pParent) {
+CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent) {
     g_type = TYPE_UNKNOWN;
     g_bIsStop = false;
     g_stats = {};
 }
 
-void CreateViewModelProcess::setData(
-    TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords,
-    QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel,
-    QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords) {
+void CreateViewModelProcess::setData(TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
+                                     QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords) {
     this->g_type = type;
     this->g_sName = sName;
     this->g_pListArchiveRecords = pListArchiveRecords;
@@ -44,7 +41,9 @@ CreateViewModelProcess::STATS CreateViewModelProcess::getCurrentStats() {
     return g_stats;
 }
 
-void CreateViewModelProcess::stop() { g_bIsStop = true; }
+void CreateViewModelProcess::stop() {
+    g_bIsStop = true;
+}
 
 void CreateViewModelProcess::process() {
     QElapsedTimer scanTimer;
@@ -159,10 +158,8 @@ void CreateViewModelProcess::process() {
                         pItemName->setText(sPart);
 
                         if (k == (nNumberOfParts)) {
-                            pItemName->setData(sRecordFileName,
-                                               Qt::UserRole + UR_PATH);
-                            pItemName->setData(record.nUncompressedSize,
-                                               Qt::UserRole + UR_SIZE);
+                            pItemName->setData(sRecordFileName, Qt::UserRole + UR_PATH);
+                            pItemName->setData(record.nUncompressedSize, Qt::UserRole + UR_SIZE);
                             pItemName->setData(false, Qt::UserRole + UR_ISROOT);
                             pItemName->setData(ftPref, Qt::UserRole + UR_FT);
                         }
@@ -172,8 +169,7 @@ void CreateViewModelProcess::process() {
                         if (k == 0) {
                             pItemParent = pRootItemName;
                         } else {
-                            pItemParent = mapItems.value(
-                                _sRecordFileName.section("/", 0, k - 1));
+                            pItemParent = mapItems.value(_sRecordFileName.section("/", 0, k - 1));
                         }
 
                         QList<QStandardItem *> listItems;
@@ -182,8 +178,7 @@ void CreateViewModelProcess::process() {
 
                         if (k == (nNumberOfParts)) {
                             QStandardItem *pItemSize = new QStandardItem;
-                            pItemSize->setData(record.nUncompressedSize,
-                                               Qt::DisplayRole);
+                            pItemSize->setData(record.nUncompressedSize, Qt::DisplayRole);
                             pItemSize->setTextAlignment(Qt::AlignRight);
 
                             listItems.append(pItemSize);
@@ -202,8 +197,7 @@ void CreateViewModelProcess::process() {
             pItemNumber->setData(j, Qt::DisplayRole);
             pItemNumber->setTextAlignment(Qt::AlignRight);
             pItemNumber->setData(sRecordFileName, Qt::UserRole + UR_PATH);
-            pItemNumber->setData(record.nUncompressedSize,
-                                 Qt::UserRole + UR_SIZE);
+            pItemNumber->setData(record.nUncompressedSize, Qt::UserRole + UR_SIZE);
             pItemNumber->setData(false, Qt::UserRole + UR_ISROOT);
             pItemNumber->setData(ftPref, Qt::UserRole + UR_FT);
             listItems.append(pItemNumber);

@@ -26,20 +26,19 @@
 class UnpackFileProcess : public QObject {
     Q_OBJECT
 
-   public:
+public:
     explicit UnpackFileProcess(QObject *pParent = nullptr);
 
-    void setData(QString sFileName, XArchive::RECORD *pRecord,
-                 QString sResultFileName, XBinary::PDSTRUCT *pPdStruct);
+    void setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct);
 
-   signals:
+signals:
     void errorMessage(QString sText);
     void completed(qint64 nElapsed);
 
-   public slots:
+public slots:
     void process();
 
-   private:
+private:
     QString g_sFileName;
     XArchive::RECORD *g_pRecord;
     QString sResultFileName;

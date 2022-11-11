@@ -25,9 +25,7 @@ UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent) {
     g_pPdStruct = nullptr;
 }
 
-void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord,
-                                QString sResultFileName,
-                                XBinary::PDSTRUCT *pPdStruct) {
+void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct) {
     this->g_sFileName = sFileName;
     this->g_pRecord = pRecord;
     this->sResultFileName = sResultFileName;
@@ -41,9 +39,8 @@ void UnpackFileProcess::process() {
     qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
     XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, 0);
 
-    bool bResult =
-        XArchives::decompressToFile(g_sFileName, g_pRecord, sResultFileName,
-                                    g_pPdStruct);  // TODO Error signals
+    bool bResult = XArchives::decompressToFile(g_sFileName, g_pRecord, sResultFileName,
+                                               g_pPdStruct);  // TODO Error signals
 
     g_pPdStruct->bIsStop = !(bResult);
 
