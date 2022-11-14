@@ -47,8 +47,7 @@ void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS op
     setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options, stAvailableOpenFileTypes, pParent);
 }
 
-void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes,
-                             QWidget *pParent) {
+void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent) {
     g_type = type;
     g_sName = sName;
     g_options = options;
@@ -125,10 +124,8 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
 
     ui->treeViewArchive->expand(pNewTreeModel->index(0, 0));
 
-    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onTreeElement_selected(QItemSelection, QItemSelection)));
-    connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
+    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(onTreeElement_selected(QItemSelection, QItemSelection)));
+    connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
 
     if (g_options.bFilter) {
         ui->comboBoxType->setCurrentIndex(1);  // TODO enum !!!
@@ -438,8 +435,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
 void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite) {
     QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(sFileName, true);
 
-    if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) ||
-        stFileTypes.contains(XBinary::FT_GIF)) {
+    if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) || stFileTypes.contains(XBinary::FT_GIF)) {
         DialogShowImage dialogShowImage(this, sFileName, sTitle);
 
         dialogShowImage.exec();
@@ -461,9 +457,8 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
         dialogTextInfo.setText(sString);
 
         dialogTextInfo.exec();
-    } else if (stFileTypes.contains(XBinary::FT_MSDOS) || stFileTypes.contains(XBinary::FT_NE) || stFileTypes.contains(XBinary::FT_LE) ||
-               stFileTypes.contains(XBinary::FT_LX) || stFileTypes.contains(XBinary::FT_PE) || stFileTypes.contains(XBinary::FT_ELF) ||
-               stFileTypes.contains(XBinary::FT_MACHO) || stFileTypes.contains(XBinary::FT_DEX)) {
+    } else if (stFileTypes.contains(XBinary::FT_MSDOS) || stFileTypes.contains(XBinary::FT_NE) || stFileTypes.contains(XBinary::FT_LE) || stFileTypes.contains(XBinary::FT_LX) ||
+               stFileTypes.contains(XBinary::FT_PE) || stFileTypes.contains(XBinary::FT_ELF) || stFileTypes.contains(XBinary::FT_MACHO) || stFileTypes.contains(XBinary::FT_DEX)) {
         QFile file;
 
         file.setFileName(sFileName);

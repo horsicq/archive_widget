@@ -26,8 +26,8 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
     g_stats = {};
 }
 
-void CreateViewModelProcess::setData(TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
-                                     QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords) {
+void CreateViewModelProcess::setData(TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel,
+                                     QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords) {
     this->g_type = type;
     this->g_sName = sName;
     this->g_pListArchiveRecords = pListArchiveRecords;
