@@ -20,14 +20,16 @@
  */
 #include "createviewmodelprocess.h"
 
-CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent) {
+CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent)
+{
     g_type = TYPE_UNKNOWN;
     g_bIsStop = false;
     g_stats = {};
 }
 
 void CreateViewModelProcess::setData(TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel,
-                                     QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords) {
+                                     QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords)
+{
     this->g_type = type;
     this->g_sName = sName;
     this->g_pListArchiveRecords = pListArchiveRecords;
@@ -37,15 +39,18 @@ void CreateViewModelProcess::setData(TYPE type, QString sName, QList<XArchive::R
     this->g_pListViewRecords = pListViewRecords;
 }
 
-CreateViewModelProcess::STATS CreateViewModelProcess::getCurrentStats() {
+CreateViewModelProcess::STATS CreateViewModelProcess::getCurrentStats()
+{
     return g_stats;
 }
 
-void CreateViewModelProcess::stop() {
+void CreateViewModelProcess::stop()
+{
     g_bIsStop = true;
 }
 
-void CreateViewModelProcess::process() {
+void CreateViewModelProcess::process()
+{
     QElapsedTimer scanTimer;
     scanTimer.start();
 

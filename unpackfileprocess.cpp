@@ -20,19 +20,22 @@
  */
 #include "unpackfileprocess.h"
 
-UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent) {
+UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
+{
     g_pRecord = nullptr;
     g_pPdStruct = nullptr;
 }
 
-void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct) {
+void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct)
+{
     this->g_sFileName = sFileName;
     this->g_pRecord = pRecord;
     this->sResultFileName = sResultFileName;
     this->g_pPdStruct = pPdStruct;
 }
 
-void UnpackFileProcess::process() {
+void UnpackFileProcess::process()
+{
     QElapsedTimer scanTimer;
     scanTimer.start();
 

@@ -22,7 +22,8 @@
 
 #include "ui_dialogarchive.h"
 
-DialogArchive::DialogArchive(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogArchive) {
+DialogArchive::DialogArchive(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogArchive)
+{
     ui->setupUi(this);
 
     setWindowFlags(Qt::Window);
@@ -30,11 +31,13 @@ DialogArchive::DialogArchive(QWidget *pParent) : QDialog(pParent), ui(new Ui::Di
     g_options = {};
 }
 
-DialogArchive::~DialogArchive() {
+DialogArchive::~DialogArchive()
+{
     delete ui;
 }
 
-void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes) {
+void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+{
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
     }
@@ -43,11 +46,13 @@ void DialogArchive::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet
     ui->widget->setFileName(sFileName, options, stAvailableFileTypes);
 }
 
-void DialogArchive::setDevice(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes) {
+void DialogArchive::setDevice(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+{
     setFileName(XBinary::getDeviceFileName(pDevice), options, stAvailableFileTypes);
 }
 
-void DialogArchive::setDirectory(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes) {
+void DialogArchive::setDirectory(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+{
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
     }
@@ -56,19 +61,23 @@ void DialogArchive::setDirectory(QString sDirectoryName, FW_DEF::OPTIONS options
     ui->widget->setDirectoryName(sDirectoryName, options, stAvailableFileTypes);
 }
 
-void DialogArchive::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions) {
+void DialogArchive::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)
+{
     ui->widget->setGlobal(pShortcuts, pXOptions);
 }
 
-QString DialogArchive::getCurrentRecordFileName() {
+QString DialogArchive::getCurrentRecordFileName()
+{
     return g_sCurrentRecordFileName;
 }
 
-void DialogArchive::on_pushButtonClose_clicked() {
+void DialogArchive::on_pushButtonClose_clicked()
+{
     reject();
 }
 
-void DialogArchive::on_pushButtonOpen_clicked() {
+void DialogArchive::on_pushButtonOpen_clicked()
+{
     g_sCurrentRecordFileName = ui->widget->getCurrentRecordFileName();
 
     if (!g_options.bNoWindowOpen) {

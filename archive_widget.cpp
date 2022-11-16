@@ -22,7 +22,8 @@
 
 #include "ui_archive_widget.h"
 
-Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::Archive_widget) {
+Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::Archive_widget)
+{
     ui->setupUi(this);
 
     g_pFilterTable = new QSortFilterProxyModel(this);
@@ -39,15 +40,18 @@ Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui
     g_type = CreateViewModelProcess::TYPE_UNKNOWN;
 }
 
-void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent) {
+void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+{
     setData(CreateViewModelProcess::TYPE_FILE, sFileName, options, stAvailableOpenFileTypes, pParent);
 }
 
-void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent) {
+void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+{
     setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options, stAvailableOpenFileTypes, pParent);
 }
 
-void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent) {
+void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+{
     g_type = type;
     g_sName = sName;
     g_options = options;
@@ -136,11 +140,13 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
     }
 }
 
-QString Archive_widget::getCurrentRecordFileName() {
+QString Archive_widget::getCurrentRecordFileName()
+{
     return g_sCurrentRecordFileName;
 }
 
-QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(XBinary::FT fileType) {
+QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(XBinary::FT fileType)
+{
     QList<CreateViewModelProcess::RECORD> listResult;
 
     qint32 nNumberOfRecords = g_listViewRecords.count();
@@ -154,11 +160,13 @@ QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(XBina
     return listResult;
 }
 
-Archive_widget::~Archive_widget() {
+Archive_widget::~Archive_widget()
+{
     delete ui;
 }
 
-void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint &pos) {
+void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint &pos)
+{
     QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
@@ -166,7 +174,8 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
     }
 }
 
-void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint &pos) {
+void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint &pos)
+{
     QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
@@ -174,7 +183,8 @@ void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint
     }
 }
 
-void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint point) {
+void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint point)
+{
     if (sRecordFileName != "") {
         QMenu contextMenu(this);
 
@@ -232,7 +242,8 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
     }
 }
 
-bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot) {
+bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
+{
     bool bResult = false;
 
     QSet<XBinary::FT> stFileTypes;
@@ -253,7 +264,8 @@ bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot) {
     return bResult;
 }
 
-void Archive_widget::openRecord() {
+void Archive_widget::openRecord()
+{
     if (!g_options.bNoWindowOpen) {
         if (isOpenAvailable(g_sCurrentRecordFileName, g_bCurrentFileIsRoot)) {
             handleAction(ACTION_OPEN);
@@ -264,35 +276,43 @@ void Archive_widget::openRecord() {
     // TODO open for g_options.bNoWindowOpen
 }
 
-void Archive_widget::scanRecord() {
+void Archive_widget::scanRecord()
+{
     handleAction(ACTION_SCAN);
 }
 
-void Archive_widget::hexRecord() {
+void Archive_widget::hexRecord()
+{
     handleAction(ACTION_HEX);
 }
 
-void Archive_widget::stringsRecord() {
+void Archive_widget::stringsRecord()
+{
     handleAction(ACTION_STRINGS);
 }
 
-void Archive_widget::entropyRecord() {
+void Archive_widget::entropyRecord()
+{
     handleAction(ACTION_ENTROPY);
 }
 
-void Archive_widget::hashRecord() {
+void Archive_widget::hashRecord()
+{
     handleAction(ACTION_HASH);
 }
 
-void Archive_widget::copyFileName() {
+void Archive_widget::copyFileName()
+{
     handleAction(ACTION_COPYFILENAME);
 }
 
-void Archive_widget::dumpRecord() {
+void Archive_widget::dumpRecord()
+{
     handleAction(ACTION_DUMP);
 }
 
-void Archive_widget::handleAction(Archive_widget::ACTION action) {
+void Archive_widget::handleAction(Archive_widget::ACTION action)
+{
     qint64 nSize = g_nCurrentFileSize;
     bool bIsRoot = g_bCurrentFileIsRoot;
     QString sRecordFileName = g_sCurrentRecordFileName;
@@ -388,7 +408,8 @@ void Archive_widget::handleAction(Archive_widget::ACTION action) {
     }
 }
 
-void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevice *pDevice) {
+void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevice *pDevice)
+{
     if (action == ACTION_SCAN) {
         DialogStaticScan dialogStaticScan(this);
         dialogStaticScan.setData(pDevice, true);
@@ -432,7 +453,8 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
     }
 }
 
-void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite) {
+void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite)
+{
     QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(sFileName, true);
 
     if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) || stFileTypes.contains(XBinary::FT_GIF)) {
@@ -552,13 +574,15 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
     }
 }
 
-void Archive_widget::on_comboBoxType_currentIndexChanged(int nIndex) {
+void Archive_widget::on_comboBoxType_currentIndexChanged(int nIndex)
+{
     ui->stackedWidgetArchive->setCurrentIndex(nIndex);
 
     ui->groupBoxFilter->setEnabled(nIndex);
 }
 
-void Archive_widget::on_lineEditFilter_textChanged(const QString &sString) {
+void Archive_widget::on_lineEditFilter_textChanged(const QString &sString)
+{
 #if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
     g_pFilterTable->setFilterRegularExpression(sString);
 #else
@@ -568,7 +592,8 @@ void Archive_widget::on_lineEditFilter_textChanged(const QString &sString) {
     g_pFilterTable->setFilterKeyColumn(1);
 }
 
-void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index) {
+void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index)
+{
     Q_UNUSED(index)
 
     QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
@@ -578,7 +603,8 @@ void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index) 
     }
 }
 
-void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index) {
+void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
+{
     Q_UNUSED(index)
 
     QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
@@ -588,7 +614,8 @@ void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
     }
 }
 
-void Archive_widget::onTreeElement_selected(const QItemSelection &selected, const QItemSelection &prev) {
+void Archive_widget::onTreeElement_selected(const QItemSelection &selected, const QItemSelection &prev)
+{
     Q_UNUSED(selected)
     Q_UNUSED(prev)
 
@@ -603,13 +630,15 @@ void Archive_widget::onTreeElement_selected(const QItemSelection &selected, cons
     }
 }
 
-void Archive_widget::registerShortcuts(bool bState) {
+void Archive_widget::registerShortcuts(bool bState)
+{
     Q_UNUSED(bState)
 
     // TODO !!!
 }
 
-void Archive_widget::onTableElement_selected(const QItemSelection &selected, const QItemSelection &prev) {
+void Archive_widget::onTableElement_selected(const QItemSelection &selected, const QItemSelection &prev)
+{
     Q_UNUSED(selected)
     Q_UNUSED(prev)
 

@@ -22,7 +22,8 @@
 
 #include "ui_dialogunpackfile.h"
 
-DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent) {
+DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent)
+{
     g_pUnpackFileProcess = new UnpackFileProcess;
     g_pThread = new QThread;
 
@@ -32,7 +33,8 @@ DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent) {
     connect(g_pUnpackFileProcess, SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
 }
 
-DialogUnpackFile::~DialogUnpackFile() {
+DialogUnpackFile::~DialogUnpackFile()
+{
     stop();
     waitForFinished();
 
@@ -43,7 +45,8 @@ DialogUnpackFile::~DialogUnpackFile() {
     delete g_pUnpackFileProcess;
 }
 
-void DialogUnpackFile::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName) {
+void DialogUnpackFile::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName)
+{
     g_pUnpackFileProcess->setData(sFileName, pRecord, sResultFileName, getPdStruct());
     g_pThread->start();
 }

@@ -22,7 +22,8 @@
 
 #include "ui_dialogcreateviewmodel.h"
 
-DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogCreateViewModel) {
+DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogCreateViewModel)
+{
     ui->setupUi(this);
 
     pCreateViewModelProcess = new CreateViewModelProcess;
@@ -37,7 +38,8 @@ DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : QDialog(pParent
     connect(g_pTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
 }
 
-DialogCreateViewModel::~DialogCreateViewModel() {
+DialogCreateViewModel::~DialogCreateViewModel()
+{
     pCreateViewModelProcess->stop();
 
     g_pTimer->stop();
@@ -52,24 +54,28 @@ DialogCreateViewModel::~DialogCreateViewModel() {
 }
 
 void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
-                                    QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<CreateViewModelProcess::RECORD> *pListViewRecords) {
+                                    QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<CreateViewModelProcess::RECORD> *pListViewRecords)
+{
     pCreateViewModelProcess->setData(type, sName, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords);
     pThread->start();
     g_pTimer->start(N_REFRESH_DELAY);
     ui->progressBarTotal->setMaximum(100);
 }
 
-void DialogCreateViewModel::on_pushButtonCancel_clicked() {
+void DialogCreateViewModel::on_pushButtonCancel_clicked()
+{
     pCreateViewModelProcess->stop();
 }
 
-void DialogCreateViewModel::onCompleted(qint64 nElapsed) {
+void DialogCreateViewModel::onCompleted(qint64 nElapsed)
+{
     Q_UNUSED(nElapsed)
 
     this->close();
 }
 
-void DialogCreateViewModel::timerSlot() {
+void DialogCreateViewModel::timerSlot()
+{
     CreateViewModelProcess::STATS stats = pCreateViewModelProcess->getCurrentStats();
 
     ui->labelTotal->setText(QString::number(stats.nTotal));
