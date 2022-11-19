@@ -22,7 +22,8 @@
 
 #include "ui_dialogunpackfile.h"
 
-DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent)
+DialogUnpackFile::DialogUnpackFile(QWidget *pParent)
+    : XDialogProcess(pParent)
 {
     g_pUnpackFileProcess = new UnpackFileProcess;
     g_pThread = new QThread;

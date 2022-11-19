@@ -22,7 +22,8 @@
 
 #include "ui_archive_widget.h"
 
-Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::Archive_widget)
+Archive_widget::Archive_widget(QWidget *pParent)
+    : XShortcutsWidget(pParent), ui(new Ui::Archive_widget)
 {
     ui->setupUi(this);
 

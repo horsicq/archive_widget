@@ -22,7 +22,8 @@
 
 #include "ui_dialogcreateviewmodel.h"
 
-DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogCreateViewModel)
+DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent)
+    : QDialog(pParent), ui(new Ui::DialogCreateViewModel)
 {
     ui->setupUi(this);
 

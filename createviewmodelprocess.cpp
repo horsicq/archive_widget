@@ -20,7 +20,8 @@
  */
 #include "createviewmodelprocess.h"
 
-CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent)
+CreateViewModelProcess::CreateViewModelProcess(QObject *pParent)
+    : QObject(pParent)
 {
     g_type = TYPE_UNKNOWN;
     g_bIsStop = false;

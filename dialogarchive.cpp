@@ -22,7 +22,8 @@
 
 #include "ui_dialogarchive.h"
 
-DialogArchive::DialogArchive(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogArchive)
+DialogArchive::DialogArchive(QWidget *pParent)
+    : QDialog(pParent), ui(new Ui::DialogArchive)
 {
     ui->setupUi(this);
 

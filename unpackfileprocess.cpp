@@ -20,7 +20,8 @@
  */
 #include "unpackfileprocess.h"
 
-UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
+UnpackFileProcess::UnpackFileProcess(QObject *pParent)
+    : QObject(pParent)
 {
     g_pRecord = nullptr;
     g_pPdStruct = nullptr;
