@@ -22,8 +22,7 @@
 
 #include "ui_dialogcreateviewmodel.h"
 
-DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent)
-    : QDialog(pParent), ui(new Ui::DialogCreateViewModel)
+DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogCreateViewModel)
 {
     ui->setupUi(this);
 
@@ -54,8 +53,8 @@ DialogCreateViewModel::~DialogCreateViewModel()
     delete pCreateViewModelProcess;
 }
 
-void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
-                                    QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<CreateViewModelProcess::RECORD> *pListViewRecords)
+void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, QString sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel,
+                                    QSet<XBinary::FT> stFilterFileTypes, QList<CreateViewModelProcess::RECORD> *pListViewRecords)
 {
     pCreateViewModelProcess->setData(type, sName, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords);
     pThread->start();
