@@ -128,8 +128,10 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
 
     ui->treeViewArchive->expand(pNewTreeModel->index(0, 0));
 
-    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(onTreeElement_selected(QItemSelection, QItemSelection)));
-    connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
+    connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+            SLOT(onTreeElement_selected(QItemSelection, QItemSelection)));
+    connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+            SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
 
     if (g_options.bFilter) {
         ui->comboBoxType->setCurrentIndex(1);  // TODO enum !!!
@@ -479,8 +481,9 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
         dialogTextInfo.setText(sString);
 
         dialogTextInfo.exec();
-    } else if (stFileTypes.contains(XBinary::FT_MSDOS) || stFileTypes.contains(XBinary::FT_NE) || stFileTypes.contains(XBinary::FT_LE) || stFileTypes.contains(XBinary::FT_LX) ||
-               stFileTypes.contains(XBinary::FT_PE) || stFileTypes.contains(XBinary::FT_ELF) || stFileTypes.contains(XBinary::FT_MACHO) || stFileTypes.contains(XBinary::FT_DEX)) {
+    } else if (stFileTypes.contains(XBinary::FT_MSDOS) || stFileTypes.contains(XBinary::FT_NE) || stFileTypes.contains(XBinary::FT_LE) ||
+               stFileTypes.contains(XBinary::FT_LX) || stFileTypes.contains(XBinary::FT_PE) || stFileTypes.contains(XBinary::FT_ELF) ||
+               stFileTypes.contains(XBinary::FT_MACHO) || stFileTypes.contains(XBinary::FT_DEX)) {
         QFile file;
 
         file.setFileName(sFileName);
