@@ -459,7 +459,8 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
 {
     QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(sFileName, true);
 
-    if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) || stFileTypes.contains(XBinary::FT_GIF)) {
+    if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) ||
+        stFileTypes.contains(XBinary::FT_GIF)) {
         DialogShowImage dialogShowImage(this, sFileName, sTitle);
 
         dialogShowImage.exec();
