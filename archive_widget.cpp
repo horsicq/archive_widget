@@ -70,6 +70,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
         g_stAvailableOpenFileTypes.insert(XBinary::FT_DEX);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_MACHO);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_MACHOFAT);
+        g_stAvailableOpenFileTypes.insert(XBinary::FT_BMP);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_PNG);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_JPEG);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_GIF);
@@ -460,7 +461,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
     QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(sFileName, true);
 
     if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) ||
-        stFileTypes.contains(XBinary::FT_GIF)) {
+        stFileTypes.contains(XBinary::FT_GIF) || stFileTypes.contains(XBinary::FT_BMP)) {
         DialogShowImage dialogShowImage(this, sFileName, sTitle);
 
         dialogShowImage.exec();
