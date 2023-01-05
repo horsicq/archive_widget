@@ -30,6 +30,9 @@ public:
     explicit UnpackFileProcess(QObject *pParent = nullptr);
 
     void setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct);
+    void setData(QString sFileName, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
+    void setData(QIODevice *pDevice, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct);
+    void setData(QIODevice *pDevice, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
 
 signals:
     void errorMessage(QString sText);
@@ -40,8 +43,10 @@ public slots:
 
 private:
     QString g_sFileName;
+    QIODevice *g_pDevice;
     XArchive::RECORD *g_pRecord;
-    QString sResultFileName;
+    QString g_sResultFileName;
+    QString g_sResultFileFolder;
     XBinary::PDSTRUCT *g_pPdStruct;
 };
 

@@ -22,6 +22,7 @@
 
 UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
 {
+    g_pDevice = nullptr;
     g_pRecord = nullptr;
     g_pPdStruct = nullptr;
 }
@@ -30,7 +31,29 @@ void UnpackFileProcess::setData(QString sFileName, XArchive::RECORD *pRecord, QS
 {
     this->g_sFileName = sFileName;
     this->g_pRecord = pRecord;
-    this->sResultFileName = sResultFileName;
+    this->g_sResultFileName = sResultFileName;
+    this->g_pPdStruct = pPdStruct;
+}
+
+void UnpackFileProcess::setData(QString sFileName, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
+{
+    this->g_sFileName = sFileName;
+    this->g_sResultFileFolder = sResultFileFolder;
+    this->g_pPdStruct = pPdStruct;
+}
+
+void UnpackFileProcess::setData(QIODevice *pDevice, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct)
+{
+    this->g_pDevice = pDevice;
+    this->g_pRecord = pRecord;
+    this->g_sResultFileName = sResultFileName;
+    this->g_pPdStruct = pPdStruct;
+}
+
+void UnpackFileProcess::setData(QIODevice *pDevice, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
+{
+    this->g_pDevice = pDevice;
+    this->g_sResultFileFolder = sResultFileFolder;
     this->g_pPdStruct = pPdStruct;
 }
 
@@ -42,8 +65,23 @@ void UnpackFileProcess::process()
     qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
     XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, 0);
 
-    bool bResult = XArchives::decompressToFile(g_sFileName, g_pRecord, sResultFileName,
-                                               g_pPdStruct);  // TODO Error signals
+    bool bResult = false;
+
+    if (g_sFileName != "") {
+        if (g_sResultFileName != "") {
+            bResult = XArchives::decompressToFile(g_sFileName, g_pRecord, g_sResultFileName,
+                                                       g_pPdStruct);  // TODO Error signals
+        } else if (g_sResultFileFolder != "") {
+            bResult = XArchives::decompressToFolder(g_sFileName, g_sResultFileFolder,g_pPdStruct);  // TODO Error signals
+        }
+    } else if (g_pDevice) {
+        if (g_sResultFileName != "") {
+            bResult = XArchives::decompressToFile(g_pDevice, g_pRecord, g_sResultFileName,
+                                                       g_pPdStruct);  // TODO Error signals
+        } else if (g_sResultFileFolder != "") {
+            bResult = XArchives::decompressToFolder(g_pDevice, g_sResultFileFolder,g_pPdStruct);  // TODO Error signals
+        }
+    }
 
     g_pPdStruct->bIsStop = !(bResult);
 

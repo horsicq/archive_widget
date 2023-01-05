@@ -352,6 +352,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     dialogUnpackFile.setData(g_sName, &record, sTempFileName);
 
+                    // TODO timer
                     if (dialogUnpackFile.exec() == QDialog::Accepted) {
                         _handleActionOpenFile(sTempFileName, record.sFileName, false);
                     }
@@ -368,6 +369,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     dialogUnpackFile.setData(g_sName, &record, sSaveFileName);
 
+                    // TODO timer
                     if (dialogUnpackFile.exec() != QDialog::Accepted) {
                         QMessageBox::critical(XOptions::getMainWidget(this), tr("Error"), tr("Cannot save file"));
                     }

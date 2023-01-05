@@ -33,7 +33,11 @@ class DialogUnpackFile : public XDialogProcess {
 public:
     explicit DialogUnpackFile(QWidget *pParent = nullptr);
     ~DialogUnpackFile();
+
     void setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName);
+    void setData(QString sFileName, QString sResultFileFolder);
+    void setData(QIODevice *pDevice, XArchive::RECORD *pRecord, QString sResultFileName);
+    void setData(QIODevice *pDevice, QString sResultFileFolder);
 
 private:
     UnpackFileProcess *g_pUnpackFileProcess;

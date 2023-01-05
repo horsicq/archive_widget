@@ -50,3 +50,21 @@ void DialogUnpackFile::setData(QString sFileName, XArchive::RECORD *pRecord, QSt
     g_pUnpackFileProcess->setData(sFileName, pRecord, sResultFileName, getPdStruct());
     g_pThread->start();
 }
+
+void DialogUnpackFile::setData(QString sFileName, QString sResultFileFolder)
+{
+    g_pUnpackFileProcess->setData(sFileName, sResultFileFolder, getPdStruct());
+    g_pThread->start();
+}
+
+void DialogUnpackFile::setData(QIODevice *pDevice, XArchive::RECORD *pRecord, QString sResultFileName)
+{
+    g_pUnpackFileProcess->setData(pDevice, pRecord, sResultFileName, getPdStruct());
+    g_pThread->start();
+}
+
+void DialogUnpackFile::setData(QIODevice *pDevice, QString sResultFileFolder)
+{
+    g_pUnpackFileProcess->setData(pDevice, sResultFileFolder, getPdStruct());
+    g_pThread->start();
+}
