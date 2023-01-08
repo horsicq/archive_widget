@@ -70,16 +70,16 @@ void UnpackFileProcess::process()
     if (g_sFileName != "") {
         if (g_sResultFileName != "") {
             bResult = XArchives::decompressToFile(g_sFileName, g_pRecord, g_sResultFileName,
-                                                       g_pPdStruct);  // TODO Error signals
+                                                  g_pPdStruct);  // TODO Error signals
         } else if (g_sResultFileFolder != "") {
-            bResult = XArchives::decompressToFolder(g_sFileName, g_sResultFileFolder,g_pPdStruct);  // TODO Error signals
+            bResult = XArchives::decompressToFolder(g_sFileName, g_sResultFileFolder, g_pPdStruct);  // TODO Error signals
         }
     } else if (g_pDevice) {
         if (g_sResultFileName != "") {
             bResult = XArchives::decompressToFile(g_pDevice, g_pRecord, g_sResultFileName,
-                                                       g_pPdStruct);  // TODO Error signals
+                                                  g_pPdStruct);  // TODO Error signals
         } else if (g_sResultFileFolder != "") {
-            bResult = XArchives::decompressToFolder(g_pDevice, g_sResultFileFolder,g_pPdStruct);  // TODO Error signals
+            bResult = XArchives::decompressToFolder(g_pDevice, g_sResultFileFolder, g_pPdStruct);  // TODO Error signals
         }
     }
 

@@ -241,7 +241,7 @@ void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint p
             contextMenu.addAction(&actionDump);
         }
 
-        //contextMenu.addMenu(getShortcuts()->getRowCopyMenu(this, ui->tableView_XXXX));
+        // contextMenu.addMenu(getShortcuts()->getRowCopyMenu(this, ui->tableView_XXXX));
 
         contextMenu.exec(point);
     }
