@@ -40,17 +40,17 @@ Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui
     g_type = CreateViewModelProcess::TYPE_UNKNOWN;
 }
 
-void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+void Archive_widget::setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes)
 {
-    setData(CreateViewModelProcess::TYPE_FILE, sFileName, options, stAvailableOpenFileTypes, pParent);
+    setData(CreateViewModelProcess::TYPE_FILE, sFileName, options, stAvailableOpenFileTypes);
 }
 
-void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes)
 {
-    setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options, stAvailableOpenFileTypes, pParent);
+    setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options, stAvailableOpenFileTypes);
 }
 
-void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent)
+void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes)
 {
     g_type = type;
     g_sName = sName;
@@ -101,7 +101,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, QString sName, F
 
     g_listViewRecords.clear();
 
-    DialogCreateViewModel dialogCreateViewModel(pParent);
+    DialogCreateViewModel dialogCreateViewModel(XOptions::getMainWidget(this));
 
     dialogCreateViewModel.setData(type, sName, &g_listRecords, &pNewTreeModel, &pNewTableModel, stFilterFileTypes, &g_listViewRecords);
 
@@ -348,7 +348,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
                 if (fileTemp.open()) {
                     QString sTempFileName = fileTemp.fileName();
 
-                    DialogUnpackFile dialogUnpackFile(this);
+                    DialogUnpackFile dialogUnpackFile(XOptions::getMainWidget(this));
 
                     dialogUnpackFile.setData(g_sName, &record, sTempFileName);
 
@@ -365,7 +365,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
                 sSaveFileName = QFileDialog::getSaveFileName(this, tr("Save file"), sSaveFileName, QFileInfo(record.sFileName).completeSuffix());
 
                 if (sSaveFileName != "") {
-                    DialogUnpackFile dialogUnpackFile(this);
+                    DialogUnpackFile dialogUnpackFile(XOptions::getMainWidget(this));
 
                     dialogUnpackFile.setData(g_sName, &record, sSaveFileName);
 

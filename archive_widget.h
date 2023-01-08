@@ -65,10 +65,9 @@ public:
     ~Archive_widget();
 
     // TODO setOptions
-    void setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes,
-                     QWidget *pParent = nullptr);  // TODO options for Viewers TODO Device
-    void setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent = nullptr);
-    void setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes, QWidget *pParent = nullptr);
+    void setFileName(QString sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes);  // TODO options for Viewers TODO Device
+    void setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes);
+    void setData(CreateViewModelProcess::TYPE type, QString sName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes);
     QString getCurrentRecordFileName();
     QList<CreateViewModelProcess::RECORD> getRecordsByFileType(XBinary::FT fileType);
 
