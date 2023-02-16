@@ -32,7 +32,6 @@ Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui
     ui->comboBoxType->addItem(tr("Table"));
 
     ui->groupBoxFilter->setEnabled(false);
-
     ui->comboBoxType->setCurrentIndex(0);
 
     g_nCurrentFileSize = 0;
