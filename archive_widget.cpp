@@ -622,10 +622,10 @@ void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
     }
 }
 
-void Archive_widget::onTreeElement_selected(const QItemSelection &selected, const QItemSelection &prev)
+void Archive_widget::onTreeElement_selected(const QItemSelection &itemSelected, const QItemSelection &itemDeselected)
 {
-    Q_UNUSED(selected)
-    Q_UNUSED(prev)
+    Q_UNUSED(itemSelected)
+    Q_UNUSED(itemDeselected)
 
     QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
 
@@ -645,10 +645,10 @@ void Archive_widget::registerShortcuts(bool bState)
     // TODO !!!
 }
 
-void Archive_widget::onTableElement_selected(const QItemSelection &selected, const QItemSelection &prev)
+void Archive_widget::onTableElement_selected(const QItemSelection &itemSelected, const QItemSelection &itemDeselected)
 {
-    Q_UNUSED(selected)
-    Q_UNUSED(prev)
+    Q_UNUSED(itemSelected)
+    Q_UNUSED(itemDeselected)
 
     QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
 

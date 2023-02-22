@@ -93,8 +93,8 @@ private slots:
     void on_lineEditFilter_textChanged(const QString &sString);
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
     void on_tableViewArchive_doubleClicked(const QModelIndex &index);
-    void onTreeElement_selected(const QItemSelection &selected, const QItemSelection &prev);  // TrackSelection
-    void onTableElement_selected(const QItemSelection &selected, const QItemSelection &prev);  // TrackSelection
+    void onTreeElement_selected(const QItemSelection &itemSelected, const QItemSelection &itemDeselected);  // TrackSelection
+    void onTableElement_selected(const QItemSelection &itemSelected, const QItemSelection &itemDeselected);  // TrackSelection
 
 protected:
     virtual void registerShortcuts(bool bState);
