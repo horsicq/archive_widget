@@ -51,6 +51,7 @@ void CreateViewModelProcess::stop()
 
 void CreateViewModelProcess::process()
 {
+    // TODO pdStruct !!!
     QElapsedTimer scanTimer;
     scanTimer.start();
 
