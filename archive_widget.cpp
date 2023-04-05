@@ -426,7 +426,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
 
         // TODO options
 
-        DialogHexView dialogHexView(this, pDevice, options, nullptr); // TODO XINfoDB !!!
+        DialogHexView dialogHexView(this, pDevice, options, nullptr);  // TODO XINfoDB !!!
         dialogHexView.setGlobal(getShortcuts(), getGlobalOptions());
 
         dialogHexView.exec();
