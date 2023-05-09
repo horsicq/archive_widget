@@ -473,7 +473,7 @@ void Archive_widget::_handleActionOpenFile(QString sFileName, QString sTitle, bo
         dialogTextInfo.setTitle(sTitle);
         dialogTextInfo.setWrap(false);
 
-        dialogTextInfo.setFile(sFileName);
+        dialogTextInfo.setFileName(sFileName);
 
         dialogTextInfo.exec();
     } else if (stFileTypes.contains(XBinary::FT_ANDROIDXML)) {
