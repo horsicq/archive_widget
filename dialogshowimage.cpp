@@ -22,7 +22,7 @@
 
 #include "ui_dialogshowimage.h"
 
-DialogShowImage::DialogShowImage(QWidget *pParent, QString sFileName, QString sTitle) : QDialog(pParent), ui(new Ui::DialogShowImage)
+DialogShowImage::DialogShowImage(QWidget *pParent, const QString &sFileName, QString sTitle) : QDialog(pParent), ui(new Ui::DialogShowImage)
 {
     ui->setupUi(this);
 
