@@ -44,7 +44,7 @@ void Archive_widget::setFileName(const QString &sFileName, FW_DEF::OPTIONS optio
     setData(CreateViewModelProcess::TYPE_FILE, sFileName, options, stAvailableOpenFileTypes);
 }
 
-void Archive_widget::setDirectoryName(QString sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes)
+void Archive_widget::setDirectoryName(const QString &sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableOpenFileTypes)
 {
     setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options, stAvailableOpenFileTypes);
 }
