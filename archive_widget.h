@@ -77,7 +77,7 @@ public slots:
 private slots:
     void on_treeViewArchive_customContextMenuRequested(const QPoint &pos);
     void on_tableViewArchive_customContextMenuRequested(const QPoint &pos);
-    void showContext(QString sRecordFileName, bool bIsRoot, QPoint point);
+    void showContext(const QString &sRecordFileName, bool bIsRoot, QPoint point);
     bool isOpenAvailable(QString sRecordFileName, bool bIsRoot);
     void scanRecord();
     void hexRecord();

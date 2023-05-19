@@ -185,7 +185,7 @@ void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint
     }
 }
 
-void Archive_widget::showContext(QString sRecordFileName, bool bIsRoot, QPoint point)
+void Archive_widget::showContext(const QString &sRecordFileName, bool bIsRoot, QPoint point)
 {
     if (sRecordFileName != "") {
         QMenu contextMenu(this);
