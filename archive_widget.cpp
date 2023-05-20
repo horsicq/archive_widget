@@ -246,7 +246,7 @@ void Archive_widget::showContext(const QString &sRecordFileName, bool bIsRoot, Q
     }
 }
 
-bool Archive_widget::isOpenAvailable(QString sRecordFileName, bool bIsRoot)
+bool Archive_widget::isOpenAvailable(const QString &sRecordFileName, bool bIsRoot)
 {
     bool bResult = false;
 
