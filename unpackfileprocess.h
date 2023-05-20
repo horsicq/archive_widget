@@ -29,7 +29,7 @@ class UnpackFileProcess : public QObject {
 public:
     explicit UnpackFileProcess(QObject *pParent = nullptr);
 
-    void setData(const QString &sFileName, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct);
+    void setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct);
     void setData(QString sFileName, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
     void setData(QIODevice *pDevice, XArchive::RECORD *pRecord, QString sResultFileName, XBinary::PDSTRUCT *pPdStruct);
     void setData(QIODevice *pDevice, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
