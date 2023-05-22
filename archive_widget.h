@@ -88,7 +88,7 @@ private slots:
     void dumpRecord();
     void handleAction(ACTION action);
     void _handleActionDevice(ACTION action, QIODevice *pDevice);
-    void _handleActionOpenFile(QString sFileName, QString sTitle, bool bReadWrite);
+    void _handleActionOpenFile(const QString &sFileName, QString sTitle, bool bReadWrite);
     void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_lineEditFilter_textChanged(const QString &sString);
     void on_treeViewArchive_doubleClicked(const QModelIndex &index);
