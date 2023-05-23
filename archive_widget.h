@@ -34,7 +34,7 @@
 #include "dialogpe.h"
 #include "dialogsearchstrings.h"
 #include "dialogshowimage.h"
-#include "dialogstaticscan.h"
+#include "dialognfdscan.h"
 #include "dialogtextinfo.h"
 #include "dialogunpackfile.h"
 #include "xandroidbinary.h"

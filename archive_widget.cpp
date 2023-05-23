@@ -417,8 +417,8 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevice *pDevice)
 {
     if (action == ACTION_SCAN) {
-        DialogStaticScan dialogStaticScan(this);
-        dialogStaticScan.setData(pDevice, true);
+        DialogNFDScan dialogStaticScan(this);
+        dialogStaticScan.setData(pDevice, true, XBinary::FT_UNKNOWN);
 
         dialogStaticScan.exec();
     } else if (action == ACTION_HEX) {
