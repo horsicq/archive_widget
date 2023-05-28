@@ -32,7 +32,7 @@ class DialogShowImage : public QDialog {
     Q_OBJECT
 
 public:
-    explicit DialogShowImage(QWidget *pParent, const QString &sFileName, QString sTitle);
+    explicit DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle);
     ~DialogShowImage();
 
 private slots:
