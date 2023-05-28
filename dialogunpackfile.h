@@ -37,7 +37,7 @@ public:
     void setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName);
     void setData(QString sFileName, QString sResultFileFolder);
     void setData(QIODevice *pDevice, XArchive::RECORD *pRecord, QString sResultFileName);
-    void setData(QIODevice *pDevice, QString sResultFileFolder);
+    void setData(QIODevice *pDevice, const QString &sResultFileFolder);
 
 private:
     UnpackFileProcess *g_pUnpackFileProcess;
