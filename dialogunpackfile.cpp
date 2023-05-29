@@ -45,7 +45,7 @@ DialogUnpackFile::~DialogUnpackFile()
     delete g_pUnpackFileProcess;
 }
 
-void DialogUnpackFile::setData(QString sFileName, XArchive::RECORD *pRecord, QString sResultFileName)
+void DialogUnpackFile::setData(const QString &sFileName, XArchive::RECORD *pRecord, QString sResultFileName)
 {
     g_pUnpackFileProcess->setData(sFileName, pRecord, sResultFileName, getPdStruct());
     g_pThread->start();
