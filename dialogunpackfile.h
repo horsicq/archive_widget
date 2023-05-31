@@ -34,7 +34,7 @@ public:
     explicit DialogUnpackFile(QWidget *pParent = nullptr);
     ~DialogUnpackFile();
 
-    void setData(const QString &sFileName, XArchive::RECORD *pRecord, QString sResultFileName);
+    void setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName);
     void setData(QString sFileName, QString sResultFileFolder);
     void setData(QIODevice *pDevice, XArchive::RECORD *pRecord, QString sResultFileName);
     void setData(QIODevice *pDevice, const QString &sResultFileFolder);
