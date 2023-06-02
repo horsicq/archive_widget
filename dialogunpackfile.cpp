@@ -51,7 +51,7 @@ void DialogUnpackFile::setData(const QString &sFileName, XArchive::RECORD *pReco
     g_pThread->start();
 }
 
-void DialogUnpackFile::setData(const QString &sFileName, QString sResultFileFolder)
+void DialogUnpackFile::setData(const QString &sFileName, const QString &sResultFileFolder)
 {
     g_pUnpackFileProcess->setData(sFileName, sResultFileFolder, getPdStruct());
     g_pThread->start();
