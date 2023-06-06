@@ -35,7 +35,7 @@ void UnpackFileProcess::setData(const QString &sFileName, XArchive::RECORD *pRec
     this->g_pPdStruct = pPdStruct;
 }
 
-void UnpackFileProcess::setData(QString sFileName, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
+void UnpackFileProcess::setData(const QString &sFileName, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_sFileName = sFileName;
     this->g_sResultFileFolder = sResultFileFolder;
