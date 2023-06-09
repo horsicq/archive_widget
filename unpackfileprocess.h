@@ -32,7 +32,7 @@ public:
     void setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct);
     void setData(const QString &sFileName, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
     void setData(QIODevice *pDevice, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct);
-    void setData(QIODevice *pDevice, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
+    void setData(QIODevice *pDevice, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
 
 signals:
     void errorMessage(QString sText);

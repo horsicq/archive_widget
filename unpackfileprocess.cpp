@@ -50,7 +50,7 @@ void UnpackFileProcess::setData(QIODevice *pDevice, XArchive::RECORD *pRecord, c
     this->g_pPdStruct = pPdStruct;
 }
 
-void UnpackFileProcess::setData(QIODevice *pDevice, QString sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
+void UnpackFileProcess::setData(QIODevice *pDevice, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_pDevice = pDevice;
     this->g_sResultFileFolder = sResultFileFolder;
