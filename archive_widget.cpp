@@ -440,20 +440,20 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         stringsOptions.bCStrings = false;
 
         DialogSearchStrings dialogSearchStrings(this);
-        dialogSearchStrings.setData(pDevice, stringsOptions, true);
         dialogSearchStrings.setGlobal(getShortcuts(), getGlobalOptions());
+        dialogSearchStrings.setData(pDevice, stringsOptions, true);
 
         dialogSearchStrings.exec();
     } else if (action == ACTION_ENTROPY) {
         DialogEntropy dialogEntropy(this);
-        dialogEntropy.setData(pDevice);
         dialogEntropy.setGlobal(getShortcuts(), getGlobalOptions());
+        dialogEntropy.setData(pDevice);
 
         dialogEntropy.exec();
     } else if (action == ACTION_HASH) {
         DialogHash dialogHash(this);
-        dialogHash.setData(pDevice, XBinary::FT_UNKNOWN);
         dialogHash.setGlobal(getShortcuts(), getGlobalOptions());
+        dialogHash.setData(pDevice, XBinary::FT_UNKNOWN);
 
         dialogHash.exec();
     }
@@ -510,9 +510,8 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
                 options.nImageBase = -1;
 
                 DialogPE dialogPE(this);
-
-                dialogPE.setData(&file, options);
                 dialogPE.setGlobal(getShortcuts(), getGlobalOptions());
+                dialogPE.setData(&file, options);
 
                 dialogPE.exec();
             } else if (stFileTypes.contains(XBinary::FT_LE)) {
@@ -520,9 +519,8 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
                 options.nImageBase = -1;
 
                 DialogLE dialogLE(this);
-
-                dialogLE.setData(&file, options);
                 dialogLE.setGlobal(getShortcuts(), getGlobalOptions());
+                dialogLE.setData(&file, options);
 
                 dialogLE.exec();
             } else if (stFileTypes.contains(XBinary::FT_NE)) {
@@ -530,9 +528,8 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
                 options.nImageBase = -1;
 
                 DialogNE dialogNE(this);
-
-                dialogNE.setData(&file, options);
                 dialogNE.setGlobal(getShortcuts(), getGlobalOptions());
+                dialogNE.setData(&file, options);
 
                 dialogNE.exec();
             } else if (stFileTypes.contains(XBinary::FT_MSDOS)) {
@@ -540,9 +537,8 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
                 options.nImageBase = -1;
 
                 DialogMSDOS dialogMSDOS(this);
-
-                dialogMSDOS.setData(&file, options);
                 dialogMSDOS.setGlobal(getShortcuts(), getGlobalOptions());
+                dialogMSDOS.setData(&file, options);
 
                 dialogMSDOS.exec();
             } else if (stFileTypes.contains(XBinary::FT_ELF)) {
@@ -550,9 +546,8 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
                 options.nImageBase = -1;
 
                 DialogELF dialogELF(this);
-
-                dialogELF.setData(&file, options);
                 dialogELF.setGlobal(getShortcuts(), getGlobalOptions());
+                dialogELF.setData(&file, options);
 
                 dialogELF.exec();
             } else if (stFileTypes.contains(XBinary::FT_MACHO)) {
@@ -560,9 +555,8 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
                 options.nImageBase = -1;
 
                 DialogMACH dialogMACH(this);
-
-                dialogMACH.setData(&file, options);
                 dialogMACH.setGlobal(getShortcuts(), getGlobalOptions());
+                dialogMACH.setData(&file, options);
 
                 dialogMACH.exec();
             } else if (stFileTypes.contains(XBinary::FT_DEX)) {
@@ -570,9 +564,8 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
                 options.nImageBase = -1;
 
                 DialogDEX dialogDEX(this);
-
-                dialogDEX.setData(&file, options);
                 dialogDEX.setGlobal(getShortcuts(), getGlobalOptions());
+                dialogDEX.setData(&file, options);
 
                 dialogDEX.exec();
             }
