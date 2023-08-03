@@ -63,7 +63,7 @@ public:
     STATS getCurrentStats();
 
 signals:
-    void errorMessage(QString sText);
+    void errorMessage(const QString &sText);
     void completed(qint64 nElapsed);
 
 public slots:
