@@ -100,7 +100,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &s
 
     g_listViewRecords.clear();
 
-    DialogCreateViewModel dialogCreateViewModel(XOptions::getMainWidget(this)); // TODO ProcessDialog
+    DialogCreateViewModel dialogCreateViewModel(XOptions::getMainWidget(this));  // TODO ProcessDialog
     dialogCreateViewModel.setData(type, sName, &g_listRecords, &pNewTreeModel, &pNewTableModel, stFilterFileTypes, &g_listViewRecords);
 
     dialogCreateViewModel.exec();
