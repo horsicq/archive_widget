@@ -37,7 +37,7 @@ public:
     explicit DialogArchive(QWidget *pParent = nullptr);
     ~DialogArchive();
 
-    void setFileName(const QString &sFileName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes);
+    void setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes);
     void setDevice(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes);
     void setDirectory(const QString &sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes);
     void setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions);
