@@ -46,7 +46,7 @@ void DialogArchive::setFileName(const QString &sFileName, const FW_DEF::OPTIONS 
     ui->widget->setFileName(sFileName, options, stAvailableFileTypes);
 }
 
-void DialogArchive::setDevice(QIODevice *pDevice, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setDevice(QIODevice *pDevice, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes)
 {
     setFileName(XBinary::getDeviceFileName(pDevice), options, stAvailableFileTypes);
 }
