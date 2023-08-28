@@ -51,7 +51,7 @@ void DialogArchive::setDevice(QIODevice *pDevice, const FW_DEF::OPTIONS &options
     setFileName(XBinary::getDeviceFileName(pDevice), options, stAvailableFileTypes);
 }
 
-void DialogArchive::setDirectory(const QString &sDirectoryName, FW_DEF::OPTIONS options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setDirectory(const QString &sDirectoryName, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes)
 {
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
