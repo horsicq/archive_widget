@@ -36,7 +36,7 @@ DialogArchive::~DialogArchive()
     delete ui;
 }
 
-void DialogArchive::setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableFileTypes)
 {
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
