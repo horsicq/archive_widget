@@ -39,7 +39,7 @@ Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui
     g_type = CreateViewModelProcess::TYPE_UNKNOWN;
 }
 
-void Archive_widget::setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableOpenFileTypes)
+void Archive_widget::setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes)
 {
     setData(CreateViewModelProcess::TYPE_FILE, sFileName, options, stAvailableOpenFileTypes);
 }
@@ -440,7 +440,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
 
         DialogSearchStrings dialogSearchStrings(this);
         dialogSearchStrings.setGlobal(getShortcuts(), getGlobalOptions());
-        dialogSearchStrings.setData(pDevice, stringsOptions, true);
+        dialogSearchStrings.setData(pDevice, XBinary::FT_UNKNOWN, stringsOptions, true);
 
         dialogSearchStrings.exec();
     } else if (action == ACTION_ENTROPY) {
