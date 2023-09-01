@@ -54,7 +54,7 @@ DialogCreateViewModel::~DialogCreateViewModel()
 }
 
 void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QString &sName, QList<XArchive::RECORD> *pListArchiveRecords,
-                                    QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes,
+                                    QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                                     QList<CreateViewModelProcess::RECORD> *pListViewRecords)
 {
     pCreateViewModelProcess->setData(type, sName, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords);
