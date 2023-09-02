@@ -65,7 +65,8 @@ public:
     ~Archive_widget();
 
     // TODO setOptions
-    void setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes);  // TODO options for Viewers TODO Device
+    void setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options,
+                     const QSet<XBinary::FT> &stAvailableOpenFileTypes);  // TODO options for Viewers TODO Device
     void setDirectoryName(const QString &sDirectoryName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes);
     void setData(CreateViewModelProcess::TYPE type, const QString &sName, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableOpenFileTypes);
     QString getCurrentRecordFileName();
