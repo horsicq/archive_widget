@@ -60,6 +60,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &s
     if (!g_stAvailableOpenFileTypes.count()) {
         // TODO more
         // TODO Check mb Archives
+        // TODO APJ, JAR, ZIP, IPA
         g_stAvailableOpenFileTypes.insert(XBinary::FT_MSDOS);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_NE);
         g_stAvailableOpenFileTypes.insert(XBinary::FT_LE);
