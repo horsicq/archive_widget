@@ -22,13 +22,13 @@
 
 CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent)
 {
+    g_pPdStruct = nullptr;
     g_type = TYPE_UNKNOWN;
-    g_bIsStop = false;
-    g_stats = {};
+    // TODO nullptr
 }
 
 void CreateViewModelProcess::setData(TYPE type, const QString &sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
-                                     QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords)
+                                     QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_type = type;
     this->g_sName = sName;
@@ -37,16 +37,7 @@ void CreateViewModelProcess::setData(TYPE type, const QString &sName, QList<XArc
     this->g_ppTableModel = ppTableModel;
     this->g_stFilterFileTypes = stFilterFileTypes;
     this->g_pListViewRecords = pListViewRecords;
-}
-
-CreateViewModelProcess::STATS CreateViewModelProcess::getCurrentStats()
-{
-    return g_stats;
-}
-
-void CreateViewModelProcess::stop()
-{
-    g_bIsStop = true;
+    this->g_pPdStruct = pPdStruct;
 }
 
 void CreateViewModelProcess::process()
@@ -65,6 +56,9 @@ void CreateViewModelProcess::process()
 
     qint32 nNumberOfRecords = g_pListArchiveRecords->count();
 
+    qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
+    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, nNumberOfRecords);
+
     if (nNumberOfRecords == 0) {
         QSet<XBinary::FT> stFT = XFormats::getFileTypes(g_sName, true);
 
@@ -77,8 +71,6 @@ void CreateViewModelProcess::process()
 
         g_pListViewRecords->append(_record);
     }
-
-    g_stats.nTotal = nNumberOfRecords;
 
     *g_ppTreeModel = new QStandardItemModel;
     (*g_ppTreeModel)->setColumnCount(2);
@@ -106,7 +98,7 @@ void CreateViewModelProcess::process()
 
     QMap<QString, QStandardItem *> mapItems;
 
-    for (qint32 i = 0, j = 0; (i < nNumberOfRecords) && (!g_bIsStop); i++) {
+    for (qint32 i = 0, j = 0; (i < nNumberOfRecords) && (!(g_pPdStruct->bIsStop)); i++) {
         XArchive::RECORD record = g_pListArchiveRecords->at(i);
         QString sRecordFileName = record.sFileName;
 
@@ -222,8 +214,8 @@ void CreateViewModelProcess::process()
             j++;
         }
 
-        g_stats.nCurrent = i;
-        g_stats.sStatus = g_pListArchiveRecords->at(i).sFileName;
+        XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
+        XBinary::setPdStructStatus(g_pPdStruct, _nFreeIndex, g_pListArchiveRecords->at(i).sFileName);
     }
 
     (*g_ppTreeModel)->setHeaderData(0, Qt::Horizontal, tr("File"));
@@ -233,7 +225,7 @@ void CreateViewModelProcess::process()
     (*g_ppTableModel)->setHeaderData(1, Qt::Horizontal, tr("File"));
     (*g_ppTableModel)->setHeaderData(2, Qt::Horizontal, tr("Size"));
 
-    g_bIsStop = false;
+    XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
 
     emit completed(scanTimer.elapsed());
 }

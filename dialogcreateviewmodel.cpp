@@ -22,10 +22,8 @@
 
 #include "ui_dialogcreateviewmodel.h"
 
-DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogCreateViewModel)
+DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : XDialogProcess(pParent)
 {
-    ui->setupUi(this);
-
     pCreateViewModelProcess = new CreateViewModelProcess;
     pThread = new QThread;
 
@@ -33,21 +31,15 @@ DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : QDialog(pParent
 
     connect(pThread, SIGNAL(started()), pCreateViewModelProcess, SLOT(process()));
     connect(pCreateViewModelProcess, SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
-
-    g_pTimer = new QTimer(this);
-    connect(g_pTimer, SIGNAL(timeout()), this, SLOT(timerSlot()));
 }
 
 DialogCreateViewModel::~DialogCreateViewModel()
 {
-    pCreateViewModelProcess->stop();
-
-    g_pTimer->stop();
+    stop();
+    waitForFinished();
 
     pThread->quit();
     pThread->wait();
-
-    delete ui;
 
     delete pThread;
     delete pCreateViewModelProcess;
@@ -57,33 +49,6 @@ void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QSt
                                     QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                                     QList<CreateViewModelProcess::RECORD> *pListViewRecords)
 {
-    pCreateViewModelProcess->setData(type, sName, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords);
+    pCreateViewModelProcess->setData(type, sName, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords, getPdStruct());
     pThread->start();
-    g_pTimer->start(N_REFRESH_DELAY);
-    ui->progressBarTotal->setMaximum(100);
-}
-
-void DialogCreateViewModel::on_pushButtonCancel_clicked()
-{
-    pCreateViewModelProcess->stop();
-}
-
-void DialogCreateViewModel::onCompleted(qint64 nElapsed)
-{
-    Q_UNUSED(nElapsed)
-
-    this->close();
-}
-
-void DialogCreateViewModel::timerSlot()
-{
-    CreateViewModelProcess::STATS stats = pCreateViewModelProcess->getCurrentStats();
-
-    ui->labelTotal->setText(QString::number(stats.nTotal));
-    ui->labelCurrent->setText(QString::number(stats.nCurrent));
-    ui->labelCurrentStatus->setText(stats.sStatus);
-
-    if (stats.nTotal) {
-        ui->progressBarTotal->setValue((int)((stats.nCurrent * 100) / stats.nTotal));
-    }
 }

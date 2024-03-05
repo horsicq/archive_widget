@@ -27,12 +27,13 @@
 #include <QTimer>
 
 #include "createviewmodelprocess.h"
+#include "xdialogprocess.h"
 
 namespace Ui {
 class DialogCreateViewModel;
 }
 
-class DialogCreateViewModel : public QDialog {
+class DialogCreateViewModel : public XDialogProcess {
     Q_OBJECT
 
 public:
@@ -42,17 +43,9 @@ public:
     void setData(CreateViewModelProcess::TYPE type, const QString &sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
                  QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes, QList<CreateViewModelProcess::RECORD> *pListViewRecords);
 
-private slots:
-    void on_pushButtonCancel_clicked();
-    void onCompleted(qint64 nElapsed);
-    void timerSlot();
-
 private:
-    static const qint32 N_REFRESH_DELAY = 1000;  // TODO check
-    Ui::DialogCreateViewModel *ui;
     CreateViewModelProcess *pCreateViewModelProcess;
     QThread *pThread;
-    QTimer *g_pTimer;
 };
 
 #endif  // DIALOGCREATEVIEWMODEL_H

@@ -36,7 +36,6 @@ SOURCES += \
 FORMS += \
     $$PWD/archive_widget.ui \
     $$PWD/dialogarchive.ui \
-    $$PWD/dialogcreateviewmodel.ui \
     $$PWD/dialogshowimage.ui \
     $$PWD/dialogunpackfile.ui
 
