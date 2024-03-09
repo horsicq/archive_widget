@@ -36,8 +36,7 @@ SOURCES += \
 FORMS += \
     $$PWD/archive_widget.ui \
     $$PWD/dialogarchive.ui \
-    $$PWD/dialogshowimage.ui \
-    $$PWD/dialogunpackfile.ui
+    $$PWD/dialogshowimage.ui
 
 !contains(XCONFIG, allformatwidgets) {
     XCONFIG += allformatwidgets
