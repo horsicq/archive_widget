@@ -20,8 +20,6 @@
  */
 #include "dialogunpackfile.h"
 
-#include "ui_dialogunpackfile.h"
-
 DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent)
 {
     g_pUnpackFileProcess = new UnpackFileProcess;
