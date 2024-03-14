@@ -20,8 +20,6 @@
  */
 #include "dialogcreateviewmodel.h"
 
-#include "ui_dialogcreateviewmodel.h"
-
 DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : XDialogProcess(pParent)
 {
     pCreateViewModelProcess = new CreateViewModelProcess;
