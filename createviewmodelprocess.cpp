@@ -107,7 +107,7 @@ void CreateViewModelProcess::process()
         QSet<XBinary::FT> stFT;
 
         if (g_type == TYPE_FILE) {
-            QByteArray baData = XArchives::decompress(g_sName, &record, true);
+            QByteArray baData = XArchives::decompress(g_sName, &record, g_pPdStruct);
 
             stFT = XFormats::getFileTypes(&baData, true);
         } else if (g_type == TYPE_DIRECTORY) {

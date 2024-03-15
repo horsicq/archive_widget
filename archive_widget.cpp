@@ -257,7 +257,7 @@ bool Archive_widget::isOpenAvailable(const QString &sRecordFileName, bool bIsRoo
     } else {
         XArchive::RECORD record = XArchive::getArchiveRecord(sRecordFileName, &g_listRecords);
 
-        QByteArray baData = XArchives::decompress(g_sName, &record, true);
+        QByteArray baData = XArchives::decompress(g_sName, &record, nullptr, 0, 0x200);
         stFileTypes = XFormats::getFileTypes(&baData, true);
     }
 
