@@ -47,10 +47,15 @@ void CreateViewModelProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
+    XBinary::FT ftPref = XBinary::FT_UNKNOWN;
+
     if (g_type == TYPE_FILE) {
-        *g_pListArchiveRecords = XArchives::getRecords(g_sName);
+        QSet<XBinary::FT> stFT = XFormats::getFileTypes(g_sName, true, g_pPdStruct);
+        ftPref = XBinary::_getPrefFileType(&stFT);
+
+        *g_pListArchiveRecords = XArchives::getRecords(g_sName, ftPref, -1, g_pPdStruct);
     } else if (g_type == TYPE_DIRECTORY) {
-        *g_pListArchiveRecords = XArchives::getRecordsFromDirectory(g_sName);
+        *g_pListArchiveRecords = XArchives::getRecordsFromDirectory(g_sName, -1, g_pPdStruct);
     }
 
     qint64 nFileSize = XBinary::getSize(g_sName);
@@ -61,10 +66,6 @@ void CreateViewModelProcess::process()
     XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, nNumberOfRecords);
 
     if (nNumberOfRecords == 0) {
-        QSet<XBinary::FT> stFT = XFormats::getFileTypes(g_sName, true);
-
-        XBinary::FT ftPref = XBinary::_getPrefFileType(&stFT);
-
         RECORD _record = {};
         _record.sRecordName = g_sName;
         _record.ft = ftPref;
