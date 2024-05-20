@@ -36,19 +36,19 @@ DialogArchive::~DialogArchive()
     delete ui;
 }
 
-void DialogArchive::setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableFileTypes)
+void DialogArchive::setFileName(const QString &sFileName, XBinary::FT fileType, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableFileTypes)
 {
     if (options.sTitle != "") {
         setWindowTitle(options.sTitle);
     }
 
     g_options = options;
-    ui->widget->setFileName(sFileName, options, stAvailableFileTypes);
+    ui->widget->setFileName(sFileName, fileType, options, stAvailableFileTypes);
 }
 
-void DialogArchive::setDevice(QIODevice *pDevice, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes)
+void DialogArchive::setDevice(QIODevice *pDevice, XBinary::FT fileType, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes)
 {
-    setFileName(XBinary::getDeviceFileName(pDevice), options, stAvailableFileTypes);
+    setFileName(XBinary::getDeviceFileName(pDevice), fileType, options, stAvailableFileTypes);
 }
 
 void DialogArchive::setDirectory(const QString &sDirectoryName, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes)

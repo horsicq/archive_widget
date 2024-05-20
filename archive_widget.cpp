@@ -39,17 +39,17 @@ Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui
     g_type = CreateViewModelProcess::TYPE_UNKNOWN;
 }
 
-void Archive_widget::setFileName(const QString &sFileName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes)
+void Archive_widget::setFileName(const QString &sFileName, XBinary::FT fileType, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes)
 {
-    setData(CreateViewModelProcess::TYPE_FILE, sFileName, options, stAvailableOpenFileTypes);
+    setData(CreateViewModelProcess::TYPE_FILE, sFileName, fileType, options, stAvailableOpenFileTypes);
 }
 
 void Archive_widget::setDirectoryName(const QString &sDirectoryName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes)
 {
-    setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, options, stAvailableOpenFileTypes);
+    setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, XBinary::FT_UNKNOWN, options, stAvailableOpenFileTypes);
 }
 
-void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &sName, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes)
+void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes)
 {
     g_type = type;
     g_sName = sName;
@@ -102,7 +102,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &s
     g_listViewRecords.clear();
 
     DialogCreateViewModel dialogCreateViewModel(XOptions::getMainWidget(this));
-    dialogCreateViewModel.setData(type, sName, &g_listRecords, &pNewTreeModel, &pNewTableModel, stFilterFileTypes, &g_listViewRecords);
+    dialogCreateViewModel.setData(type, sName, fileType, &g_listRecords, &pNewTreeModel, &pNewTableModel, stFilterFileTypes, &g_listViewRecords);
 
     dialogCreateViewModel.showDialogDelay();
 

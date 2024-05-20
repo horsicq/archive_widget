@@ -43,10 +43,10 @@ DialogCreateViewModel::~DialogCreateViewModel()
     delete pCreateViewModelProcess;
 }
 
-void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QString &sName, QList<XArchive::RECORD> *pListArchiveRecords,
+void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
                                     QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                                     QList<CreateViewModelProcess::RECORD> *pListViewRecords)
 {
-    pCreateViewModelProcess->setData(type, sName, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords, getPdStruct());
+    pCreateViewModelProcess->setData(type, sName, fileType, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords, getPdStruct());
     pThread->start();
 }

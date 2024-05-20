@@ -24,15 +24,17 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
 {
     g_pPdStruct = nullptr;
     g_type = TYPE_UNKNOWN;
+    g_fileType = XBinary::FT_UNKNOWN;
     // TODO nullptr
 }
 
-void CreateViewModelProcess::setData(TYPE type, const QString &sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
+void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
                                      QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords,
                                      XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_type = type;
     this->g_sName = sName;
+    this->g_fileType= fileType;
     this->g_pListArchiveRecords = pListArchiveRecords;
     this->g_ppTreeModel = ppTreeModel;
     this->g_ppTableModel = ppTableModel;
@@ -47,11 +49,13 @@ void CreateViewModelProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    XBinary::FT ftPref = XBinary::FT_UNKNOWN;
+    XBinary::FT ftPref = g_fileType;
 
     if (g_type == TYPE_FILE) {
-        QSet<XBinary::FT> stFT = XFormats::getFileTypes(g_sName, true, g_pPdStruct);
-        ftPref = XBinary::_getPrefFileType(&stFT);
+        if (ftPref == XBinary::FT_UNKNOWN) {
+            QSet<XBinary::FT> stFT = XFormats::getFileTypes(g_sName, true, g_pPdStruct);
+            ftPref = XBinary::_getPrefFileType(&stFT);
+        }
 
         *g_pListArchiveRecords = XArchives::getRecords(g_sName, ftPref, -1, g_pPdStruct);
     } else if (g_type == TYPE_DIRECTORY) {

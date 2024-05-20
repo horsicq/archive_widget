@@ -58,7 +58,7 @@ public:
 
     explicit CreateViewModelProcess(QObject *pParent = nullptr);
 
-    void setData(CreateViewModelProcess::TYPE type, const QString &sName, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
+    void setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
                  QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords, XBinary::PDSTRUCT *pPdStruct);
 
 signals:
@@ -71,6 +71,7 @@ public slots:
 private:
     TYPE g_type;
     QString g_sName;
+    XBinary::FT g_fileType;
     QList<XArchive::RECORD> *g_pListArchiveRecords;
     QStandardItemModel **g_ppTreeModel;
     QStandardItemModel **g_ppTableModel;
