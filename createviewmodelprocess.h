@@ -26,7 +26,6 @@
 
 #include "xformats.h"
 
-// TODO PDStruct
 class CreateViewModelProcess : public QObject {
     Q_OBJECT
 

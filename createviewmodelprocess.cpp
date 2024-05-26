@@ -45,7 +45,6 @@ void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::F
 
 void CreateViewModelProcess::process()
 {
-    // TODO pdStruct !!!
     QElapsedTimer scanTimer;
     scanTimer.start();
 
