@@ -49,7 +49,8 @@ void Archive_widget::setDirectoryName(const QString &sDirectoryName, const FW_DE
     setData(CreateViewModelProcess::TYPE_DIRECTORY, sDirectoryName, XBinary::FT_UNKNOWN, options, stAvailableOpenFileTypes);
 }
 
-void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableOpenFileTypes)
+void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, const FW_DEF::OPTIONS &options,
+                             const QSet<XBinary::FT> &stAvailableOpenFileTypes)
 {
     g_type = type;
     g_sName = sName;

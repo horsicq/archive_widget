@@ -40,8 +40,9 @@ public:
     explicit DialogCreateViewModel(QWidget *pParent = nullptr);
     ~DialogCreateViewModel();
 
-    void setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
-                 QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes, QList<CreateViewModelProcess::RECORD> *pListViewRecords);
+    void setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
+                 QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
+                 QList<CreateViewModelProcess::RECORD> *pListViewRecords);
 
 private:
     CreateViewModelProcess *pCreateViewModelProcess;

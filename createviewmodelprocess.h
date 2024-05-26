@@ -58,8 +58,9 @@ public:
 
     explicit CreateViewModelProcess(QObject *pParent = nullptr);
 
-    void setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
-                 QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords, XBinary::PDSTRUCT *pPdStruct);
+    void setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
+                 QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords,
+                 XBinary::PDSTRUCT *pPdStruct);
 
 signals:
     void errorMessage(const QString &sText);

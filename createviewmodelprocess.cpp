@@ -28,13 +28,13 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
     // TODO nullptr
 }
 
-void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords, QStandardItemModel **ppTreeModel,
-                                     QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes, QList<RECORD> *pListViewRecords,
-                                     XBinary::PDSTRUCT *pPdStruct)
+void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
+                                     QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes,
+                                     QList<RECORD> *pListViewRecords, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_type = type;
     this->g_sName = sName;
-    this->g_fileType= fileType;
+    this->g_fileType = fileType;
     this->g_pListArchiveRecords = pListArchiveRecords;
     this->g_ppTreeModel = ppTreeModel;
     this->g_ppTableModel = ppTableModel;
