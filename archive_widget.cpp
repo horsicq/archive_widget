@@ -438,7 +438,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         stringsOptions.bAnsi = true;
         stringsOptions.bUTF8 = false;
         stringsOptions.bUnicode = true;
-        stringsOptions.bCStrings = false;
+        stringsOptions.bNullTerminated = false;
 
         DialogSearchStrings dialogSearchStrings(this);
         dialogSearchStrings.setGlobal(getShortcuts(), getGlobalOptions());
