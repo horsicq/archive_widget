@@ -163,6 +163,10 @@ QList<CreateViewModelProcess::RECORD> Archive_widget::getRecordsByFileType(XBina
     return listResult;
 }
 
+void Archive_widget::adjustView()
+{
+}
+
 Archive_widget::~Archive_widget()
 {
     delete ui;

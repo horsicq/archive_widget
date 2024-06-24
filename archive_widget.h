@@ -72,6 +72,7 @@ public:
                  const QSet<XBinary::FT> &stAvailableOpenFileTypes);
     QString getCurrentRecordFileName();
     QList<CreateViewModelProcess::RECORD> getRecordsByFileType(XBinary::FT fileType);
+    virtual void adjustView();
 
 public slots:
     void openRecord();
