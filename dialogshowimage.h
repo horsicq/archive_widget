@@ -21,22 +21,27 @@
 #ifndef DIALOGSHOWIMAGE_H
 #define DIALOGSHOWIMAGE_H
 
-#include <QDialog>
+#include "xshortcutsdialog.h"
 
 namespace Ui {
 class DialogShowImage;
 }
 
 // TODO move to FormatDialogs
-class DialogShowImage : public QDialog {
+class DialogShowImage : public XShortcutsDialog {
     Q_OBJECT
 
 public:
     explicit DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle);
     ~DialogShowImage();
 
+    virtual void adjustView() {}
+
 private slots:
     void on_pushButtonClose_clicked();
+
+protected:
+    virtual void registerShortcuts(bool bState) { Q_UNUSED(bState) }
 
 private:
     Ui::DialogShowImage *ui;

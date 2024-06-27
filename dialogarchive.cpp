@@ -22,11 +22,9 @@
 
 #include "ui_dialogarchive.h"
 
-DialogArchive::DialogArchive(QWidget *pParent) : QDialog(pParent), ui(new Ui::DialogArchive)
+DialogArchive::DialogArchive(QWidget *pParent) : XShortcutsDialog(pParent), ui(new Ui::DialogArchive)
 {
     ui->setupUi(this);
-
-    setWindowFlags(Qt::Window);
 
     g_options = {};
 }

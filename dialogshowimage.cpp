@@ -22,11 +22,10 @@
 
 #include "ui_dialogshowimage.h"
 
-DialogShowImage::DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle) : QDialog(pParent), ui(new Ui::DialogShowImage)
+DialogShowImage::DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle) : XShortcutsDialog(pParent), ui(new Ui::DialogShowImage)
 {
     ui->setupUi(this);
 
-    setWindowFlags(Qt::Window);
     setWindowTitle(sTitle);
 
     // TODO resize
