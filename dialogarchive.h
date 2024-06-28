@@ -37,7 +37,9 @@ public:
     explicit DialogArchive(QWidget *pParent = nullptr);
     ~DialogArchive();
 
-    virtual void adjustView() {}
+    virtual void adjustView()
+    {
+    }
 
     void setFileName(const QString &sFileName, XBinary::FT fileType, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableFileTypes);
     void setDevice(QIODevice *pDevice, XBinary::FT fileType, const FW_DEF::OPTIONS &options, QSet<XBinary::FT> stAvailableFileTypes);
@@ -50,7 +52,10 @@ private slots:
     void on_pushButtonOpen_clicked();
 
 protected:
-    virtual void registerShortcuts(bool bState) { Q_UNUSED(bState) }
+    virtual void registerShortcuts(bool bState)
+    {
+        Q_UNUSED(bState)
+    }
 
 private:
     Ui::DialogArchive *ui;
