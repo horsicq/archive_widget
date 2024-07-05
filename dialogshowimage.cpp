@@ -22,7 +22,7 @@
 
 #include "ui_dialogshowimage.h"
 
-DialogShowImage::DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle) : XShortcutsDialog(pParent), ui(new Ui::DialogShowImage)
+DialogShowImage::DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle) : XShortcutsDialog(pParent, true), ui(new Ui::DialogShowImage)
 {
     ui->setupUi(this);
 
