@@ -36,7 +36,6 @@ DialogArchive::~DialogArchive()
 
 void DialogArchive::adjustView()
 {
-
 }
 
 void DialogArchive::setFileName(const QString &sFileName, XBinary::FT fileType, const FW_DEF::OPTIONS &options, const QSet<XBinary::FT> &stAvailableFileTypes)
