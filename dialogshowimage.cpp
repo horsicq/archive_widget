@@ -39,6 +39,11 @@ DialogShowImage::~DialogShowImage()
     delete ui;
 }
 
+void DialogShowImage::adjustView()
+{
+
+}
+
 void DialogShowImage::on_pushButtonClose_clicked()
 {
     this->close();

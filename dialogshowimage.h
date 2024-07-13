@@ -35,9 +35,7 @@ public:
     explicit DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle);
     ~DialogShowImage();
 
-    virtual void adjustView()
-    {
-    }
+    virtual void adjustView();
 
 private slots:
     void on_pushButtonClose_clicked();
