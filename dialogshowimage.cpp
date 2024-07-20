@@ -41,7 +41,6 @@ DialogShowImage::~DialogShowImage()
 
 void DialogShowImage::adjustView()
 {
-
 }
 
 void DialogShowImage::on_pushButtonClose_clicked()
