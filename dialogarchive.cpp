@@ -88,3 +88,8 @@ void DialogArchive::on_pushButtonOpen_clicked()
         accept();
     }
 }
+
+void DialogArchive::registerShortcuts(bool bState)
+{
+    Q_UNUSED(bState)
+}
