@@ -47,3 +47,8 @@ void DialogShowImage::on_pushButtonClose_clicked()
 {
     this->close();
 }
+
+void DialogShowImage::registerShortcuts(bool bState)
+{
+    Q_UNUSED(bState)
+}
