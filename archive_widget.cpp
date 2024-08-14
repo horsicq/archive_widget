@@ -427,12 +427,14 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
 
         dialogStaticScan.exec();
     } else if (action == ACTION_HEX) {
-        XHexView::OPTIONS options = {};
+        XHexViewWidget::OPTIONS options = {};
 
         // TODO options
 
-        DialogHexView dialogHexView(this, pDevice, options, nullptr);  // TODO XINfoDB !!!
+        DialogHexView dialogHexView(this);
         dialogHexView.setGlobal(getShortcuts(), getGlobalOptions());
+        dialogHexView.setData(pDevice, options);
+          // TODO XINfoDB !!!
 
         dialogHexView.exec();
     } else if (action == ACTION_STRINGS) {
