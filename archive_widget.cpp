@@ -434,7 +434,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         DialogHexView dialogHexView(this);
         dialogHexView.setGlobal(getShortcuts(), getGlobalOptions());
         dialogHexView.setData(pDevice, options);
-          // TODO XINfoDB !!!
+        // TODO XINfoDB !!!
 
         dialogHexView.exec();
     } else if (action == ACTION_STRINGS) {
