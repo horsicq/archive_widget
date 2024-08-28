@@ -398,7 +398,7 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
                         QString sTempFileName = fileTemp.fileName();
 
                         DialogUnpackFile dialogUnpackFile(this);
-
+                        dialogUnpackFile.setGlobal(getShortcuts(), getGlobalOptions());
                         dialogUnpackFile.setData(g_sName, &record, sTempFileName);
 
                         if (dialogUnpackFile.exec() == QDialog::Accepted) {
