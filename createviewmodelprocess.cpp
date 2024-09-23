@@ -29,7 +29,7 @@ CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pPare
 }
 
 void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
-                                     QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, QSet<XBinary::FT> stFilterFileTypes,
+                                     QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                                      QList<RECORD> *pListViewRecords, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_type = type;
