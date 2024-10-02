@@ -442,7 +442,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
         stringsOptions.bMenu_Hex = true;
         stringsOptions.bMenu_Demangle = true;
         stringsOptions.bAnsi = true;
-        stringsOptions.bUTF8 = false;
+        // stringsOptions.bUTF8 = false;
         stringsOptions.bUnicode = true;
         stringsOptions.bNullTerminated = false;
 
