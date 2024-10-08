@@ -111,7 +111,7 @@ private:
     QString g_sName;
     FW_DEF::OPTIONS g_options;
     QList<XArchive::RECORD> g_listRecords;
-    QSortFilterProxyModel *g_pFilterTable;
+    QSortFilterProxyModel *g_pFilterTable; // TODO remove
     QSet<XBinary::FT> g_stAvailableOpenFileTypes;
     qint64 g_nCurrentFileSize;
     bool g_bCurrentFileIsRoot;
