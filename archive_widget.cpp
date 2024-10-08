@@ -113,7 +113,7 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &s
     ui->treeViewArchive->header()->setSectionResizeMode(1, QHeaderView::Interactive);
 
     g_pFilterTable->setSourceModel(pNewTableModel);
-    ui->tableViewArchive->setModel(g_pFilterTable);
+    ui->tableViewArchive->setModel(g_pFilterTable); // TODO XTableView
 
     ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Interactive);
     ui->tableViewArchive->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
