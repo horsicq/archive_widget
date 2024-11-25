@@ -73,6 +73,7 @@ public:
     QString getCurrentRecordFileName();
     QList<CreateViewModelProcess::RECORD> getRecordsByFileType(XBinary::FT fileType);
     virtual void adjustView();
+    virtual void reloadData(bool bSaveSelection);
 
 public slots:
     void openRecord();

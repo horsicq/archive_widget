@@ -167,6 +167,13 @@ void Archive_widget::adjustView()
 {
 }
 
+void Archive_widget::reloadData(bool bSaveSelection)
+{
+    Q_UNUSED(bSaveSelection)
+
+    // TODO
+}
+
 Archive_widget::~Archive_widget()
 {
     delete ui;
