@@ -365,15 +365,15 @@ void Archive_widget::handleAction(Archive_widget::ACTION action)
 
                     // TODO timer
                     if (dialogUnpackFile.exec() == QDialog::Accepted) {
-                        _handleActionOpenFile(sTempFileName, record.sFileName, false);
+                        _handleActionOpenFile(sTempFileName, record.spInfo.sRecordName, false);
                     }
                 }
             } else if (action == ACTION_COPYFILENAME) {
-                QGuiApplication::clipboard()->setText(record.sFileName);
+                QGuiApplication::clipboard()->setText(record.spInfo.sRecordName);
             } else if (action == ACTION_DUMP) {
-                QString sSaveFileName = QFileInfo(g_sName).absolutePath() + QDir::separator() + QFileInfo(record.sFileName).fileName();
+                QString sSaveFileName = QFileInfo(g_sName).absolutePath() + QDir::separator() + QFileInfo(record.spInfo.sRecordName).fileName();
 
-                sSaveFileName = QFileDialog::getSaveFileName(this, tr("Save file"), sSaveFileName, QFileInfo(record.sFileName).completeSuffix());
+                sSaveFileName = QFileDialog::getSaveFileName(this, tr("Save file"), sSaveFileName, QFileInfo(record.spInfo.sRecordName).completeSuffix());
 
                 if (sSaveFileName != "") {
                     DialogUnpackFile dialogUnpackFile(XOptions::getMainWidget(this));

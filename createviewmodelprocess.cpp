@@ -105,7 +105,7 @@ void CreateViewModelProcess::process()
 
     for (qint32 i = 0, j = 0; (i < nNumberOfRecords) && (!(g_pPdStruct->bIsStop)); i++) {
         XArchive::RECORD record = g_pListArchiveRecords->at(i);
-        QString sRecordFileName = record.sFileName;
+        QString sRecordFileName = record.spInfo.sRecordName;
 
         bool bAdd = true;
 
@@ -162,7 +162,7 @@ void CreateViewModelProcess::process()
 
                         if (k == (nNumberOfParts)) {
                             pItemName->setData(sRecordFileName, Qt::UserRole + UR_PATH);
-                            pItemName->setData(record.nUncompressedSize, Qt::UserRole + UR_SIZE);
+                            pItemName->setData(record.spInfo.nUncompressedSize, Qt::UserRole + UR_SIZE);
                             pItemName->setData(false, Qt::UserRole + UR_ISROOT);
                             pItemName->setData(ftPref, Qt::UserRole + UR_FT);
                         }
@@ -181,7 +181,7 @@ void CreateViewModelProcess::process()
 
                         if (k == (nNumberOfParts)) {
                             QStandardItem *pItemSize = new QStandardItem;
-                            pItemSize->setData(record.nUncompressedSize, Qt::DisplayRole);
+                            pItemSize->setData(record.spInfo.nUncompressedSize, Qt::DisplayRole);
                             pItemSize->setTextAlignment(Qt::AlignRight);
 
                             listItems.append(pItemSize);
@@ -200,7 +200,7 @@ void CreateViewModelProcess::process()
             pItemNumber->setData(j, Qt::DisplayRole);
             pItemNumber->setTextAlignment(Qt::AlignRight);
             pItemNumber->setData(sRecordFileName, Qt::UserRole + UR_PATH);
-            pItemNumber->setData(record.nUncompressedSize, Qt::UserRole + UR_SIZE);
+            pItemNumber->setData(record.spInfo.nUncompressedSize, Qt::UserRole + UR_SIZE);
             pItemNumber->setData(false, Qt::UserRole + UR_ISROOT);
             pItemNumber->setData(ftPref, Qt::UserRole + UR_FT);
             listItems.append(pItemNumber);
@@ -210,7 +210,7 @@ void CreateViewModelProcess::process()
             listItems.append(pItemName);
 
             QStandardItem *pItemSize = new QStandardItem;
-            pItemSize->setData(record.nUncompressedSize, Qt::DisplayRole);
+            pItemSize->setData(record.spInfo.nUncompressedSize, Qt::DisplayRole);
             pItemSize->setTextAlignment(Qt::AlignRight);
             listItems.append(pItemSize);
 
@@ -220,7 +220,7 @@ void CreateViewModelProcess::process()
         }
 
         XBinary::setPdStructCurrentIncrement(g_pPdStruct, _nFreeIndex);
-        XBinary::setPdStructStatus(g_pPdStruct, _nFreeIndex, g_pListArchiveRecords->at(i).sFileName);
+        XBinary::setPdStructStatus(g_pPdStruct, _nFreeIndex, g_pListArchiveRecords->at(i).spInfo.sRecordName);
     }
 
     (*g_ppTreeModel)->setHeaderData(0, Qt::Horizontal, tr("File"));
