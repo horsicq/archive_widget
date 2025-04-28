@@ -491,7 +491,7 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
 
         dialogTextInfo.exec();
     } else if (stFileTypes.contains(XBinary::FT_ANDROIDXML)) {
-        QString sString = XAndroidBinary::getDecoded(sFileName);
+        QString sString = XAndroidBinary::getDecoded(sFileName, nullptr);
 
         DialogTextInfo dialogTextInfo(this);
         dialogTextInfo.setTitle(sTitle);
