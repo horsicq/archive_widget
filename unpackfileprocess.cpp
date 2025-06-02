@@ -83,7 +83,9 @@ void UnpackFileProcess::process()
         }
     }
 
-    g_pPdStruct->bIsStop = !(bResult);
+    if (!(bResult)) {
+        XBinary::setPdStructStopped(g_pPdStruct);
+    }
 
     XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
 
