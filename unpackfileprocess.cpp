@@ -24,7 +24,7 @@ UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
 {
     g_pDevice = nullptr;
     g_pRecord = nullptr;
-    g_pPdStruct = nullptr;
+    m_pPdStruct = nullptr;
 }
 
 void UnpackFileProcess::setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct)
@@ -32,14 +32,14 @@ void UnpackFileProcess::setData(const QString &sFileName, XArchive::RECORD *pRec
     this->g_sFileName = sFileName;
     this->g_pRecord = pRecord;
     this->g_sResultFileName = sResultFileName;
-    this->g_pPdStruct = pPdStruct;
+    this->m_pPdStruct = pPdStruct;
 }
 
 void UnpackFileProcess::setData(const QString &sFileName, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_sFileName = sFileName;
     this->g_sResultFileFolder = sResultFileFolder;
-    this->g_pPdStruct = pPdStruct;
+    this->m_pPdStruct = pPdStruct;
 }
 
 void UnpackFileProcess::setData(QIODevice *pDevice, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct)
@@ -47,14 +47,14 @@ void UnpackFileProcess::setData(QIODevice *pDevice, XArchive::RECORD *pRecord, c
     this->g_pDevice = pDevice;
     this->g_pRecord = pRecord;
     this->g_sResultFileName = sResultFileName;
-    this->g_pPdStruct = pPdStruct;
+    this->m_pPdStruct = pPdStruct;
 }
 
 void UnpackFileProcess::setData(QIODevice *pDevice, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
 {
     this->g_pDevice = pDevice;
     this->g_sResultFileFolder = sResultFileFolder;
-    this->g_pPdStruct = pPdStruct;
+    this->m_pPdStruct = pPdStruct;
 }
 
 void UnpackFileProcess::process()
@@ -62,32 +62,32 @@ void UnpackFileProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
-    qint32 _nFreeIndex = XBinary::getFreeIndex(g_pPdStruct);
-    XBinary::setPdStructInit(g_pPdStruct, _nFreeIndex, 0);
+    qint32 _nFreeIndex = XBinary::getFreeIndex(m_pPdStruct);
+    XBinary::setPdStructInit(m_pPdStruct, _nFreeIndex, 0);
 
     bool bResult = false;
 
     if (g_sFileName != "") {
         if (g_sResultFileName != "") {
             bResult = XArchives::decompressToFile(g_sFileName, g_pRecord, g_sResultFileName,
-                                                  g_pPdStruct);  // TODO Error signals
+                                                  m_pPdStruct);  // TODO Error signals
         } else if (g_sResultFileFolder != "") {
-            bResult = XArchives::decompressToFolder(g_sFileName, g_sResultFileFolder, g_pPdStruct);  // TODO Error signals
+            bResult = XArchives::decompressToFolder(g_sFileName, g_sResultFileFolder, m_pPdStruct);  // TODO Error signals
         }
     } else if (g_pDevice) {
         if (g_sResultFileName != "") {
             bResult = XArchives::decompressToFile(g_pDevice, g_pRecord, g_sResultFileName,
-                                                  g_pPdStruct);  // TODO Error signals
+                                                  m_pPdStruct);  // TODO Error signals
         } else if (g_sResultFileFolder != "") {
-            bResult = XArchives::decompressToFolder(g_pDevice, g_sResultFileFolder, g_pPdStruct);  // TODO Error signals
+            bResult = XArchives::decompressToFolder(g_pDevice, g_sResultFileFolder, m_pPdStruct);  // TODO Error signals
         }
     }
 
     if (!(bResult)) {
-        XBinary::setPdStructStopped(g_pPdStruct);
+        XBinary::setPdStructStopped(m_pPdStruct);
     }
 
-    XBinary::setPdStructFinished(g_pPdStruct, _nFreeIndex);
+    XBinary::setPdStructFinished(m_pPdStruct, _nFreeIndex);
 
     emit completed(scanTimer.elapsed());
 }

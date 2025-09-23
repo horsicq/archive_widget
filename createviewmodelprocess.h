@@ -77,7 +77,7 @@ private:
     QStandardItemModel **g_ppTableModel;
     QSet<XBinary::FT> g_stFilterFileTypes;
     QList<RECORD> *g_pListViewRecords;
-    XBinary::PDSTRUCT *g_pPdStruct;
+    XBinary::PDSTRUCT *m_pPdStruct;
 };
 
 #endif  // CREATEVIEWMODELPROCESS_H

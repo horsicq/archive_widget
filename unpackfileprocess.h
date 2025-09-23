@@ -47,7 +47,7 @@ private:
     XArchive::RECORD *g_pRecord;
     QString g_sResultFileName;
     QString g_sResultFileFolder;
-    XBinary::PDSTRUCT *g_pPdStruct;
+    XBinary::PDSTRUCT *m_pPdStruct;
 };
 
 #endif  // UNPACKFILEPROCESS_H
