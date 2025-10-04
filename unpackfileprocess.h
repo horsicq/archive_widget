@@ -43,7 +43,7 @@ public slots:
 
 private:
     QString g_sFileName;
-    QIODevice *g_pDevice;
+    QIODevice *m_pDevice;
     XArchive::RECORD *g_pRecord;
     QString g_sResultFileName;
     QString g_sResultFileFolder;
