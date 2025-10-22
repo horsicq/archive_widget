@@ -26,7 +26,7 @@ DialogArchive::DialogArchive(QWidget *pParent) : XShortcutsDialog(pParent, true)
 {
     ui->setupUi(this);
 
-    g_options = {};
+    m_options = {};
 }
 
 DialogArchive::~DialogArchive()
@@ -44,7 +44,7 @@ void DialogArchive::setFileName(const QString &sFileName, XBinary::FT fileType, 
         setWindowTitle(options.sTitle);
     }
 
-    g_options = options;
+    m_options = options;
     ui->widget->setFileName(sFileName, fileType, options, stAvailableFileTypes);
 }
 
@@ -59,7 +59,7 @@ void DialogArchive::setDirectory(const QString &sDirectoryName, const FW_DEF::OP
         setWindowTitle(options.sTitle);
     }
 
-    g_options = options;
+    m_options = options;
     ui->widget->setDirectoryName(sDirectoryName, options, stAvailableFileTypes);
 }
 
@@ -82,7 +82,7 @@ void DialogArchive::on_pushButtonOpen_clicked()
 {
     g_sCurrentRecordFileName = ui->widget->getCurrentRecordFileName();
 
-    if (!g_options.bNoWindowOpen) {
+    if (!m_options.bNoWindowOpen) {
         ui->widget->openRecord();
     } else {
         accept();
