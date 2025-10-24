@@ -22,6 +22,7 @@
 #define DIALOGSHOWIMAGE_H
 
 #include "xshortcutsdialog.h"
+#include <QContextMenuEvent>
 
 namespace Ui {
 class DialogShowImage;
@@ -40,11 +41,28 @@ public:
 private slots:
     void on_pushButtonClose_clicked();
 
+private:
+    void updateImageDisplay();
+    void setZoomFactor(qreal factor);
+    void zoomIn();
+    void zoomOut();
+    void fitToWindow();
+    void actualSize();
+    void copyToClipboard();
+    void saveAs();
+    void updateImageInfo();
+    Ui::DialogShowImage *ui;
+    QPixmap m_originalPixmap;
+    QPixmap m_currentPixmap;
+    qreal m_zoomFactor;
+    bool m_fitToWindow;
+    QMenu *m_contextMenu;
+
 protected:
     virtual void registerShortcuts(bool bState);
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
 
-private:
-    Ui::DialogShowImage *ui;
 };
 
 #endif  // DIALOGSHOWIMAGE_H
