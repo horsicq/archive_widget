@@ -25,6 +25,7 @@
 #include <QStandardItemModel>
 #include <QThread>
 #include <QTimer>
+#include <QScopedPointer>
 
 #include "createviewmodelprocess.h"
 #include "xdialogprocess.h"
@@ -43,10 +44,12 @@ public:
     void setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
                  QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                  QList<CreateViewModelProcess::RECORD> *pListViewRecords);
+    bool isRunning() const { return bIsRunning; }
 
 private:
-    CreateViewModelProcess *pCreateViewModelProcess;
-    QThread *pThread;
+    QScopedPointer<CreateViewModelProcess> pCreateViewModelProcess;
+    QScopedPointer<QThread> pThread;
+    bool bIsRunning;
 };
 
 #endif  // DIALOGCREATEVIEWMODEL_H

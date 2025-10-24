@@ -20,33 +20,78 @@
  */
 #include "dialogcreateviewmodel.h"
 
+#include <QMessageBox>
+
 DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : XDialogProcess(pParent)
 {
-    pCreateViewModelProcess = new CreateViewModelProcess;
-    pThread = new QThread;
+    pCreateViewModelProcess.reset(new CreateViewModelProcess);
+    pThread.reset(new QThread);
+    bIsRunning = false;
 
-    pCreateViewModelProcess->moveToThread(pThread);
+    pCreateViewModelProcess->moveToThread(pThread.data());
 
-    connect(pThread, SIGNAL(started()), pCreateViewModelProcess, SLOT(process()));
-    connect(pCreateViewModelProcess, SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
+    connect(pThread.data(), SIGNAL(started()), pCreateViewModelProcess.data(), SLOT(process()));
+    connect(pCreateViewModelProcess.data(), SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
+    connect(pCreateViewModelProcess.data(), SIGNAL(progressValueChanged(qint32)), this, SLOT(onProgressValueChanged(qint32)));
+    connect(pCreateViewModelProcess.data(), SIGNAL(progressMessageChanged(const QString &)), this, SLOT(onProgressMessageChanged(const QString &)));
+    connect(pCreateViewModelProcess.data(), SIGNAL(errorMessage(const QString &)), this, SLOT(onErrorMessage(const QString &)));
 }
 
 DialogCreateViewModel::~DialogCreateViewModel()
 {
-    stop();
-    waitForFinished();
+    if (bIsRunning) {
+        stop();
+        waitForFinished();
+        bIsRunning = false;
+    }
 
-    pThread->quit();
-    pThread->wait();
-
-    delete pThread;
-    delete pCreateViewModelProcess;
+    if (pThread) {
+        pThread->quit();
+        pThread->wait();
+    }
 }
 
 void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
                                     QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                                     QList<CreateViewModelProcess::RECORD> *pListViewRecords)
 {
+    if (bIsRunning) {
+        return;  // Already running, ignore
+    }
+
+    // Validate inputs
+    if (!pListArchiveRecords || !ppTreeModel || !ppTableModel || !pListViewRecords) {
+        QMessageBox::critical(this, tr("Error"), tr("Invalid parameters provided"));
+        return;
+    }
+
+    if (sName.isEmpty()) {
+        QMessageBox::critical(this, tr("Error"), tr("File name cannot be empty"));
+        return;
+    }
+
+    bIsRunning = true;
     pCreateViewModelProcess->setData(type, sName, fileType, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords, getPdStruct());
     pThread->start();
+}
+
+void DialogCreateViewModel::onProgressValueChanged(qint32 nValue)
+{
+    setProgressBarValue(nValue);
+}
+
+void DialogCreateViewModel::onProgressMessageChanged(const QString &sText)
+{
+    setProgressBarText(sText);
+}
+
+void DialogCreateViewModel::onErrorMessage(const QString &sText)
+{
+    QMessageBox::critical(this, tr("Error"), sText);
+}
+
+void DialogCreateViewModel::onCompleted(qint64 nElapsed)
+{
+    bIsRunning = false;
+    XDialogProcess::onCompleted(nElapsed);
 }

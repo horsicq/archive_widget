@@ -32,6 +32,12 @@ void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::F
                                      QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                                      QList<RECORD> *pListViewRecords, XBinary::PDSTRUCT *pPdStruct)
 {
+    // Validate inputs
+    if (!pListArchiveRecords || !ppTreeModel || !ppTableModel || !pListViewRecords) {
+        emit errorMessage("Invalid parameters provided to CreateViewModelProcess");
+        return;
+    }
+
     this->g_type = type;
     this->g_sName = sName;
     this->g_fileType = fileType;
@@ -48,6 +54,9 @@ void CreateViewModelProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
+    emit progressValueChanged(0);
+    emit progressMessageChanged("Initializing...");
+
     XBinary::FT ftPref = g_fileType;
 
     if (g_type == TYPE_FILE) {
@@ -57,8 +66,20 @@ void CreateViewModelProcess::process()
         }
 
         *g_pListArchiveRecords = XArchives::getRecords(g_sName, ftPref, -1, m_pPdStruct);
+        
+        if (g_pListArchiveRecords->isEmpty()) {
+            emit errorMessage("Failed to read archive records");
+            emit completed(scanTimer.elapsed());
+            return;
+        }
     } else if (g_type == TYPE_DIRECTORY) {
         *g_pListArchiveRecords = XArchives::getRecordsFromDirectory(g_sName, -1, m_pPdStruct);
+        
+        if (g_pListArchiveRecords->isEmpty()) {
+            emit errorMessage("No files found in directory");
+            emit completed(scanTimer.elapsed());
+            return;
+        }
     }
 
     qint64 nFileSize = XBinary::getSize(g_sName);
@@ -106,6 +127,10 @@ void CreateViewModelProcess::process()
     for (qint32 i = 0, j = 0; (i < nNumberOfRecords) && XBinary::isPdStructNotCanceled(m_pPdStruct); i++) {
         XArchive::RECORD record = g_pListArchiveRecords->at(i);
         QString sRecordFileName = record.spInfo.sRecordName;
+
+        // Emit progress update
+        emit progressValueChanged((i * 100) / nNumberOfRecords);
+        emit progressMessageChanged(QString("Processing: %1").arg(sRecordFileName));
 
         bool bAdd = true;
 
@@ -231,6 +256,9 @@ void CreateViewModelProcess::process()
     (*g_ppTableModel)->setHeaderData(2, Qt::Horizontal, tr("Size"));
 
     XBinary::setPdStructFinished(m_pPdStruct, _nFreeIndex);
+
+    emit progressValueChanged(100);
+    emit progressMessageChanged("Completed");
 
     emit completed(scanTimer.elapsed());
 }

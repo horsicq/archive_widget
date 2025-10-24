@@ -64,6 +64,8 @@ public:
 signals:
     void errorMessage(const QString &sText);
     void completed(qint64 nElapsed);
+    void progressValueChanged(qint32 nValue);
+    void progressMessageChanged(const QString &sText);
 
 public slots:
     void process();
