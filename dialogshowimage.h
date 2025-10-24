@@ -62,7 +62,6 @@ protected:
     virtual void registerShortcuts(bool bState);
     void contextMenuEvent(QContextMenuEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
-
 };
 
 #endif  // DIALOGSHOWIMAGE_H

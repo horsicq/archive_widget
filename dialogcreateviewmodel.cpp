@@ -75,23 +75,23 @@ void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QSt
     pThread->start();
 }
 
-void DialogCreateViewModel::onProgressValueChanged(qint32 nValue)
-{
-    setProgressBarValue(nValue);
-}
+// void DialogCreateViewModel::onProgressValueChanged(qint32 nValue)
+// {
+//     setProgressBarValue(nValue);
+// }
 
-void DialogCreateViewModel::onProgressMessageChanged(const QString &sText)
-{
-    setProgressBarText(sText);
-}
+// void DialogCreateViewModel::onProgressMessageChanged(const QString &sText)
+// {
+//     setProgressBarText(sText);
+// }
 
-void DialogCreateViewModel::onErrorMessage(const QString &sText)
-{
-    QMessageBox::critical(this, tr("Error"), sText);
-}
+// void DialogCreateViewModel::onErrorMessage(const QString &sText)
+// {
+//     QMessageBox::critical(this, tr("Error"), sText);
+// }
 
-void DialogCreateViewModel::onCompleted(qint64 nElapsed)
-{
-    bIsRunning = false;
-    XDialogProcess::onCompleted(nElapsed);
-}
+// void DialogCreateViewModel::onCompleted(qint64 nElapsed)
+// {
+//     bIsRunning = false;
+//     XDialogProcess::onCompleted(nElapsed);
+// }

@@ -97,22 +97,22 @@ void DialogShowImage::registerShortcuts(bool bState)
 {
     if (bState) {
         // Zoom shortcuts
-        getShortcuts()->addShortcut(Qt::Key_Plus, this, SLOT(zoomIn()));
-        getShortcuts()->addShortcut(Qt::Key_Equal, this, SLOT(zoomIn()));
-        getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_Plus, this, SLOT(zoomIn()));
-        getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_Equal, this, SLOT(zoomIn()));
-        getShortcuts()->addShortcut(Qt::Key_Minus, this, SLOT(zoomOut()));
-        getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_Minus, this, SLOT(zoomOut()));
-        getShortcuts()->addShortcut(Qt::Key_0, this, SLOT(actualSize()));
-        getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_0, this, SLOT(actualSize()));
-        getShortcuts()->addShortcut(Qt::Key_F, this, SLOT(fitToWindow()));
+        // getShortcuts()->addShortcut(Qt::Key_Plus, this, SLOT(zoomIn()));
+        // getShortcuts()->addShortcut(Qt::Key_Equal, this, SLOT(zoomIn()));
+        // getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_Plus, this, SLOT(zoomIn()));
+        // getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_Equal, this, SLOT(zoomIn()));
+        // getShortcuts()->addShortcut(Qt::Key_Minus, this, SLOT(zoomOut()));
+        // getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_Minus, this, SLOT(zoomOut()));
+        // getShortcuts()->addShortcut(Qt::Key_0, this, SLOT(actualSize()));
+        // getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_0, this, SLOT(actualSize()));
+        // getShortcuts()->addShortcut(Qt::Key_F, this, SLOT(fitToWindow()));
 
-        // Close shortcuts
-        getShortcuts()->addShortcut(Qt::Key_Escape, this, SLOT(close()));
-        getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_W, this, SLOT(close()));
+        // // Close shortcuts
+        // getShortcuts()->addShortcut(Qt::Key_Escape, this, SLOT(close()));
+        // getShortcuts()->addShortcut(Qt::CTRL + Qt::Key_W, this, SLOT(close()));
     } else {
         // Remove shortcuts when disabled
-        getShortcuts()->clear();
+        // getShortcuts()->clear();
     }
 }
 
