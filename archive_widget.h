@@ -108,16 +108,16 @@ signals:
 
 private:
     Ui::Archive_widget *ui;
-    CreateViewModelProcess::TYPE g_type;
-    QString g_sName;
-    FW_DEF::OPTIONS g_options;
-    QList<XArchive::RECORD> g_listRecords;
-    QSortFilterProxyModel *g_pFilterTable;  // TODO remove
-    QSet<XBinary::FT> g_stAvailableOpenFileTypes;
-    qint64 g_nCurrentFileSize;
-    bool g_bCurrentFileIsRoot;
-    QString g_sCurrentRecordFileName;
-    QList<CreateViewModelProcess::RECORD> g_listViewRecords;
+    CreateViewModelProcess::TYPE m_type;
+    QString m_sName;
+    FW_DEF::OPTIONS m_options;
+    QList<XArchive::RECORD> m_listRecords;
+    QSortFilterProxyModel *m_pFilterTable;  // TODO remove
+    QSet<XBinary::FT> m_stAvailableOpenFileTypes;
+    qint64 m_nCurrentFileSize;
+    bool m_bCurrentFileIsRoot;
+    QString m_sCurrentRecordFileName;
+    QList<CreateViewModelProcess::RECORD> m_listViewRecords;
 };
 
 #endif  // ARCHIVE_WIDGET_H
