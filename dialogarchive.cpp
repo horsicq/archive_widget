@@ -70,7 +70,7 @@ void DialogArchive::setGlobal(XShortcuts *pShortcuts, XOptions *pXOptions)
 
 QString DialogArchive::getCurrentRecordFileName()
 {
-    return g_sCurrentRecordFileName;
+    return m_sCurrentRecordFileName;
 }
 
 void DialogArchive::on_pushButtonClose_clicked()
@@ -80,7 +80,7 @@ void DialogArchive::on_pushButtonClose_clicked()
 
 void DialogArchive::on_pushButtonOpen_clicked()
 {
-    g_sCurrentRecordFileName = ui->widget->getCurrentRecordFileName();
+    m_sCurrentRecordFileName = ui->widget->getCurrentRecordFileName();
 
     if (!m_options.bNoWindowOpen) {
         ui->widget->openRecord();

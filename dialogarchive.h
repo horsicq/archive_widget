@@ -54,7 +54,7 @@ protected:
 
 private:
     Ui::DialogArchive *ui;
-    QString g_sCurrentRecordFileName;
+    QString m_sCurrentRecordFileName;
     FW_DEF::OPTIONS m_options;
 };
 
