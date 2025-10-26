@@ -23,9 +23,8 @@
 CreateViewModelProcess::CreateViewModelProcess(QObject *pParent) : QObject(pParent)
 {
     m_pPdStruct = nullptr;
-    g_type = TYPE_UNKNOWN;
-    g_fileType = XBinary::FT_UNKNOWN;
-    // TODO nullptr
+    m_type = TYPE_UNKNOWN;
+    m_fileType = XBinary::FT_UNKNOWN;
 }
 
 void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
@@ -38,14 +37,14 @@ void CreateViewModelProcess::setData(TYPE type, const QString &sName, XBinary::F
         return;
     }
 
-    this->g_type = type;
-    this->g_sName = sName;
-    this->g_fileType = fileType;
-    this->g_pListArchiveRecords = pListArchiveRecords;
-    this->g_ppTreeModel = ppTreeModel;
-    this->g_ppTableModel = ppTableModel;
-    this->g_stFilterFileTypes = stFilterFileTypes;
-    this->g_pListViewRecords = pListViewRecords;
+    this->m_type = type;
+    this->m_sName = sName;
+    this->m_fileType = fileType;
+    this->m_pListArchiveRecords = pListArchiveRecords;
+    this->m_ppTreeModel = ppTreeModel;
+    this->m_ppTableModel = ppTableModel;
+    this->m_stFilterFileTypes = stFilterFileTypes;
+    this->m_pListViewRecords = pListViewRecords;
     this->m_pPdStruct = pPdStruct;
 }
 
@@ -57,75 +56,75 @@ void CreateViewModelProcess::process()
     emit progressValueChanged(0);
     emit progressMessageChanged("Initializing...");
 
-    XBinary::FT ftPref = g_fileType;
+    XBinary::FT ftPref = m_fileType;
 
-    if (g_type == TYPE_FILE) {
+    if (m_type == TYPE_FILE) {
         if (ftPref == XBinary::FT_UNKNOWN) {
-            QSet<XBinary::FT> stFT = XFormats::getFileTypes(g_sName, true, m_pPdStruct);
+            QSet<XBinary::FT> stFT = XFormats::getFileTypes(m_sName, true, m_pPdStruct);
             ftPref = XBinary::_getPrefFileType(&stFT);
         }
 
-        *g_pListArchiveRecords = XArchives::getRecords(g_sName, ftPref, -1, m_pPdStruct);
+        *m_pListArchiveRecords = XArchives::getRecords(m_sName, ftPref, -1, m_pPdStruct);
         
-        if (g_pListArchiveRecords->isEmpty()) {
+        if (m_pListArchiveRecords->isEmpty()) {
             emit errorMessage("Failed to read archive records");
             emit completed(scanTimer.elapsed());
             return;
         }
-    } else if (g_type == TYPE_DIRECTORY) {
-        *g_pListArchiveRecords = XArchives::getRecordsFromDirectory(g_sName, -1, m_pPdStruct);
+    } else if (m_type == TYPE_DIRECTORY) {
+        *m_pListArchiveRecords = XArchives::getRecordsFromDirectory(m_sName, -1, m_pPdStruct);
         
-        if (g_pListArchiveRecords->isEmpty()) {
+        if (m_pListArchiveRecords->isEmpty()) {
             emit errorMessage("No files found in directory");
             emit completed(scanTimer.elapsed());
             return;
         }
     }
 
-    qint64 nFileSize = XBinary::getSize(g_sName);
+    qint64 nFileSize = XBinary::getSize(m_sName);
 
-    qint32 nNumberOfRecords = g_pListArchiveRecords->count();
+    qint32 nNumberOfRecords = m_pListArchiveRecords->count();
 
     qint32 _nFreeIndex = XBinary::getFreeIndex(m_pPdStruct);
     XBinary::setPdStructInit(m_pPdStruct, _nFreeIndex, nNumberOfRecords);
 
     if (nNumberOfRecords == 0) {
         RECORD _record = {};
-        _record.sRecordName = g_sName;
+        _record.sRecordName = m_sName;
         _record.ft = ftPref;
         _record.bIsVirtual = false;
 
-        g_pListViewRecords->append(_record);
+        m_pListViewRecords->append(_record);
     }
 
-    *g_ppTreeModel = new QStandardItemModel;
-    (*g_ppTreeModel)->setColumnCount(2);
+    *m_ppTreeModel = new QStandardItemModel;
+    (*m_ppTreeModel)->setColumnCount(2);
 
-    *g_ppTableModel = new QStandardItemModel;
-    (*g_ppTableModel)->setColumnCount(3);
+    *m_ppTableModel = new QStandardItemModel;
+    (*m_ppTableModel)->setColumnCount(3);
 
-    QString sBaseName = QFileInfo(g_sName).fileName();
+    QString sBaseName = QFileInfo(m_sName).fileName();
 
     QStandardItem *pRootItemName = new QStandardItem;
     pRootItemName->setText(sBaseName);
-    pRootItemName->setData(g_sName, Qt::UserRole + UR_PATH);
+    pRootItemName->setData(m_sName, Qt::UserRole + UR_PATH);
     pRootItemName->setData(nFileSize, Qt::UserRole + UR_SIZE);
     pRootItemName->setData(true, Qt::UserRole + UR_ISROOT);
 
-    (*g_ppTreeModel)->setItem(0, 0, pRootItemName);
+    (*m_ppTreeModel)->setItem(0, 0, pRootItemName);
 
     QStandardItem *pRootItemSize = new QStandardItem;
     pRootItemSize->setText(QString::number(nFileSize));
     pRootItemSize->setTextAlignment(Qt::AlignRight);
 
-    (*g_ppTreeModel)->setItem(0, 1, pRootItemSize);
+    (*m_ppTreeModel)->setItem(0, 1, pRootItemSize);
 
-    bool bFilter = g_stFilterFileTypes.count();
+    bool bFilter = m_stFilterFileTypes.count();
 
     QMap<QString, QStandardItem *> mapItems;
 
     for (qint32 i = 0, j = 0; (i < nNumberOfRecords) && XBinary::isPdStructNotCanceled(m_pPdStruct); i++) {
-        XArchive::RECORD record = g_pListArchiveRecords->at(i);
+        XArchive::RECORD record = m_pListArchiveRecords->at(i);
         QString sRecordFileName = record.spInfo.sRecordName;
 
         // Emit progress update
@@ -136,11 +135,11 @@ void CreateViewModelProcess::process()
 
         QSet<XBinary::FT> stFT;
 
-        if (g_type == TYPE_FILE) {
-            QByteArray baData = XArchives::decompress(g_sName, &record, m_pPdStruct);
+        if (m_type == TYPE_FILE) {
+            QByteArray baData = XArchives::decompress(m_sName, &record, m_pPdStruct);
 
             stFT = XFormats::getFileTypes(&baData, true);
-        } else if (g_type == TYPE_DIRECTORY) {
+        } else if (m_type == TYPE_DIRECTORY) {
             stFT = XFormats::getFileTypes(sRecordFileName, true);
         }
 
@@ -151,10 +150,10 @@ void CreateViewModelProcess::process()
         _record.ft = ftPref;
         _record.bIsVirtual = true;
 
-        g_pListViewRecords->append(_record);
+        m_pListViewRecords->append(_record);
 
         if (bFilter) {
-            bAdd = XBinary::isFileTypePresent(&stFT, &g_stFilterFileTypes);
+            bAdd = XBinary::isFileTypePresent(&stFT, &m_stFilterFileTypes);
         }
 
         if (bAdd) {
@@ -239,21 +238,21 @@ void CreateViewModelProcess::process()
             pItemSize->setTextAlignment(Qt::AlignRight);
             listItems.append(pItemSize);
 
-            (*g_ppTableModel)->appendRow(listItems);
+            (*m_ppTableModel)->appendRow(listItems);
 
             j++;
         }
 
         XBinary::setPdStructCurrentIncrement(m_pPdStruct, _nFreeIndex);
-        XBinary::setPdStructStatus(m_pPdStruct, _nFreeIndex, g_pListArchiveRecords->at(i).spInfo.sRecordName);
+        XBinary::setPdStructStatus(m_pPdStruct, _nFreeIndex, m_pListArchiveRecords->at(i).spInfo.sRecordName);
     }
 
-    (*g_ppTreeModel)->setHeaderData(0, Qt::Horizontal, tr("File"));
-    (*g_ppTreeModel)->setHeaderData(1, Qt::Horizontal, tr("Size"));
+    (*m_ppTreeModel)->setHeaderData(0, Qt::Horizontal, tr("File"));
+    (*m_ppTreeModel)->setHeaderData(1, Qt::Horizontal, tr("Size"));
 
-    (*g_ppTableModel)->setHeaderData(0, Qt::Horizontal, "");
-    (*g_ppTableModel)->setHeaderData(1, Qt::Horizontal, tr("File"));
-    (*g_ppTableModel)->setHeaderData(2, Qt::Horizontal, tr("Size"));
+    (*m_ppTableModel)->setHeaderData(0, Qt::Horizontal, "");
+    (*m_ppTableModel)->setHeaderData(1, Qt::Horizontal, tr("File"));
+    (*m_ppTableModel)->setHeaderData(2, Qt::Horizontal, tr("Size"));
 
     XBinary::setPdStructFinished(m_pPdStruct, _nFreeIndex);
 

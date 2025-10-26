@@ -71,14 +71,14 @@ public slots:
     void process();
 
 private:
-    TYPE g_type;
-    QString g_sName;
-    XBinary::FT g_fileType;
-    QList<XArchive::RECORD> *g_pListArchiveRecords;
-    QStandardItemModel **g_ppTreeModel;
-    QStandardItemModel **g_ppTableModel;
-    QSet<XBinary::FT> g_stFilterFileTypes;
-    QList<RECORD> *g_pListViewRecords;
+    TYPE m_type;
+    QString m_sName;
+    XBinary::FT m_fileType;
+    QList<XArchive::RECORD> *m_pListArchiveRecords;
+    QStandardItemModel **m_ppTreeModel;
+    QStandardItemModel **m_ppTableModel;
+    QSet<XBinary::FT> m_stFilterFileTypes;
+    QList<RECORD> *m_pListViewRecords;
     XBinary::PDSTRUCT *m_pPdStruct;
 };
 
