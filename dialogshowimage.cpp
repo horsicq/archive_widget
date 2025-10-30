@@ -57,20 +57,20 @@ DialogShowImage::DialogShowImage(QWidget *pParent, const QString &sFileName, con
     m_originalPixmap = pixmap;
     m_currentPixmap = pixmap;
     m_zoomFactor = 1.0;
-    m_fitToWindow = true; // Start with fit to window
+    m_fitToWindow = true;  // Start with fit to window
 
     // Set initial display
     updateImageDisplay();
 
     // Set window size based on image size, but constrain to reasonable limits
     QSize imageSize = pixmap.size();
-    QSize maxSize(1200, 800); // Reasonable maximum window size
+    QSize maxSize(1200, 800);  // Reasonable maximum window size
 
     if (imageSize.width() > maxSize.width() || imageSize.height() > maxSize.height()) {
         imageSize.scale(maxSize, Qt::KeepAspectRatio);
     }
 
-    resize(imageSize + QSize(20, 60)); // Add some padding for window decorations
+    resize(imageSize + QSize(20, 60));  // Add some padding for window decorations
 
     // Display image information
     updateImageInfo();
@@ -133,7 +133,7 @@ void DialogShowImage::updateImageDisplay()
 
 void DialogShowImage::setZoomFactor(qreal factor)
 {
-    m_zoomFactor = qMax(0.1, qMin(5.0, factor)); // Limit zoom between 10% and 500%
+    m_zoomFactor = qMax(0.1, qMin(5.0, factor));  // Limit zoom between 10% and 500%
     m_fitToWindow = false;
     updateImageDisplay();
     updateImageInfo();
@@ -212,9 +212,8 @@ void DialogShowImage::saveAs()
         return;
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"),
-        QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
-        tr("Images (*.png *.jpg *.jpeg *.bmp *.gif)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
+                                                    tr("Images (*.png *.jpg *.jpeg *.bmp *.gif)"));
 
     if (!fileName.isEmpty()) {
         if (!m_originalPixmap.save(fileName)) {
@@ -243,11 +242,7 @@ void DialogShowImage::updateImageInfo()
     else if (extension == "gif") format = "GIF";
     else if (extension == "tiff" || extension == "tif") format = "TIFF";
 
-    QString info = tr("Size: %1 x %2 | Format: %3 | Zoom: %4%")
-                   .arg(size.width())
-                   .arg(size.height())
-                   .arg(format)
-                   .arg(qRound(m_zoomFactor * 100));
+    QString info = tr("Size: %1 x %2 | Format: %3 | Zoom: %4%").arg(size.width()).arg(size.height()).arg(format).arg(qRound(m_zoomFactor * 100));
 
     ui->labelInfo->setText(info);
 }

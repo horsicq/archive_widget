@@ -65,7 +65,7 @@ void CreateViewModelProcess::process()
         }
 
         *m_pListArchiveRecords = XArchives::getRecords(m_sName, ftPref, -1, m_pPdStruct);
-        
+
         if (m_pListArchiveRecords->isEmpty()) {
             emit errorMessage("Failed to read archive records");
             emit completed(scanTimer.elapsed());
@@ -73,7 +73,7 @@ void CreateViewModelProcess::process()
         }
     } else if (m_type == TYPE_DIRECTORY) {
         *m_pListArchiveRecords = XArchives::getRecordsFromDirectory(m_sName, -1, m_pPdStruct);
-        
+
         if (m_pListArchiveRecords->isEmpty()) {
             emit errorMessage("No files found in directory");
             emit completed(scanTimer.elapsed());

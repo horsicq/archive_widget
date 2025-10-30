@@ -44,7 +44,10 @@ public:
     void setData(CreateViewModelProcess::TYPE type, const QString &sName, XBinary::FT fileType, QList<XArchive::RECORD> *pListArchiveRecords,
                  QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                  QList<CreateViewModelProcess::RECORD> *pListViewRecords);
-    bool isRunning() const { return bIsRunning; }
+    bool isRunning() const
+    {
+        return bIsRunning;
+    }
 
 private:
     QScopedPointer<CreateViewModelProcess> pCreateViewModelProcess;
