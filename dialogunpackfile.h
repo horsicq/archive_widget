@@ -40,8 +40,8 @@ public:
     void setData(QIODevice *pDevice, const QString &sResultFileFolder);
 
 private:
-    UnpackFileProcess *g_pUnpackFileProcess;
-    QThread *g_pThread;
+    UnpackFileProcess *m_pUnpackFileProcess;
+    QThread *m_pThread;
 };
 
 #endif  // DIALOGUNPACKFILE_H
