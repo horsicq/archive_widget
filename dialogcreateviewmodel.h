@@ -49,6 +49,12 @@ public:
         return bIsRunning;
     }
 
+private slots:
+    void onCompleted(qint64 nElapsed);
+    void onProgressValueChanged(qint32 nValue);
+    void onProgressMessageChanged(const QString &sText);
+    void onErrorMessage(const QString &sText);
+
 private:
     QScopedPointer<CreateViewModelProcess> pCreateViewModelProcess;
     QScopedPointer<QThread> pThread;

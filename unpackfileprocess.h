@@ -42,11 +42,11 @@ public slots:
     void process();
 
 private:
-    QString g_sFileName;
+    QString m_sFileName;
     QIODevice *m_pDevice;
-    XArchive::RECORD *g_pRecord;
-    QString g_sResultFileName;
-    QString g_sResultFileFolder;
+    XArchive::RECORD *m_pRecord;
+    QString m_sResultFileName;
+    QString m_sResultFileFolder;
     XBinary::PDSTRUCT *m_pPdStruct;
 };
 
