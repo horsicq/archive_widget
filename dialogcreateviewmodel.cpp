@@ -24,30 +24,30 @@
 
 DialogCreateViewModel::DialogCreateViewModel(QWidget *pParent) : XDialogProcess(pParent)
 {
-    pCreateViewModelProcess.reset(new CreateViewModelProcess);
-    pThread.reset(new QThread);
-    bIsRunning = false;
+    m_pCreateViewModelProcess.reset(new CreateViewModelProcess);
+    m_pThread.reset(new QThread);
+    m_bIsRunning = false;
 
-    pCreateViewModelProcess->moveToThread(pThread.data());
+    m_pCreateViewModelProcess->moveToThread(m_pThread.data());
 
-    connect(pThread.data(), SIGNAL(started()), pCreateViewModelProcess.data(), SLOT(process()));
-    connect(pCreateViewModelProcess.data(), SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
-    connect(pCreateViewModelProcess.data(), SIGNAL(progressValueChanged(qint32)), this, SLOT(onProgressValueChanged(qint32)));
-    connect(pCreateViewModelProcess.data(), SIGNAL(progressMessageChanged(const QString &)), this, SLOT(onProgressMessageChanged(const QString &)));
-    connect(pCreateViewModelProcess.data(), SIGNAL(errorMessage(const QString &)), this, SLOT(onErrorMessage(const QString &)));
+    connect(m_pThread.data(), SIGNAL(started()), m_pCreateViewModelProcess.data(), SLOT(process()));
+    connect(m_pCreateViewModelProcess.data(), SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
+    connect(m_pCreateViewModelProcess.data(), SIGNAL(progressValueChanged(qint32)), this, SLOT(onProgressValueChanged(qint32)));
+    connect(m_pCreateViewModelProcess.data(), SIGNAL(progressMessageChanged(const QString &)), this, SLOT(onProgressMessageChanged(const QString &)));
+    connect(m_pCreateViewModelProcess.data(), SIGNAL(errorMessage(const QString &)), this, SLOT(onErrorMessage(const QString &)));
 }
 
 DialogCreateViewModel::~DialogCreateViewModel()
 {
-    if (bIsRunning) {
+    if (m_bIsRunning) {
         stop();
         waitForFinished();
-        bIsRunning = false;
+        m_bIsRunning = false;
     }
 
-    if (pThread) {
-        pThread->quit();
-        pThread->wait();
+    if (m_pThread) {
+        m_pThread->quit();
+        m_pThread->wait();
     }
 }
 
@@ -55,7 +55,7 @@ void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QSt
                                     QStandardItemModel **ppTreeModel, QStandardItemModel **ppTableModel, const QSet<XBinary::FT> &stFilterFileTypes,
                                     QList<CreateViewModelProcess::RECORD> *pListViewRecords)
 {
-    if (bIsRunning) {
+    if (m_bIsRunning) {
         return;  // Already running, ignore
     }
 
@@ -70,9 +70,9 @@ void DialogCreateViewModel::setData(CreateViewModelProcess::TYPE type, const QSt
         return;
     }
 
-    bIsRunning = true;
-    pCreateViewModelProcess->setData(type, sName, fileType, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords, getPdStruct());
-    pThread->start();
+    m_bIsRunning = true;
+    m_pCreateViewModelProcess->setData(type, sName, fileType, pListArchiveRecords, ppTreeModel, ppTableModel, stFilterFileTypes, pListViewRecords, getPdStruct());
+    m_pThread->start();
 }
 
 void DialogCreateViewModel::onProgressValueChanged(qint32 nValue)
@@ -94,6 +94,6 @@ void DialogCreateViewModel::onErrorMessage(const QString &sText)
 
 void DialogCreateViewModel::onCompleted(qint64 nElapsed)
 {
-    bIsRunning = false;
+    m_bIsRunning = false;
     XDialogProcess::onCompleted(nElapsed);
 }

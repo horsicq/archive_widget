@@ -46,7 +46,7 @@ public:
                  QList<CreateViewModelProcess::RECORD> *pListViewRecords);
     bool isRunning() const
     {
-        return bIsRunning;
+        return m_bIsRunning;
     }
 
 private slots:
@@ -56,9 +56,9 @@ private slots:
     void onErrorMessage(const QString &sText);
 
 private:
-    QScopedPointer<CreateViewModelProcess> pCreateViewModelProcess;
-    QScopedPointer<QThread> pThread;
-    bool bIsRunning;
+    QScopedPointer<CreateViewModelProcess> m_pCreateViewModelProcess;
+    QScopedPointer<QThread> m_pThread;
+    bool m_bIsRunning;
 };
 
 #endif  // DIALOGCREATEVIEWMODEL_H
