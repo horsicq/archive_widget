@@ -53,7 +53,7 @@ public:
     explicit XArchiveWidget(QWidget *pParent = nullptr);
     ~XArchiveWidget();
 
-    void setData(XBinary::FT fileType, QIODevice *pDevice, bool bIsImage = false, XADDR nModuleAddress = -1,);
+    void setData(XBinary::FT fileType, QIODevice *pDevice, bool bIsImage = false, XADDR nModuleAddress = -1);
     QString getCurrentRecordFileName();
     virtual void adjustView();
     virtual void reloadData(bool bSaveSelection);
