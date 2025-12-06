@@ -255,17 +255,17 @@ void XArchiveWidget::loadRecords()
 
     if (m_pDevice) {
         XArchive *pArchive = new XArchive(m_pDevice);
-        
+
         // Use new streaming API to get all records
         XBinary::UNPACK_STATE state = {};
         QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
-        
+
         if (pArchive->initUnpack(&state, mapProperties, nullptr)) {
             m_listRecords.clear();
-            
+
             while (state.nCurrentIndex < state.nNumberOfRecords) {
                 XBinary::ARCHIVERECORD record = pArchive->infoCurrent(&state, nullptr);
-                
+
                 QList<QStandardItem *> listItems;
 
                 QString sFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
@@ -291,7 +291,7 @@ void XArchiveWidget::loadRecords()
                 listItems.append(pItemMethod);
 
                 m_pModel->appendRow(listItems);
-                
+
                 // Store record info for later use
                 XArchive::RECORD oldRecord = {};
                 oldRecord.spInfo.sRecordName = sFileName;
@@ -300,13 +300,13 @@ void XArchiveWidget::loadRecords()
                 oldRecord.nDataOffset = record.nStreamOffset;
                 oldRecord.nDataSize = record.nStreamSize;
                 m_listRecords.append(oldRecord);
-                
+
                 pArchive->moveToNext(&state, nullptr);
             }
-            
+
             pArchive->finishUnpack(&state, nullptr);
         }
-        
+
         delete pArchive;
     }
 
