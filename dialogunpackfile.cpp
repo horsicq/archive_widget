@@ -20,49 +20,31 @@
  */
 #include "dialogunpackfile.h"
 
-DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent)
+DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent, new UnpackFileProcess)
 {
-    m_pUnpackFileProcess = new UnpackFileProcess;
-    m_pThread = new QThread;
-
-    m_pUnpackFileProcess->moveToThread(m_pThread);
-
-    connect(m_pThread, SIGNAL(started()), m_pUnpackFileProcess, SLOT(process()));
-    connect(m_pUnpackFileProcess, SIGNAL(completed(qint64)), this, SLOT(onCompleted(qint64)));
-}
-
-DialogUnpackFile::~DialogUnpackFile()
-{
-    stop();
-    waitForFinished();
-
-    m_pThread->quit();
-    m_pThread->wait();
-
-    delete m_pThread;
-    delete m_pUnpackFileProcess;
+    m_pUnpackFileProcess = static_cast<UnpackFileProcess *>(XDialogProcess::m_pThreadObject);
 }
 
 void DialogUnpackFile::setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName)
 {
     m_pUnpackFileProcess->setData(sFileName, pRecord, sResultFileName, getPdStruct());
-    m_pThread->start();
+    start();
 }
 
 void DialogUnpackFile::setData(const QString &sFileName, const QString &sResultFileFolder)
 {
     m_pUnpackFileProcess->setData(sFileName, sResultFileFolder, getPdStruct());
-    m_pThread->start();
+    start();
 }
 
 void DialogUnpackFile::setData(QIODevice *pDevice, XArchive::RECORD *pRecord, const QString &sResultFileName)
 {
     m_pUnpackFileProcess->setData(pDevice, pRecord, sResultFileName, getPdStruct());
-    m_pThread->start();
+    start();
 }
 
 void DialogUnpackFile::setData(QIODevice *pDevice, const QString &sResultFileFolder)
 {
     m_pUnpackFileProcess->setData(pDevice, sResultFileFolder, getPdStruct());
-    m_pThread->start();
+    start();
 }

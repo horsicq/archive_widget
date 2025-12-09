@@ -21,9 +21,6 @@
 #ifndef DIALOGUNPACKFILE_H
 #define DIALOGUNPACKFILE_H
 
-#include <QDialog>
-#include <QThread>
-
 #include "unpackfileprocess.h"
 #include "xdialogprocess.h"
 
@@ -32,7 +29,6 @@ class DialogUnpackFile : public XDialogProcess {
 
 public:
     explicit DialogUnpackFile(QWidget *pParent = nullptr);
-    ~DialogUnpackFile();
 
     void setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName);
     void setData(const QString &sFileName, const QString &sResultFileFolder);
@@ -41,7 +37,6 @@ public:
 
 private:
     UnpackFileProcess *m_pUnpackFileProcess;
-    QThread *m_pThread;
 };
 
 #endif  // DIALOGUNPACKFILE_H

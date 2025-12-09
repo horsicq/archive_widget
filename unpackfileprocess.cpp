@@ -20,7 +20,7 @@
  */
 #include "unpackfileprocess.h"
 
-UnpackFileProcess::UnpackFileProcess(QObject *pParent) : QObject(pParent)
+UnpackFileProcess::UnpackFileProcess(QObject *pParent) : XThreadObject(pParent)
 {
     m_pDevice = nullptr;
     m_pRecord = nullptr;

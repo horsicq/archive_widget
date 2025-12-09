@@ -22,8 +22,9 @@
 #define UNPACKFILEPROCESS_H
 
 #include "xarchives.h"
+#include "xthreadobject.h"
 
-class UnpackFileProcess : public QObject {
+class UnpackFileProcess : public XThreadObject {
     Q_OBJECT
 
 public:
@@ -34,12 +35,7 @@ public:
     void setData(QIODevice *pDevice, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct);
     void setData(QIODevice *pDevice, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct);
 
-signals:
-    void errorMessage(const QString &sText);
-    void completed(qint64 nElapsed);
-
-public slots:
-    void process();
+    virtual void process() override;
 
 private:
     QString m_sFileName;
