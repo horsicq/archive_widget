@@ -22,7 +22,7 @@
 
 DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent, new UnpackFileProcess)
 {
-    m_pUnpackFileProcess = static_cast<UnpackFileProcess *>(XDialogProcess::m_pThreadObject);
+    m_pUnpackFileProcess = static_cast<UnpackFileProcess *>(getThreadObject());
 }
 
 void DialogUnpackFile::setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName)
