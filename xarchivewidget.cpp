@@ -285,8 +285,8 @@ void XArchiveWidget::loadRecords()
                 pItemCompressed->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
                 listItems.append(pItemCompressed);
 
-                XBinary::COMPRESS_METHOD compressMethod = (XBinary::COMPRESS_METHOD)record.mapProperties.value(XBinary::FPART_PROP_COMPRESSMETHOD).toInt();
-                QStandardItem *pItemMethod = new QStandardItem(XBinary::compressMethodToString(compressMethod));
+                XBinary::HANDLE_METHOD compressMethod = (XBinary::HANDLE_METHOD)record.mapProperties.value(XBinary::FPART_PROP_HANDLEMETHOD1).toInt();
+                QStandardItem *pItemMethod = new QStandardItem(XBinary::handleMethodToString(compressMethod));
                 pItemMethod->setEditable(false);
                 listItems.append(pItemMethod);
 
