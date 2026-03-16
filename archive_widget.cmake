@@ -23,4 +23,6 @@ set(ARCHIVE_WIDGET_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/xarchivewidget.ui
     ${CMAKE_CURRENT_LIST_DIR}/xgenericarchivewidget.cpp
     ${CMAKE_CURRENT_LIST_DIR}/xgenericarchivewidget.ui
+    ${CMAKE_CURRENT_LIST_DIR}/archiveexplorerwidget.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/archiveexplorerwidget.ui
     )
