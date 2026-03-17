@@ -57,6 +57,11 @@ FORMS += \
     include($$PWD/../XArchive/xarchives.pri)
 }
 
+!contains(XCONFIG, xmodel_archiverecords) {
+    XCONFIG += xmodel_archiverecords
+    include($$PWD/../Controls/xmodel_archiverecords.pri)
+}
+
 DISTFILES += \
     $$PWD/LICENSE \
     $$PWD/README.md \
