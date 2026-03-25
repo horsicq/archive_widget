@@ -59,11 +59,8 @@ void CreateViewModelProcess::process()
     XBinary::FT ftPref = m_fileType;
 
     if (m_type == TYPE_FILE) {
-        if (ftPref == XBinary::FT_UNKNOWN) {
-            QSet<XBinary::FT> stFT = XFormats::getFileTypes(m_sName, true, m_pPdStruct);
-            ftPref = XBinary::_getPrefFileType(&stFT);
-        }
-
+        // Pass ftPref (possibly FT_UNKNOWN) directly so XArchives::getClass can
+        // run its own XBinary::getFileTypes detection which covers all formats.
         *m_pListArchiveRecords = XArchives::getRecords(m_sName, ftPref, -1, m_pPdStruct);
 
         if (m_pListArchiveRecords->isEmpty()) {
