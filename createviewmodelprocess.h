@@ -21,10 +21,15 @@
 #ifndef CREATEVIEWMODELPROCESS_H
 #define CREATEVIEWMODELPROCESS_H
 
+#ifndef USE_ARCHIVE
+#define USE_ARCHIVE
+#endif
+
 #include <QElapsedTimer>
 #include <QStandardItemModel>
 
 #include "xformats.h"
+#include "xarchives.h"
 
 class CreateViewModelProcess : public QObject {
     Q_OBJECT
