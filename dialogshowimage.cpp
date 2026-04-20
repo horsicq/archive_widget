@@ -42,14 +42,14 @@ DialogShowImage::DialogShowImage(QWidget *pParent, const QString &sFileName, con
 
     // Check if file exists
     if (!QFileInfo::exists(sFileName)) {
-        QMessageBox::critical(this, tr("Error"), tr("Image file does not exist: %1").arg(sFileName));
+        QMessageBox::critical(this, tr("Error"), tr("Image file does not exist") + QString(": %1").arg(sFileName));
         return;
     }
 
     // Load the image
     QPixmap pixmap(sFileName);
     if (pixmap.isNull()) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to load image: %1").arg(sFileName));
+        QMessageBox::critical(this, tr("Error"), tr("Failed to load image") + QString(": %1").arg(sFileName));
         return;
     }
 
@@ -177,10 +177,10 @@ void DialogShowImage::contextMenuEvent(QContextMenuEvent *event)
     zoomOutAction->setShortcut(QKeySequence::ZoomOut);
 
     QAction *actualSizeAction = menu.addAction(tr("Actual Size"), this, SLOT(actualSize()));
-    actualSizeAction->setShortcut(tr("Ctrl+0"));
+    actualSizeAction->setShortcut(QString("Ctrl+0"));
 
     QAction *fitToWindowAction = menu.addAction(tr("Fit to Window"), this, SLOT(fitToWindow()));
-    fitToWindowAction->setShortcut(tr("F"));
+    fitToWindowAction->setShortcut(QString("F"));
 
     menu.addSeparator();
 
@@ -188,7 +188,7 @@ void DialogShowImage::contextMenuEvent(QContextMenuEvent *event)
     QAction *copyAction = menu.addAction(tr("Copy"), this, SLOT(copyToClipboard()));
     copyAction->setShortcut(QKeySequence::Copy);
 
-    QAction *saveAsAction = menu.addAction(tr("Save As..."), this, SLOT(saveAs()));
+    QAction *saveAsAction = menu.addAction(tr("Save as") + QString("..."), this, SLOT(saveAs()));
 
     menu.addSeparator();
 
@@ -213,7 +213,7 @@ void DialogShowImage::saveAs()
     }
 
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Image"), QStandardPaths::writableLocation(QStandardPaths::PicturesLocation),
-                                                    tr("Images (*.png *.jpg *.jpeg *.bmp *.gif)"));
+                                                    tr("Images") + QString(" (*.png *.jpg *.jpeg *.bmp *.gif)"));
 
     if (!fileName.isEmpty()) {
         if (!m_originalPixmap.save(fileName)) {
@@ -242,7 +242,7 @@ void DialogShowImage::updateImageInfo()
     else if (extension == "gif") format = "GIF";
     else if (extension == "tiff" || extension == "tif") format = "TIFF";
 
-    QString info = tr("Size: %1 x %2 | Format: %3 | Zoom: %4%").arg(size.width()).arg(size.height()).arg(format).arg(qRound(m_zoomFactor * 100));
+    QString info = (tr("Size") + QString(": %1 x %2 | ") + tr("Format") + QString(": %3 | ") + tr("Zoom") + QString(": %4%")).arg(size.width()).arg(size.height()).arg(format).arg(qRound(m_zoomFactor * 100));
 
     ui->labelInfo->setText(info);
 }
