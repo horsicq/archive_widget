@@ -242,7 +242,11 @@ void DialogShowImage::updateImageInfo()
     else if (extension == "gif") format = "GIF";
     else if (extension == "tiff" || extension == "tif") format = "TIFF";
 
-    QString info = (tr("Size") + QString(": %1 x %2 | ") + tr("Format") + QString(": %3 | ") + tr("Zoom") + QString(": %4%")).arg(size.width()).arg(size.height()).arg(format).arg(qRound(m_zoomFactor * 100));
+    QString info = (tr("Size") + QString(": %1 x %2 | ") + tr("Format") + QString(": %3 | ") + tr("Zoom") + QString(": %4%"))
+                       .arg(size.width())
+                       .arg(size.height())
+                       .arg(format)
+                       .arg(qRound(m_zoomFactor * 100));
 
     ui->labelInfo->setText(info);
 }
