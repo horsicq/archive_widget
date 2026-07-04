@@ -166,7 +166,7 @@ void ArchiveExplorerWidget::handleAction(ArchiveExplorerWidget::ACTION action)
 
                 if (sSaveFileName != "") {
                     if (m_pDevice) {
-                        XArchive *pArchive = static_cast<XArchive *>(XFormats::getClass(m_fileType, m_pDevice));
+                        XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
 
                         if (pArchive) {
                             QList<XArchive::RECORD> listOldRecords = pArchive->getRecords(-1, nullptr);
@@ -237,7 +237,7 @@ void ArchiveExplorerWidget::loadRecords()
     QList<XBinary::FPART_PROP> listColumns;
 
     if (m_pDevice) {
-        XArchive *pArchive = static_cast<XArchive *>(XFormats::getClass(m_fileType, m_pDevice));
+        XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
 
         if (pArchive) {
             listColumns = pArchive->getAvailableFPARTProperties();
