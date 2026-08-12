@@ -32,11 +32,14 @@ XGenericArchiveWidget::XGenericArchiveWidget(QWidget *pParent) : XShortcutsWidge
     m_pFilterModel = new QSortFilterProxyModel(this);
     m_nCurrentFileSize = 0;
 
-    setupTableView();
+    loadRecords();
 }
 
 XGenericArchiveWidget::~XGenericArchiveWidget()
 {
+    m_pFilterModel->setSourceModel(nullptr);
+    ui->tableViewRecords->setModel(nullptr);
+
     if (m_pModel) {
         delete m_pModel;
     }
@@ -52,9 +55,7 @@ void XGenericArchiveWidget::setData(XBinary::FT fileType, QIODevice *pDevice, bo
     m_fileType = fileType;
     m_pDevice = pDevice;
 
-    if (m_pDevice) {
-        loadRecords();
-    }
+    loadRecords();
 }
 
 QString XGenericArchiveWidget::getCurrentRecordFileName()
@@ -121,6 +122,12 @@ void XGenericArchiveWidget::registerShortcuts(bool bState)
 
 void XGenericArchiveWidget::loadRecords()
 {
+    m_listRecords.clear();
+    m_sCurrentRecordFileName.clear();
+    m_nCurrentFileSize = 0;
+    m_pFilterModel->setSourceModel(nullptr);
+    ui->tableViewRecords->setModel(nullptr);
+
     if (m_pModel) {
         delete m_pModel;
         m_pModel = nullptr;
@@ -137,8 +144,6 @@ void XGenericArchiveWidget::loadRecords()
         QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
 
         if (pArchive->initUnpack(&state, mapProperties, nullptr)) {
-            m_listRecords.clear();
-
             while (state.nCurrentIndex < state.nNumberOfRecords) {
                 XBinary::ARCHIVERECORD record = pArchive->infoCurrent(&state, nullptr);
 
@@ -198,13 +203,18 @@ void XGenericArchiveWidget::setupTableView()
     ui->tableViewRecords->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableViewRecords->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->tableViewRecords->horizontalHeader()->setStretchLastSection(false);
-    ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    if (ui->tableViewRecords->horizontalHeader()->count() >= 4) {
+        ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+        ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+        ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+        ui->tableViewRecords->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    }
     ui->tableViewRecords->verticalHeader()->setVisible(false);
     ui->tableViewRecords->verticalHeader()->setDefaultSectionSize(20);
 
-    connect(ui->tableViewRecords->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
+    QItemSelectionModel *pSelectionModel = ui->tableViewRecords->selectionModel();
+    if (pSelectionModel) {
+        connect(pSelectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+                SLOT(onTableElement_selected(QItemSelection, QItemSelection)), Qt::UniqueConnection);
+    }
 }

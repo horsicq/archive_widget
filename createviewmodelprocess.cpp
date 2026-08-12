@@ -76,6 +76,12 @@ void CreateViewModelProcess::process()
     QElapsedTimer scanTimer;
     scanTimer.start();
 
+    if (!m_pListArchiveRecords || !m_ppTreeModel || !m_ppTableModel || !m_pListViewRecords) {
+        emit errorMessage("Invalid parameters provided to CreateViewModelProcess");
+        emit completed(scanTimer.elapsed());
+        return;
+    }
+
     emit progressValueChanged(0);
     emit progressMessageChanged("Initializing...");
 
@@ -88,16 +94,12 @@ void CreateViewModelProcess::process()
 
         if (m_pListArchiveRecords->isEmpty()) {
             emit errorMessage("Failed to read archive records");
-            emit completed(scanTimer.elapsed());
-            return;
         }
     } else if (m_type == TYPE_DIRECTORY) {
         *m_pListArchiveRecords = XArchives::getRecordsFromDirectory(m_sName, -1, m_pPdStruct);
 
         if (m_pListArchiveRecords->isEmpty()) {
             emit errorMessage("No files found in directory");
-            emit completed(scanTimer.elapsed());
-            return;
         }
     }
 

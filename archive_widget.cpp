@@ -28,6 +28,16 @@ Archive_widget::Archive_widget(QWidget *pParent) : XShortcutsWidget(pParent), ui
 
     m_pFilterTable = new QSortFilterProxyModel(this);
 
+    QStandardItemModel *pTreeModel = new QStandardItemModel(0, 2);
+    QStandardItemModel *pTableModel = new QStandardItemModel(0, 3);
+    pTreeModel->setHeaderData(0, Qt::Horizontal, tr("File"));
+    pTreeModel->setHeaderData(1, Qt::Horizontal, tr("Size"));
+    pTableModel->setHeaderData(1, Qt::Horizontal, tr("File"));
+    pTableModel->setHeaderData(2, Qt::Horizontal, tr("Size"));
+    ui->treeViewArchive->setModel(pTreeModel);
+    m_pFilterTable->setSourceModel(pTableModel);
+    ui->tableViewArchive->setModel(m_pFilterTable);
+
     ui->comboBoxType->addItem(tr("Tree"));
     ui->comboBoxType->addItem(tr("Table"));
 
@@ -55,6 +65,9 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &s
     m_type = type;
     m_sName = sName;
     m_options = options;
+    m_sCurrentRecordFileName.clear();
+    m_nCurrentFileSize = 0;
+    m_bCurrentFileIsRoot = false;
 
     m_stAvailableOpenFileTypes = stAvailableOpenFileTypes;
 
@@ -107,6 +120,13 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &s
 
     dialogCreateViewModel.showDialogDelay();
 
+    if (!pNewTreeModel) {
+        pNewTreeModel = new QStandardItemModel(0, 2);
+    }
+    if (!pNewTableModel) {
+        pNewTableModel = new QStandardItemModel(0, 3);
+    }
+
     ui->treeViewArchive->setModel(pNewTreeModel);
 
     ui->treeViewArchive->header()->setSectionResizeMode(0, QHeaderView::Stretch);
@@ -130,9 +150,9 @@ void Archive_widget::setData(CreateViewModelProcess::TYPE type, const QString &s
     ui->treeViewArchive->expand(pNewTreeModel->index(0, 0));
 
     connect(ui->treeViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onTreeElement_selected(QItemSelection, QItemSelection)));
+            SLOT(onTreeElement_selected(QItemSelection, QItemSelection)), Qt::UniqueConnection);
     connect(ui->tableViewArchive->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
+            SLOT(onTableElement_selected(QItemSelection, QItemSelection)), Qt::UniqueConnection);
 
     if (m_options.bFilter) {
         ui->comboBoxType->setCurrentIndex(1);  // TODO enum !!!
@@ -191,6 +211,10 @@ Archive_widget::~Archive_widget()
 
 void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint &pos)
 {
+    if (!ui->treeViewArchive->selectionModel()) {
+        return;
+    }
+
     QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
@@ -200,6 +224,10 @@ void Archive_widget::on_treeViewArchive_customContextMenuRequested(const QPoint 
 
 void Archive_widget::on_tableViewArchive_customContextMenuRequested(const QPoint &pos)
 {
+    if (!ui->tableViewArchive->selectionModel()) {
+        return;
+    }
+
     QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
@@ -621,6 +649,10 @@ void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index)
 {
     Q_UNUSED(index)
 
+    if (!ui->treeViewArchive->selectionModel()) {
+        return;
+    }
+
     QModelIndexList listIndexes = ui->treeViewArchive->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
@@ -631,6 +663,10 @@ void Archive_widget::on_treeViewArchive_doubleClicked(const QModelIndex &index)
 void Archive_widget::on_tableViewArchive_doubleClicked(const QModelIndex &index)
 {
     Q_UNUSED(index)
+
+    if (!ui->tableViewArchive->selectionModel()) {
+        return;
+    }
 
     QModelIndexList listIndexes = ui->tableViewArchive->selectionModel()->selectedIndexes();
 

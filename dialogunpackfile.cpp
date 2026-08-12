@@ -20,7 +20,7 @@
  */
 #include "dialogunpackfile.h"
 
-DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent, new UnpackFileProcess)
+DialogUnpackFile::DialogUnpackFile(QWidget *pParent) : XDialogProcess(pParent, new UnpackFileProcess, true)
 {
     m_pUnpackFileProcess = static_cast<UnpackFileProcess *>(getThreadObject());
 }

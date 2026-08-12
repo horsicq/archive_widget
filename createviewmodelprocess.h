@@ -80,12 +80,12 @@ private:
     TYPE m_type;
     QString m_sName;
     XBinary::FT m_fileType;
-    QList<XArchive::RECORD> *m_pListArchiveRecords;
-    QStandardItemModel **m_ppTreeModel;
-    QStandardItemModel **m_ppTableModel;
+    QList<XArchive::RECORD> *m_pListArchiveRecords = nullptr;
+    QStandardItemModel **m_ppTreeModel = nullptr;
+    QStandardItemModel **m_ppTableModel = nullptr;
     QSet<XBinary::FT> m_stFilterFileTypes;
-    QList<RECORD> *m_pListViewRecords;
-    XBinary::PDSTRUCT *m_pPdStruct;
+    QList<RECORD> *m_pListViewRecords = nullptr;
+    XBinary::PDSTRUCT *m_pPdStruct = nullptr;
 };
 
 #endif  // CREATEVIEWMODELPROCESS_H

@@ -20,6 +20,10 @@
  */
 #include "archiveexplorerwidget.h"
 
+#include <QSet>
+
+#include <algorithm>
+
 #include "ui_archiveexplorerwidget.h"
 
 ArchiveExplorerWidget::ArchiveExplorerWidget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::ArchiveExplorerWidget)
@@ -30,6 +34,7 @@ ArchiveExplorerWidget::ArchiveExplorerWidget(QWidget *pParent) : XShortcutsWidge
     m_fileType = XBinary::FT_UNKNOWN;
     m_pModel = nullptr;
     m_nCurrentFileSize = 0;
+    m_bAdvanced = false;
 }
 
 ArchiveExplorerWidget::~ArchiveExplorerWidget()
@@ -45,9 +50,12 @@ void ArchiveExplorerWidget::setData(XBinary::FT fileType, QIODevice *pDevice, bo
     m_fileType = fileType;
     m_pDevice = pDevice;
 
-    if (m_pDevice) {
-        loadRecords();
-    }
+    loadRecords();
+}
+
+const QList<XBinary::ARCHIVERECORD> *ArchiveExplorerWidget::getArchiveRecords() const
+{
+    return &m_listArchiveRecords;
 }
 
 QString ArchiveExplorerWidget::getCurrentRecordFileName()
@@ -66,8 +74,21 @@ void ArchiveExplorerWidget::reloadData(bool bSaveSelection)
     loadRecords();
 }
 
+void ArchiveExplorerWidget::on_checkBoxAdvanced_toggled(bool bChecked)
+{
+    m_bAdvanced = bChecked;
+
+    if (m_pDevice) {
+        loadRecords();
+    }
+}
+
 void ArchiveExplorerWidget::on_tableViewRecords_customContextMenuRequested(const QPoint &pos)
 {
+    if (!ui->tableViewRecords->selectionModel()) {
+        return;
+    }
+
     QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
@@ -150,6 +171,10 @@ void ArchiveExplorerWidget::handleAction(ArchiveExplorerWidget::ACTION action)
         } else if (action == ACTION_DUMP) {
             qint32 nRow = -1;
 
+            if (!ui->tableViewRecords->selectionModel() || !ui->tableViewRecords->getProxyModel()) {
+                return;
+            }
+
             QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
 
             if (listIndexes.count() > 0) {
@@ -169,11 +194,33 @@ void ArchiveExplorerWidget::handleAction(ArchiveExplorerWidget::ACTION action)
                         XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
 
                         if (pArchive) {
-                            QList<XArchive::RECORD> listOldRecords = pArchive->getRecords(-1, nullptr);
-                            XArchive::RECORD oldRecord = XArchive::getArchiveRecord(sOrigName, &listOldRecords);
+                            // records were listed with the streaming unpack API, so dump the
+                            // selected row through the same API: it handles solid archives
+                            // (e.g. 7z LZMA2 blocks) that the legacy per-record path cannot
+                            bool bResult = false;
 
                             XBinary::PDSTRUCT pdStruct = XBinary::createPdStruct();
-                            bool bResult = pArchive->decompressToFile(&oldRecord, sSaveFileName, &pdStruct);
+                            XBinary::UNPACK_STATE state = {};
+                            QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
+
+                            if (pArchive->initUnpack(&state, mapProperties, &pdStruct)) {
+                                bool bSeekOk = true;
+
+                                for (qint32 nIndex = 0; (nIndex < nRow) && bSeekOk; nIndex++) {
+                                    bSeekOk = pArchive->moveToNext(&state, &pdStruct);
+                                }
+
+                                if (bSeekOk && (state.nCurrentIndex < state.nNumberOfRecords)) {
+                                    QFile fileResult(sSaveFileName);
+
+                                    if (fileResult.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
+                                        bResult = pArchive->unpackCurrent(&state, &fileResult, &pdStruct);
+                                        fileResult.close();
+                                    }
+                                }
+
+                                pArchive->finishUnpack(&state, &pdStruct);
+                            }
 
                             delete pArchive;
 
@@ -196,6 +243,10 @@ void ArchiveExplorerWidget::on_tableViewRecords_doubleClicked(const QModelIndex 
 {
     Q_UNUSED(index)
 
+    if (!ui->tableViewRecords->selectionModel()) {
+        return;
+    }
+
     QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
 
     if (listIndexes.size() > 0) {
@@ -207,6 +258,10 @@ void ArchiveExplorerWidget::onTableElement_selected(const QItemSelection &itemSe
 {
     Q_UNUSED(itemSelected)
     Q_UNUSED(itemDeselected)
+
+    if (!ui->tableViewRecords->selectionModel() || !ui->tableViewRecords->getProxyModel()) {
+        return;
+    }
 
     QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
 
@@ -263,6 +318,91 @@ void ArchiveExplorerWidget::loadRecords()
         }
     }
 
+    // show every property the format parser actually filled, in a fixed preferred
+    // order, so each archive type exposes the maximum available information
+    {
+        QList<XBinary::FPART_PROP> listPreferred;
+        listPreferred.append(XBinary::FPART_PROP_ORIGINALNAME);
+        listPreferred.append(XBinary::FPART_PROP_UNCOMPRESSEDSIZE);
+        listPreferred.append(XBinary::FPART_PROP_COMPRESSEDSIZE);
+        listPreferred.append(XBinary::FPART_PROP_HANDLEMETHOD);
+        listPreferred.append(XBinary::FPART_PROP_DATETIME);
+        listPreferred.append(XBinary::FPART_PROP_MTIME);
+        listPreferred.append(XBinary::FPART_PROP_CTIME);
+        listPreferred.append(XBinary::FPART_PROP_ATIME);
+        listPreferred.append(XBinary::FPART_PROP_UNCOMPRESSEDCRC);
+        listPreferred.append(XBinary::FPART_PROP_RESULTCRC);
+        listPreferred.append(XBinary::FPART_PROP_ENCRYPTED);
+        listPreferred.append(XBinary::FPART_PROP_FILEMODE);
+        listPreferred.append(XBinary::FPART_PROP_USERNAME);
+        listPreferred.append(XBinary::FPART_PROP_GROUPNAME);
+        listPreferred.append(XBinary::FPART_PROP_UID);
+        listPreferred.append(XBinary::FPART_PROP_GID);
+        listPreferred.append(XBinary::FPART_PROP_LINKNAME);
+        listPreferred.append(XBinary::FPART_PROP_INFO);
+
+        QList<XBinary::FPART_PROP> listPresent;
+        QSet<XBinary::FPART_PROP> stAdded;
+        qint32 nNumberOfPreferred = listPreferred.count();
+        qint32 nNumberOfRecords = m_listArchiveRecords.count();
+
+        for (qint32 i = 0; i < nNumberOfPreferred; i++) {
+            XBinary::FPART_PROP fpartProp = listPreferred.at(i);
+            bool bPresent = false;
+
+            for (qint32 j = 0; (j < nNumberOfRecords) && (!bPresent); j++) {
+                bPresent = m_listArchiveRecords.at(j).mapProperties.contains(fpartProp);
+            }
+
+            if (bPresent) {
+                listPresent.append(fpartProp);
+                stAdded.insert(fpartProp);
+            }
+        }
+
+        if (m_bAdvanced) {
+            // advanced mode: additionally show every remaining property the
+            // format parser filled, in enum order
+            QSet<XBinary::FPART_PROP> stAll;
+
+            for (qint32 j = 0; j < nNumberOfRecords; j++) {
+                QList<XBinary::FPART_PROP> listKeys = m_listArchiveRecords.at(j).mapProperties.keys();
+                qint32 nNumberOfKeys = listKeys.count();
+
+                for (qint32 k = 0; k < nNumberOfKeys; k++) {
+                    stAll.insert(listKeys.at(k));
+                }
+            }
+
+            QList<XBinary::FPART_PROP> listAll = stAll.values();
+            std::sort(listAll.begin(), listAll.end());
+
+            qint32 nNumberOfProps = listAll.count();
+
+            for (qint32 i = 0; i < nNumberOfProps; i++) {
+                XBinary::FPART_PROP fpartProp = listAll.at(i);
+
+                if (!stAdded.contains(fpartProp)) {
+                    listPresent.append(fpartProp);
+                    stAdded.insert(fpartProp);
+                }
+            }
+        }
+
+        if (listPresent.count() > 1) {
+            // stream location inside the archive file is always known
+            if (!stAdded.contains(XBinary::FPART_PROP_STREAMOFFSET)) {
+                listPresent.append(XBinary::FPART_PROP_STREAMOFFSET);
+            }
+
+            if (!stAdded.contains(XBinary::FPART_PROP_STREAMSIZE)) {
+                listPresent.append(XBinary::FPART_PROP_STREAMSIZE);
+            }
+
+            listColumns = listPresent;
+        }
+    }
+
     if (listColumns.isEmpty()) {
         listColumns.append(XBinary::FPART_PROP_ORIGINALNAME);
         listColumns.append(XBinary::FPART_PROP_COMPRESSEDSIZE);
@@ -277,5 +417,5 @@ void ArchiveExplorerWidget::loadRecords()
     ui->tableViewRecords->setCustomModel(m_pModel, true);
 
     connect(ui->tableViewRecords->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onTableElement_selected(QItemSelection, QItemSelection)));
+            SLOT(onTableElement_selected(QItemSelection, QItemSelection)), Qt::UniqueConnection);
 }

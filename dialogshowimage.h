@@ -54,9 +54,8 @@ private:
     Ui::DialogShowImage *ui;
     QPixmap m_originalPixmap;
     QPixmap m_currentPixmap;
-    qreal m_zoomFactor;
-    bool m_fitToWindow;
-    QMenu *m_contextMenu;
+    qreal m_zoomFactor = 1.0;
+    bool m_fitToWindow = true;
 
 protected:
     void registerShortcuts(bool bState) override;

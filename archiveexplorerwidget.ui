@@ -27,6 +27,33 @@
     <number>0</number>
    </property>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayoutOptions">
+     <item>
+      <spacer name="horizontalSpacerOptions">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="checkBoxAdvanced">
+       <property name="text">
+        <string>Advanced</string>
+       </property>
+       <property name="toolTip">
+        <string>Show all available information for this file format</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="XTableView" name="tableViewRecords">
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>

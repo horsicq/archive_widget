@@ -53,10 +53,12 @@ public:
 
     void setData(XBinary::FT fileType, QIODevice *pDevice, bool bIsImage = false, XADDR nModuleAddress = -1);
     QString getCurrentRecordFileName();
+    const QList<XBinary::ARCHIVERECORD> *getArchiveRecords() const;
     virtual void adjustView();
     virtual void reloadData(bool bSaveSelection);
 
 private slots:
+    void on_checkBoxAdvanced_toggled(bool bChecked);
     void on_tableViewRecords_customContextMenuRequested(const QPoint &pos);
     void showContext(const QString &sRecordFileName, QPoint point);
     void hexRecord();
@@ -83,6 +85,7 @@ private:
     XModel_ArchiveRecords *m_pModel;
     QString m_sCurrentRecordFileName;
     qint64 m_nCurrentFileSize;
+    bool m_bAdvanced;
 };
 
 #endif  // ARCHIVEEXPLORERWIDGET_H

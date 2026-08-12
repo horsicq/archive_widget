@@ -59,9 +59,6 @@ void UnpackFileProcess::setData(QIODevice *pDevice, const QString &sResultFileFo
 
 void UnpackFileProcess::process()
 {
-    QElapsedTimer scanTimer;
-    scanTimer.start();
-
     qint32 _nFreeIndex = XBinary::getFreeIndex(m_pPdStruct);
     XBinary::setPdStructInit(m_pPdStruct, _nFreeIndex, 0);
 
@@ -88,6 +85,4 @@ void UnpackFileProcess::process()
     }
 
     XBinary::setPdStructFinished(m_pPdStruct, _nFreeIndex);
-
-    emit completed(scanTimer.elapsed());
 }
