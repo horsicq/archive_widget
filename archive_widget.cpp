@@ -522,6 +522,7 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
         dialogShowImage.exec();
     } else if (stFileTypes.contains(XBinary::FT_TEXT)) {
         DialogTextInfo dialogTextInfo(this);
+        dialogTextInfo.setGlobal(getShortcuts(), getGlobalOptions());
         dialogTextInfo.setTitle(sTitle);
         dialogTextInfo.setWrap(false);
 
@@ -532,6 +533,7 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
         QString sString = XAndroidBinary::getDecoded(sFileName, nullptr);
 
         DialogTextInfo dialogTextInfo(this);
+        dialogTextInfo.setGlobal(getShortcuts(), getGlobalOptions());
         dialogTextInfo.setTitle(sTitle);
         dialogTextInfo.setWrap(false);
 
