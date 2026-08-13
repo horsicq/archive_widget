@@ -518,6 +518,7 @@ void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QStri
     if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) ||
         stFileTypes.contains(XBinary::FT_GIF) || stFileTypes.contains(XBinary::FT_BMP)) {
         DialogShowImage dialogShowImage(this, sFileName, sTitle);
+        dialogShowImage.setGlobal(getShortcuts(), getGlobalOptions());
 
         dialogShowImage.exec();
     } else if (stFileTypes.contains(XBinary::FT_TEXT)) {

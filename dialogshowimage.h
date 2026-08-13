@@ -22,7 +22,12 @@
 #define DIALOGSHOWIMAGE_H
 
 #include "xshortcutsdialog.h"
-#include <QContextMenuEvent>
+#include <QPixmap>
+
+class QAction;
+class QContextMenuEvent;
+class QEvent;
+class QWheelEvent;
 
 namespace Ui {
 class DialogShowImage;
@@ -34,14 +39,15 @@ class DialogShowImage : public XShortcutsDialog {
 
 public:
     explicit DialogShowImage(QWidget *pParent, const QString &sFileName, const QString &sTitle);
-    ~DialogShowImage();
+    ~DialogShowImage() override;
 
     void adjustView() override;
-
-private slots:
-    void on_pushButtonClose_clicked();
+    bool isImageLoaded() const;
+    bool saveToFile(const QString &sFileName) const;
 
 private:
+    void createActions();
+    void setLoadError(const QString &sMessage);
     void updateImageDisplay();
     void setZoomFactor(qreal factor);
     void zoomIn();
@@ -51,14 +57,30 @@ private:
     void copyToClipboard();
     void saveAs();
     void updateImageInfo();
+    void updateActionState();
+    void showContextMenu(const QPoint &globalPosition);
+
     Ui::DialogShowImage *ui;
     QPixmap m_originalPixmap;
-    QPixmap m_currentPixmap;
+    QString m_sSourceFileName;
+    QString m_sImageFormat;
+    QString m_sLoadError;
     qreal m_zoomFactor = 1.0;
     bool m_fitToWindow = true;
+    bool m_bUpdatingImage = false;
+    bool m_bUiReady = false;
+
+    QAction *m_pActionZoomOut = nullptr;
+    QAction *m_pActionActualSize = nullptr;
+    QAction *m_pActionFitToWindow = nullptr;
+    QAction *m_pActionZoomIn = nullptr;
+    QAction *m_pActionCopy = nullptr;
+    QAction *m_pActionSaveAs = nullptr;
+    QAction *m_pActionClose = nullptr;
 
 protected:
     void registerShortcuts(bool bState) override;
+    bool eventFilter(QObject *pObject, QEvent *pEvent) override;
     void contextMenuEvent(QContextMenuEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 };
