@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QTemporaryFile>
+#include <QStringList>
 #include "xarchives.h"
 #include "xmodel_archiverecords.h"
 #include "xshortcutswidget.h"
@@ -38,15 +39,6 @@ class ArchiveExplorerWidget;
 class ArchiveExplorerWidget : public XShortcutsWidget {
     Q_OBJECT
 
-    enum ACTION {
-        ACTION_HEX = 0,
-        ACTION_STRINGS,
-        ACTION_ENTROPY,
-        ACTION_HASH,
-        ACTION_COPYFILENAME,
-        ACTION_DUMP
-    };
-
 public:
     explicit ArchiveExplorerWidget(QWidget *pParent = nullptr);
     ~ArchiveExplorerWidget();
@@ -57,24 +49,37 @@ public:
     virtual void adjustView();
     virtual void reloadData(bool bSaveSelection);
 
+signals:
+    void recordsLoaded(qint32 nNumberOfRecords);
+    void currentRecordChanged(const QString &sRecordFileName, qint64 nFileSize);
+    void extractAllRequested();
+    void testRequested();
+
 private slots:
+    void on_toolButtonExtractAll_clicked();
+    void on_toolButtonTest_clicked();
     void on_checkBoxAdvanced_toggled(bool bChecked);
     void on_tableViewRecords_customContextMenuRequested(const QPoint &pos);
     void showContext(const QString &sRecordFileName, QPoint point);
-    void hexRecord();
-    void stringsRecord();
-    void entropyRecord();
-    void hashRecord();
+    void openRecord();
+    void extractRecord();
     void copyFileName();
-    void dumpRecord();
-    void handleAction(ACTION action);
+    void copyRecordPath();
+    void copyRecordDetails();
+    void showRecordProperties();
+    void refreshRecords();
     void on_tableViewRecords_doubleClicked(const QModelIndex &index);
-    void onTableElement_selected(const QItemSelection &itemSelected, const QItemSelection &itemDeselected);
+    void onCurrentRecordChanged(const QModelIndex &current, const QModelIndex &previous);
 
 protected:
     virtual void registerShortcuts(bool bState);
 
 private:
+    qint32 getCurrentRecordIndex() const;
+    bool extractRecordToDevice(qint32 nRow, QIODevice *pOutputDevice);
+    bool extractRecordToFile(qint32 nRow, const QString &sFileName);
+    QString getRecordDetails(const XBinary::ARCHIVERECORD &record) const;
+    void updateActions();
     void loadRecords();
 
 private:
@@ -86,6 +91,7 @@ private:
     QString m_sCurrentRecordFileName;
     qint64 m_nCurrentFileSize;
     bool m_bAdvanced;
+    QStringList m_listTemporaryFiles;
 };
 
 #endif  // ARCHIVEEXPLORERWIDGET_H

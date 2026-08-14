@@ -20,11 +20,45 @@
  */
 #include "archiveexplorerwidget.h"
 
+#include <QDesktopServices>
+#include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <QSaveFile>
 #include <QSet>
+#include <QStorageInfo>
+#include <QTemporaryFile>
+#include <QUrl>
 
 #include <algorithm>
 
 #include "ui_archiveexplorerwidget.h"
+#include "xoptions.h"
+
+namespace {
+
+const qint64 N_MAX_OPEN_RECORD_SIZE = 256LL * 1024LL * 1024LL;
+const qint32 N_MAX_OPEN_TEMPORARY_FILES = 4;
+
+QString getArchiveRecordBaseName(QString sRecordFileName)
+{
+    sRecordFileName.replace(QChar('\\'), QChar('/'));
+
+    while (sRecordFileName.endsWith(QChar('/'))) {
+        sRecordFileName.chop(1);
+    }
+
+    return sRecordFileName.section(QChar('/'), -1);
+}
+
+bool isArchiveFolderRecord(const XBinary::ARCHIVERECORD &record)
+{
+    QString sRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
+
+    return record.mapProperties.value(XBinary::FPART_PROP_ISFOLDER).toBool() || sRecordFileName.endsWith(QChar('/')) || sRecordFileName.endsWith(QChar('\\'));
+}
+
+}  // namespace
 
 ArchiveExplorerWidget::ArchiveExplorerWidget(QWidget *pParent) : XShortcutsWidget(pParent), ui(new Ui::ArchiveExplorerWidget)
 {
@@ -35,10 +69,21 @@ ArchiveExplorerWidget::ArchiveExplorerWidget(QWidget *pParent) : XShortcutsWidge
     m_pModel = nullptr;
     m_nCurrentFileSize = 0;
     m_bAdvanced = false;
+
+    XOptions::adjustToolButton(ui->toolButtonExtractAll, XOptions::ICONTYPE_EXTRACTOR);
+    XOptions::adjustToolButton(ui->toolButtonTest, XOptions::ICONTYPE_SCAN);
+
+    updateActions();
 }
 
 ArchiveExplorerWidget::~ArchiveExplorerWidget()
 {
+    qint32 nNumberOfTemporaryFiles = m_listTemporaryFiles.count();
+
+    for (qint32 i = 0; i < nNumberOfTemporaryFiles; i++) {
+        QFile::remove(m_listTemporaryFiles.at(i));
+    }
+
     delete ui;
 }
 
@@ -50,6 +95,7 @@ void ArchiveExplorerWidget::setData(XBinary::FT fileType, QIODevice *pDevice, bo
     m_fileType = fileType;
     m_pDevice = pDevice;
 
+    updateActions();
     loadRecords();
 }
 
@@ -69,9 +115,71 @@ void ArchiveExplorerWidget::adjustView()
 
 void ArchiveExplorerWidget::reloadData(bool bSaveSelection)
 {
-    Q_UNUSED(bSaveSelection)
+    QString sSelectedRecord;
+    qint32 nSelectedRow = -1;
+    XADDR nSelectedStreamOffset = 0;
+    XADDR nSelectedStreamSize = 0;
+    bool bRestoreSelection = false;
+
+    if (bSaveSelection) {
+        nSelectedRow = getCurrentRecordIndex();
+
+        if ((nSelectedRow >= 0) && (nSelectedRow < m_listArchiveRecords.count())) {
+            const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nSelectedRow);
+            sSelectedRecord = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
+            nSelectedStreamOffset = record.nStreamOffset;
+            nSelectedStreamSize = record.nStreamSize;
+            bRestoreSelection = true;
+        }
+    }
 
     loadRecords();
+    updateActions();
+
+    if (bRestoreSelection && m_pModel && ui->tableViewRecords->getProxyModel()) {
+        qint32 nNumberOfRecords = m_listArchiveRecords.count();
+        qint32 nTargetRow = -1;
+
+        auto isSelectedRecord = [&sSelectedRecord, nSelectedStreamOffset, nSelectedStreamSize](const XBinary::ARCHIVERECORD &record) {
+            return (record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString() == sSelectedRecord) &&
+                   (record.nStreamOffset == nSelectedStreamOffset) && (record.nStreamSize == nSelectedStreamSize);
+        };
+
+        if ((nSelectedRow >= 0) && (nSelectedRow < nNumberOfRecords) && isSelectedRecord(m_listArchiveRecords.at(nSelectedRow))) {
+            nTargetRow = nSelectedRow;
+        } else {
+            for (qint32 i = 0; i < nNumberOfRecords; i++) {
+                if (isSelectedRecord(m_listArchiveRecords.at(i))) {
+                    nTargetRow = i;
+                    break;
+                }
+            }
+        }
+
+        if (nTargetRow >= 0) {
+            QModelIndex sourceIndex = m_pModel->index(nTargetRow, 0);
+            QModelIndex proxyIndex = ui->tableViewRecords->getProxyModel()->mapFromSource(sourceIndex);
+
+            if (proxyIndex.isValid()) {
+                ui->tableViewRecords->setCurrentIndex(proxyIndex);
+                ui->tableViewRecords->selectRow(proxyIndex.row());
+            }
+        }
+    }
+}
+
+void ArchiveExplorerWidget::on_toolButtonExtractAll_clicked()
+{
+    if (ui->toolButtonExtractAll->isEnabled()) {
+        emit extractAllRequested();
+    }
+}
+
+void ArchiveExplorerWidget::on_toolButtonTest_clicked()
+{
+    if (ui->toolButtonTest->isEnabled()) {
+        emit testRequested();
+    }
 }
 
 void ArchiveExplorerWidget::on_checkBoxAdvanced_toggled(bool bChecked)
@@ -79,7 +187,7 @@ void ArchiveExplorerWidget::on_checkBoxAdvanced_toggled(bool bChecked)
     m_bAdvanced = bChecked;
 
     if (m_pDevice) {
-        loadRecords();
+        reloadData(true);
     }
 }
 
@@ -89,192 +197,386 @@ void ArchiveExplorerWidget::on_tableViewRecords_customContextMenuRequested(const
         return;
     }
 
-    QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
+    QModelIndex index = ui->tableViewRecords->indexAt(pos);
 
-    if (listIndexes.size() > 0) {
+    if (index.isValid()) {
+        ui->tableViewRecords->setCurrentIndex(index);
+        ui->tableViewRecords->selectRow(index.row());
         showContext(m_sCurrentRecordFileName, ui->tableViewRecords->viewport()->mapToGlobal(pos));
     }
 }
 
 void ArchiveExplorerWidget::showContext(const QString &sRecordFileName, QPoint point)
 {
-    if (sRecordFileName != "") {
-        QMenu contextMenu(this);
+    XShortcuts *pShortcuts = getShortcuts();
+    qint32 nRow = getCurrentRecordIndex();
 
-        QAction actionHex(tr("Hex"), this);
-        connect(&actionHex, SIGNAL(triggered()), this, SLOT(hexRecord()));
-        contextMenu.addAction(&actionHex);
+    if (sRecordFileName.isEmpty() || (pShortcuts == nullptr) || (nRow < 0) || (nRow >= m_listArchiveRecords.count())) {
+        return;
+    }
 
-        QAction actionStrings(tr("Strings"), this);
-        connect(&actionStrings, SIGNAL(triggered()), this, SLOT(stringsRecord()));
-        contextMenu.addAction(&actionStrings);
+    QMenu contextMenu(this);
+    QList<XShortcuts::MENUITEM> listMenuItems;
+    const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
+    bool bIsFolder = isArchiveFolderRecord(record);
 
-        QAction actionEntropy(tr("Entropy"), this);
-        connect(&actionEntropy, SIGNAL(triggered()), this, SLOT(entropyRecord()));
-        contextMenu.addAction(&actionEntropy);
+    auto appendMenuItem = [&listMenuItems](const QString &sText, const QObject *pRecv, const char *pMethod, XOptions::ICONTYPE iconType,
+                                           quint64 nSubgroups) {
+        XShortcuts::MENUITEM menuItem = {};
+        menuItem.sText = sText;
+        menuItem.pRecv = pRecv;
+        menuItem.pMethod = pMethod;
+        menuItem.iconType = iconType;
+        menuItem.nSubgroups = nSubgroups;
+        listMenuItems.append(menuItem);
+    };
 
-        QAction actionHash(tr("Hash"), this);
-        connect(&actionHash, SIGNAL(triggered()), this, SLOT(hashRecord()));
-        contextMenu.addAction(&actionHash);
+    if (!bIsFolder) {
+        pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_OPEN, this, SLOT(openRecord()), XShortcuts::GROUPID_NONE);
+        appendMenuItem(tr("Extract"), this, SLOT(extractRecord()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
+    }
 
-        QMenu menuCopy(tr("Copy"), this);
-        QAction actionCopyFilename(tr("File name"), this);
-        connect(&actionCopyFilename, SIGNAL(triggered()), this, SLOT(copyFileName()));
-        menuCopy.addAction(&actionCopyFilename);
-        contextMenu.addMenu(&menuCopy);
+    appendMenuItem(tr("Extract all"), this, SLOT(on_toolButtonExtractAll_clicked()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
+    appendMenuItem(tr("Test archive"), this, SLOT(on_toolButtonTest_clicked()), XOptions::ICONTYPE_SCAN, XShortcuts::GROUPID_NONE);
+    pShortcuts->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_NONE);
 
-        QAction actionDump(tr("Dump to file"), this);
-        connect(&actionDump, SIGNAL(triggered()), this, SLOT(dumpRecord()));
-        contextMenu.addAction(&actionDump);
+    pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_COPY_FILENAME, this, SLOT(copyFileName()), XShortcuts::GROUPID_COPY);
+    appendMenuItem(tr("Member path"), this, SLOT(copyRecordPath()), XOptions::ICONTYPE_PATH, XShortcuts::GROUPID_COPY);
+    appendMenuItem(tr("Row details"), this, SLOT(copyRecordDetails()), XOptions::ICONTYPE_COPY, XShortcuts::GROUPID_COPY);
 
-        contextMenu.exec(point);
+    pShortcuts->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_NONE);
+    appendMenuItem(tr("Properties"), this, SLOT(showRecordProperties()), XOptions::ICONTYPE_INFO, XShortcuts::GROUPID_NONE);
+    appendMenuItem(tr("Refresh"), this, SLOT(refreshRecords()), XOptions::ICONTYPE_RELOAD, XShortcuts::GROUPID_NONE);
+
+    pShortcuts->adjustContextMenu(&contextMenu, &listMenuItems);
+    contextMenu.exec(point);
+}
+
+void ArchiveExplorerWidget::openRecord()
+{
+    qint32 nRow = getCurrentRecordIndex();
+
+    if ((nRow < 0) || (nRow >= m_listArchiveRecords.count())) {
+        return;
+    }
+
+    const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
+
+    if (isArchiveFolderRecord(record)) {
+        return;
+    }
+
+    QString sRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
+    QString sBaseName = getArchiveRecordBaseName(sRecordFileName);
+    QString sSuffix = QFileInfo(sBaseName).suffix().toLower();
+    QString sSafeSuffix;
+    qint32 nSuffixLength = sSuffix.length();
+
+    for (qint32 i = 0; i < nSuffixLength; i++) {
+        if (sSuffix.at(i).isLetterOrNumber()) {
+            sSafeSuffix.append(sSuffix.at(i));
+        }
+    }
+
+    if (!record.mapProperties.contains(XBinary::FPART_PROP_UNCOMPRESSEDSIZE)) {
+        QMessageBox::information(this, tr("Open file"), tr("The unpacked size is unknown. Extract the file before opening it."));
+        return;
+    }
+
+    qint64 nUncompressedSize = record.mapProperties.value(XBinary::FPART_PROP_UNCOMPRESSEDSIZE).toLongLong();
+
+    if ((nUncompressedSize < 0) || (nUncompressedSize > N_MAX_OPEN_RECORD_SIZE)) {
+        QMessageBox::information(this, tr("Open file"),
+                                 tr("Files larger than %1 cannot be opened directly. Extract the file first.")
+                                     .arg(XBinary::bytesCountToString(N_MAX_OPEN_RECORD_SIZE, 1024)));
+        return;
+    }
+
+    QStorageInfo temporaryStorage(QDir::tempPath());
+    const qint64 nRequiredFreeSpace = (nUncompressedSize * 2) + (64LL * 1024LL * 1024LL);
+
+    if (temporaryStorage.isValid() && temporaryStorage.isReady() && (temporaryStorage.bytesAvailable() < nRequiredFreeSpace)) {
+        QMessageBox::critical(this, tr("Error"), tr("There is not enough free space to open this file."));
+        return;
+    }
+
+    const QSet<QString> stExecutableSuffixes = QSet<QString>() << "appimage" << "bat" << "bin" << "cmd" << "com" << "command" << "cpl" << "desktop" << "exe"
+                                                                 << "hta" << "jar" << "js" << "jse" << "lnk" << "msi" << "msp" << "pif" << "pl" << "ps1" << "py"
+                                                                 << "reg" << "run" << "scr" << "sh" << "url" << "vbe" << "vbs" << "wsf" << "wsh";
+
+    if (stExecutableSuffixes.contains(sSafeSuffix)) {
+        QMessageBox::StandardButton result = QMessageBox::warning(
+            this, tr("Open file"),
+            tr("This file type can run code. Open \"%1\" with its default application?").arg(sBaseName),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+        if (result != QMessageBox::Yes) {
+            return;
+        }
+    }
+
+    while (m_listTemporaryFiles.count() >= N_MAX_OPEN_TEMPORARY_FILES) {
+        QString sOldestFileName = m_listTemporaryFiles.first();
+
+        if (!QFile::exists(sOldestFileName) || QFile::remove(sOldestFileName)) {
+            m_listTemporaryFiles.removeFirst();
+        } else {
+            QMessageBox::information(this, tr("Open file"), tr("Close one of the previously opened files and try again."));
+            return;
+        }
+    }
+
+    QString sTemplate = QDir(QDir::tempPath()).filePath("xfileunpacker_XXXXXX");
+
+    if (!sSafeSuffix.isEmpty()) {
+        sTemplate += QString(".%1").arg(sSafeSuffix);
+    }
+
+    QTemporaryFile fileTemp(sTemplate);
+
+    if (!fileTemp.open()) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot create temporary file"));
+        return;
+    }
+
+    QString sTemporaryFileName = fileTemp.fileName();
+
+    if (!extractRecordToDevice(nRow, &fileTemp) || !fileTemp.flush()) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot extract file"));
+        return;
+    }
+
+    fileTemp.close();
+    fileTemp.setAutoRemove(false);
+    m_listTemporaryFiles.append(sTemporaryFileName);
+
+    if (!QDesktopServices::openUrl(QUrl::fromLocalFile(sTemporaryFileName))) {
+        m_listTemporaryFiles.removeAll(sTemporaryFileName);
+        QFile::remove(sTemporaryFileName);
+        QMessageBox::critical(this, tr("Error"), tr("Cannot open file"));
     }
 }
 
-void ArchiveExplorerWidget::hexRecord()
+void ArchiveExplorerWidget::extractRecord()
 {
-    handleAction(ACTION_HEX);
-}
+    qint32 nRow = getCurrentRecordIndex();
 
-void ArchiveExplorerWidget::stringsRecord()
-{
-    handleAction(ACTION_STRINGS);
-}
+    if ((nRow < 0) || (nRow >= m_listArchiveRecords.count())) {
+        return;
+    }
 
-void ArchiveExplorerWidget::entropyRecord()
-{
-    handleAction(ACTION_ENTROPY);
-}
+    const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
 
-void ArchiveExplorerWidget::hashRecord()
-{
-    handleAction(ACTION_HASH);
+    if (isArchiveFolderRecord(record)) {
+        return;
+    }
+
+    QString sRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
+    QString sSaveFileName = getArchiveRecordBaseName(sRecordFileName);
+    QFile *pSourceFile = qobject_cast<QFile *>(m_pDevice);
+
+    if (pSourceFile && !pSourceFile->fileName().isEmpty()) {
+        sSaveFileName = QFileInfo(pSourceFile->fileName()).absoluteDir().filePath(sSaveFileName);
+    }
+
+    sSaveFileName = QFileDialog::getSaveFileName(this, tr("Extract file"), sSaveFileName);
+
+    if (!sSaveFileName.isEmpty()) {
+        if (extractRecordToFile(nRow, sSaveFileName)) {
+            XBinary::setFileProperties(record.mapProperties, sSaveFileName);
+        } else {
+            QMessageBox::critical(this, tr("Error"), tr("Cannot extract file"));
+        }
+    }
 }
 
 void ArchiveExplorerWidget::copyFileName()
 {
-    handleAction(ACTION_COPYFILENAME);
+    QString sFileName = getArchiveRecordBaseName(m_sCurrentRecordFileName);
+
+    if (!sFileName.isEmpty()) {
+        QGuiApplication::clipboard()->setText(sFileName);
+    }
 }
 
-void ArchiveExplorerWidget::dumpRecord()
+void ArchiveExplorerWidget::copyRecordPath()
 {
-    handleAction(ACTION_DUMP);
+    if (!m_sCurrentRecordFileName.isEmpty()) {
+        QGuiApplication::clipboard()->setText(m_sCurrentRecordFileName);
+    }
 }
 
-void ArchiveExplorerWidget::handleAction(ArchiveExplorerWidget::ACTION action)
+void ArchiveExplorerWidget::copyRecordDetails()
 {
-    QString sRecordFileName = m_sCurrentRecordFileName;
+    qint32 nRow = getCurrentRecordIndex();
 
-    if (sRecordFileName != "") {
-        if (action == ACTION_COPYFILENAME) {
-            QGuiApplication::clipboard()->setText(sRecordFileName);
-        } else if (action == ACTION_DUMP) {
-            qint32 nRow = -1;
+    if ((nRow >= 0) && (nRow < m_listArchiveRecords.count())) {
+        QGuiApplication::clipboard()->setText(getRecordDetails(m_listArchiveRecords.at(nRow)));
+    }
+}
 
-            if (!ui->tableViewRecords->selectionModel() || !ui->tableViewRecords->getProxyModel()) {
-                return;
-            }
+void ArchiveExplorerWidget::showRecordProperties()
+{
+    qint32 nRow = getCurrentRecordIndex();
 
-            QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
+    if ((nRow < 0) || (nRow >= m_listArchiveRecords.count())) {
+        return;
+    }
 
-            if (listIndexes.count() > 0) {
-                QModelIndex sourceIndex = ui->tableViewRecords->getProxyModel()->mapToSource(listIndexes.at(0));
-                nRow = sourceIndex.row();
-            }
+    QMessageBox messageBox(QMessageBox::Information, tr("Properties"), getRecordDetails(m_listArchiveRecords.at(nRow)), QMessageBox::Ok, this);
+    messageBox.setTextFormat(Qt::PlainText);
+    messageBox.setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    messageBox.exec();
+}
 
-            if ((nRow >= 0) && (nRow < m_listArchiveRecords.count())) {
-                const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
-                QString sOrigName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
-                QString sSaveFileName = QFileInfo(sOrigName).fileName();
+void ArchiveExplorerWidget::refreshRecords()
+{
+    reloadData(true);
+}
 
-                sSaveFileName = QFileDialog::getSaveFileName(this, tr("Save file"), sSaveFileName, QFileInfo(sOrigName).completeSuffix());
+qint32 ArchiveExplorerWidget::getCurrentRecordIndex() const
+{
+    if (!ui->tableViewRecords->getProxyModel()) {
+        return -1;
+    }
 
-                if (sSaveFileName != "") {
-                    if (m_pDevice) {
-                        XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
+    QModelIndex proxyIndex = ui->tableViewRecords->currentIndex();
 
-                        if (pArchive) {
-                            // records were listed with the streaming unpack API, so dump the
-                            // selected row through the same API: it handles solid archives
-                            // (e.g. 7z LZMA2 blocks) that the legacy per-record path cannot
-                            bool bResult = false;
+    if (!proxyIndex.isValid()) {
+        return -1;
+    }
 
-                            XBinary::PDSTRUCT pdStruct = XBinary::createPdStruct();
-                            XBinary::UNPACK_STATE state = {};
-                            QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
+    return ui->tableViewRecords->getProxyModel()->mapToSource(proxyIndex).row();
+}
 
-                            if (pArchive->initUnpack(&state, mapProperties, &pdStruct)) {
-                                bool bSeekOk = true;
+bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutputDevice)
+{
+    if ((nRow < 0) || (nRow >= m_listArchiveRecords.count()) || !pOutputDevice || !pOutputDevice->isOpen() || !pOutputDevice->isWritable() || !m_pDevice ||
+        !m_pDevice->isOpen()) {
+        return false;
+    }
 
-                                for (qint32 nIndex = 0; (nIndex < nRow) && bSeekOk; nIndex++) {
-                                    bSeekOk = pArchive->moveToNext(&state, &pdStruct);
-                                }
+    XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
 
-                                if (bSeekOk && (state.nCurrentIndex < state.nNumberOfRecords)) {
-                                    QFile fileResult(sSaveFileName);
+    if (!pArchive) {
+        return false;
+    }
 
-                                    if (fileResult.open(QIODevice::ReadWrite | QIODevice::Truncate)) {
-                                        bResult = pArchive->unpackCurrent(&state, &fileResult, &pdStruct);
-                                        fileResult.close();
-                                    }
-                                }
+    bool bResult = false;
+    XBinary::PDSTRUCT pdStruct = XBinary::createPdStruct();
+    XBinary::UNPACK_STATE state = {};
+    QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
 
-                                pArchive->finishUnpack(&state, &pdStruct);
-                            }
+    if (pArchive->initUnpack(&state, mapProperties, &pdStruct)) {
+        bool bSeekOk = true;
 
-                            delete pArchive;
+        for (qint32 nIndex = 0; (nIndex < nRow) && bSeekOk; nIndex++) {
+            bSeekOk = pArchive->moveToNext(&state, &pdStruct);
+        }
 
-                            if (!bResult) {
-                                QMessageBox::critical(this, tr("Error"), tr("Cannot save file"));
-                            }
-                        } else {
-                            QMessageBox::critical(this, tr("Error"), tr("Cannot open archive"));
-                        }
-                    }
-                }
-            }
-        } else {
-            // TODO: Implement hex, strings, entropy, hash actions
+        if (bSeekOk && (state.nCurrentIndex < state.nNumberOfRecords)) {
+            bResult = pArchive->unpackCurrent(&state, pOutputDevice, &pdStruct);
+        }
+
+        pArchive->finishUnpack(&state, &pdStruct);
+    }
+
+    delete pArchive;
+
+    return bResult;
+}
+
+bool ArchiveExplorerWidget::extractRecordToFile(qint32 nRow, const QString &sFileName)
+{
+    if (sFileName.isEmpty()) {
+        return false;
+    }
+
+    QSaveFile fileResult(sFileName);
+
+    if (!fileResult.open(QIODevice::WriteOnly)) {
+        return false;
+    }
+
+    if (extractRecordToDevice(nRow, &fileResult)) {
+        return fileResult.commit();
+    }
+
+    fileResult.cancelWriting();
+
+    return false;
+}
+
+QString ArchiveExplorerWidget::getRecordDetails(const XBinary::ARCHIVERECORD &record) const
+{
+    QList<XBinary::FPART_PROP> listProperties = record.mapProperties.keys();
+    listProperties.removeAll(XBinary::FPART_PROP_ORIGINALNAME);
+    std::sort(listProperties.begin(), listProperties.end());
+    listProperties.prepend(XBinary::FPART_PROP_ORIGINALNAME);
+
+    if (!listProperties.contains(XBinary::FPART_PROP_STREAMOFFSET)) {
+        listProperties.append(XBinary::FPART_PROP_STREAMOFFSET);
+    }
+
+    if (!listProperties.contains(XBinary::FPART_PROP_STREAMSIZE)) {
+        listProperties.append(XBinary::FPART_PROP_STREAMSIZE);
+    }
+
+    QList<XBinary::ARCHIVERECORD> listRecords;
+    listRecords.append(record);
+    XModel_ArchiveRecords model(listProperties, &listRecords);
+    QStringList listDetails;
+    qint32 nNumberOfProperties = listProperties.count();
+
+    for (qint32 i = 0; i < nNumberOfProperties; i++) {
+        QString sTitle = model.headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
+        QString sValue = model.data(model.index(0, i), Qt::DisplayRole).toString();
+
+        if (!sTitle.isEmpty() && !sValue.isEmpty()) {
+            listDetails.append(QString("%1: %2").arg(sTitle, sValue));
         }
     }
+
+    if (listDetails.isEmpty()) {
+        return tr("No properties available");
+    }
+
+    return listDetails.join(QChar('\n'));
 }
 
 void ArchiveExplorerWidget::on_tableViewRecords_doubleClicked(const QModelIndex &index)
 {
-    Q_UNUSED(index)
-
-    if (!ui->tableViewRecords->selectionModel()) {
+    if (!index.isValid()) {
         return;
     }
 
-    QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
-
-    if (listIndexes.size() > 0) {
-        hexRecord();
-    }
+    ui->tableViewRecords->setCurrentIndex(index);
+    ui->tableViewRecords->selectRow(index.row());
+    openRecord();
 }
 
-void ArchiveExplorerWidget::onTableElement_selected(const QItemSelection &itemSelected, const QItemSelection &itemDeselected)
+void ArchiveExplorerWidget::onCurrentRecordChanged(const QModelIndex &current, const QModelIndex &previous)
 {
-    Q_UNUSED(itemSelected)
-    Q_UNUSED(itemDeselected)
+    Q_UNUSED(current)
+    Q_UNUSED(previous)
 
-    if (!ui->tableViewRecords->selectionModel() || !ui->tableViewRecords->getProxyModel()) {
-        return;
+    QString sCurrentRecordFileName;
+    qint64 nCurrentFileSize = 0;
+
+    qint32 nRow = getCurrentRecordIndex();
+
+    if ((nRow >= 0) && (nRow < m_listArchiveRecords.count())) {
+        const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
+
+        sCurrentRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
+        nCurrentFileSize = record.mapProperties.value(XBinary::FPART_PROP_UNCOMPRESSEDSIZE).toLongLong();
     }
 
-    QModelIndexList listIndexes = ui->tableViewRecords->selectionModel()->selectedIndexes();
+    if ((m_sCurrentRecordFileName != sCurrentRecordFileName) || (m_nCurrentFileSize != nCurrentFileSize)) {
+        m_sCurrentRecordFileName = sCurrentRecordFileName;
+        m_nCurrentFileSize = nCurrentFileSize;
 
-    if (listIndexes.count() > 0) {
-        QModelIndex sourceIndex = ui->tableViewRecords->getProxyModel()->mapToSource(listIndexes.at(0));
-        qint32 nRow = sourceIndex.row();
-
-        if ((nRow >= 0) && (nRow < m_listArchiveRecords.count())) {
-            const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
-
-            m_sCurrentRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
-            m_nCurrentFileSize = record.mapProperties.value(XBinary::FPART_PROP_UNCOMPRESSEDSIZE).toLongLong();
-        }
+        emit currentRecordChanged(m_sCurrentRecordFileName, m_nCurrentFileSize);
     }
 }
 
@@ -283,24 +585,49 @@ void ArchiveExplorerWidget::registerShortcuts(bool bState)
     Q_UNUSED(bState)
 }
 
+void ArchiveExplorerWidget::updateActions()
+{
+    bool bIsArchive = m_pDevice && m_pDevice->isOpen() && XFormats::isArchive(m_fileType);
+
+    ui->toolButtonExtractAll->setEnabled(bIsArchive);
+    ui->toolButtonTest->setEnabled(bIsArchive);
+}
+
 void ArchiveExplorerWidget::loadRecords()
 {
+    // XTableView may still be sorting or filtering the current model on a
+    // worker. Detach it before mutating the QList used as that model's backing
+    // store, then install the freshly populated model below.
+    ui->tableViewRecords->clear();
+    m_pModel = nullptr;
+
+    bool bHadCurrentRecord = !m_sCurrentRecordFileName.isEmpty() || (m_nCurrentFileSize != 0);
+
     m_listArchiveRecords.clear();
     m_sCurrentRecordFileName.clear();
     m_nCurrentFileSize = 0;
 
+    if (bHadCurrentRecord) {
+        emit currentRecordChanged(QString(), 0);
+    }
+
     QList<XBinary::FPART_PROP> listColumns;
 
     if (m_pDevice) {
-        XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
+        XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
 
         if (pArchive) {
             listColumns = pArchive->getAvailableFPARTProperties();
 
             XBinary::UNPACK_STATE state = {};
             QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
-
             bool bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
+
+            if (!bInit) {
+                state = XBinary::UNPACK_STATE();
+                mapProperties.insert(XBinary::UNPACK_PROP_METADATAONLY, true);
+                bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
+            }
 
             if (bInit) {
                 while (state.nCurrentIndex < state.nNumberOfRecords) {
@@ -416,6 +743,8 @@ void ArchiveExplorerWidget::loadRecords()
 
     ui->tableViewRecords->setCustomModel(m_pModel, true);
 
-    connect(ui->tableViewRecords->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-            SLOT(onTableElement_selected(QItemSelection, QItemSelection)), Qt::UniqueConnection);
+    connect(ui->tableViewRecords->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this,
+            SLOT(onCurrentRecordChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
+
+    emit recordsLoaded(m_listArchiveRecords.count());
 }

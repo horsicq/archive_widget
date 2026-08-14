@@ -303,12 +303,12 @@ bool Archive_widget::isOpenAvailable(const QString &sRecordFileName, bool bIsRoo
     QSet<XBinary::FT> stFileTypes;
 
     if (bIsRoot || (m_type == CreateViewModelProcess::TYPE_DIRECTORY)) {
-        stFileTypes = XFormats::getFileTypes(sRecordFileName, true);
+        stFileTypes = XFormats::getFileTypes(sRecordFileName, XBinary::FT_FLAG_FORMATS);
     } else {
         XArchive::RECORD record = XArchive::getArchiveRecord(sRecordFileName, &m_listRecords);
 
         QByteArray baData = XArchives::decompress(m_sName, &record, nullptr, 0, 0x200);
-        stFileTypes = XFormats::getFileTypes(&baData, true);
+        stFileTypes = XFormats::getFileTypes(&baData, XBinary::FT_FLAG_FORMATS);
     }
 
     if (XBinary::isFileTypePresent(&stFileTypes, &m_stAvailableOpenFileTypes)) {
@@ -513,7 +513,7 @@ void Archive_widget::_handleActionDevice(Archive_widget::ACTION action, QIODevic
 
 void Archive_widget::_handleActionOpenFile(const QString &sFileName, const QString &sTitle, bool bReadWrite)
 {
-    QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(sFileName, true);
+    QSet<XBinary::FT> stFileTypes = XFormats::getFileTypes(sFileName, XBinary::FT_FLAG_FORMATS);
 
     if (stFileTypes.contains(XBinary::FT_PNG) || stFileTypes.contains(XBinary::FT_JPEG) || stFileTypes.contains(XBinary::FT_TIFF) ||
         stFileTypes.contains(XBinary::FT_GIF) || stFileTypes.contains(XBinary::FT_BMP)) {
