@@ -25,36 +25,74 @@ UnpackFileProcess::UnpackFileProcess(QObject *pParent) : XThreadObject(pParent)
     m_pDevice = nullptr;
     m_pRecord = nullptr;
     m_pPdStruct = nullptr;
+    m_bTestMode = false;
 }
 
 void UnpackFileProcess::setData(const QString &sFileName, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct)
 {
     m_sFileName = sFileName;
+    m_pDevice = nullptr;
     m_pRecord = pRecord;
     m_sResultFileName = sResultFileName;
+    m_sResultFileFolder.clear();
     m_pPdStruct = pPdStruct;
+    m_mapProperties.clear();
+    m_bTestMode = false;
 }
 
 void UnpackFileProcess::setData(const QString &sFileName, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
 {
+    setData(sFileName, sResultFileFolder, QMap<XBinary::UNPACK_PROP, QVariant>(), pPdStruct);
+}
+
+void UnpackFileProcess::setData(const QString &sFileName, const QString &sResultFileFolder,
+                                const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties, XBinary::PDSTRUCT *pPdStruct)
+{
     m_sFileName = sFileName;
+    m_pDevice = nullptr;
+    m_pRecord = nullptr;
+    m_sResultFileName.clear();
     m_sResultFileFolder = sResultFileFolder;
+    m_mapProperties = mapProperties;
     m_pPdStruct = pPdStruct;
+    m_bTestMode = false;
+}
+
+void UnpackFileProcess::setDataTest(const QString &sFileName, const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties,
+                                    XBinary::PDSTRUCT *pPdStruct)
+{
+    m_sFileName = sFileName;
+    m_pDevice = nullptr;
+    m_pRecord = nullptr;
+    m_sResultFileName.clear();
+    m_sResultFileFolder.clear();
+    m_mapProperties = mapProperties;
+    m_pPdStruct = pPdStruct;
+    m_bTestMode = true;
 }
 
 void UnpackFileProcess::setData(QIODevice *pDevice, XArchive::RECORD *pRecord, const QString &sResultFileName, XBinary::PDSTRUCT *pPdStruct)
 {
+    m_sFileName.clear();
     m_pDevice = pDevice;
     m_pRecord = pRecord;
     m_sResultFileName = sResultFileName;
+    m_sResultFileFolder.clear();
     m_pPdStruct = pPdStruct;
+    m_mapProperties.clear();
+    m_bTestMode = false;
 }
 
 void UnpackFileProcess::setData(QIODevice *pDevice, const QString &sResultFileFolder, XBinary::PDSTRUCT *pPdStruct)
 {
+    m_sFileName.clear();
     m_pDevice = pDevice;
+    m_pRecord = nullptr;
+    m_sResultFileName.clear();
     m_sResultFileFolder = sResultFileFolder;
     m_pPdStruct = pPdStruct;
+    m_mapProperties.clear();
+    m_bTestMode = false;
 }
 
 void UnpackFileProcess::process()
@@ -64,12 +102,14 @@ void UnpackFileProcess::process()
 
     bool bResult = false;
 
-    if (!m_sFileName.isEmpty()) {
+    if (m_bTestMode && !m_sFileName.isEmpty()) {
+        bResult = XArchives::testArchive(m_sFileName, m_mapProperties, m_pPdStruct);
+    } else if (!m_sFileName.isEmpty()) {
         if (!m_sResultFileName.isEmpty()) {
             bResult = XArchives::decompressToFile(m_sFileName, m_pRecord, m_sResultFileName,
                                                   m_pPdStruct);  // TODO Error signals
         } else if (!m_sResultFileFolder.isEmpty()) {
-            bResult = XArchives::decompressToFolder(m_sFileName, m_sResultFileFolder, m_pPdStruct);  // TODO Error signals
+            bResult = XArchives::decompressToFolder(m_sFileName, m_sResultFileFolder, m_mapProperties, m_pPdStruct);  // TODO Error signals
         }
     } else if (m_pDevice) {
         if (!m_sResultFileName.isEmpty()) {

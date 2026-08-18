@@ -46,6 +46,8 @@ public:
     void setData(XBinary::FT fileType, QIODevice *pDevice, bool bIsImage = false, XADDR nModuleAddress = -1);
     QString getCurrentRecordFileName();
     const QList<XBinary::ARCHIVERECORD> *getArchiveRecords() const;
+    QString getPassword() const;
+    bool isArchiveAvailable() const;
     virtual void adjustView();
     virtual void reloadData(bool bSaveSelection);
 
@@ -56,8 +58,10 @@ signals:
     void testRequested();
 
 private slots:
+    void on_comboBoxType_currentIndexChanged(int nIndex);
     void on_toolButtonExtractAll_clicked();
     void on_toolButtonTest_clicked();
+    void on_lineEditPassword_editingFinished();
     void on_checkBoxAdvanced_toggled(bool bChecked);
     void on_tableViewRecords_customContextMenuRequested(const QPoint &pos);
     void showContext(const QString &sRecordFileName, QPoint point);
@@ -75,6 +79,11 @@ protected:
     virtual void registerShortcuts(bool bState);
 
 private:
+    enum ARCHIVE_SOURCE {
+        ARCHIVE_SOURCE_NATIVE,
+        ARCHIVE_SOURCE_IP7Z
+    };
+
     qint32 getCurrentRecordIndex() const;
     bool extractRecordToDevice(qint32 nRow, QIODevice *pOutputDevice);
     bool extractRecordToFile(qint32 nRow, const QString &sFileName);
@@ -91,6 +100,9 @@ private:
     QString m_sCurrentRecordFileName;
     qint64 m_nCurrentFileSize;
     bool m_bAdvanced;
+    bool m_bArchiveAvailable;
+    bool m_bUserFileType;
+    ARCHIVE_SOURCE m_archiveSource;
     QStringList m_listTemporaryFiles;
 };
 

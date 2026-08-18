@@ -26,6 +26,7 @@
 #include <QFileInfo>
 #include <QSaveFile>
 #include <QSet>
+#include <QSignalBlocker>
 #include <QStorageInfo>
 #include <QTemporaryFile>
 #include <QUrl>
@@ -69,6 +70,9 @@ ArchiveExplorerWidget::ArchiveExplorerWidget(QWidget *pParent) : XShortcutsWidge
     m_pModel = nullptr;
     m_nCurrentFileSize = 0;
     m_bAdvanced = false;
+    m_bArchiveAvailable = false;
+    m_bUserFileType = false;
+    m_archiveSource = ARCHIVE_SOURCE_NATIVE;
 
     XOptions::adjustToolButton(ui->toolButtonExtractAll, XOptions::ICONTYPE_EXTRACTOR);
     XOptions::adjustToolButton(ui->toolButtonTest, XOptions::ICONTYPE_SCAN);
@@ -92,16 +96,48 @@ void ArchiveExplorerWidget::setData(XBinary::FT fileType, QIODevice *pDevice, bo
     Q_UNUSED(bIsImage)
     Q_UNUSED(nModuleAddress)
 
-    m_fileType = fileType;
+    // setData() establishes a new archive session. Never carry credentials
+    // across sessions, including when a caller reuses the same QFile object.
+    ui->lineEditPassword->clear();
+
     m_pDevice = pDevice;
 
-    updateActions();
+    // A fresh archive session starts in auto-detect mode: the best reader
+    // (including the ip7z source) may pick the format. The user forcing a type
+    // via the combobox switches to that exact type through the native reader.
+    m_bUserFileType = false;
+
+    // Populate the file-type selector from the device (same pattern as
+    // XEntropyWidget). Block signals so the programmatic population does not
+    // trigger a redundant reload; the loadRecords() below is the initial load.
+    {
+        QSignalBlocker signalBlocker(ui->comboBoxType);
+        ui->comboBoxType->clear();
+
+        if (m_pDevice) {
+            m_fileType = XFormats::setFileTypeComboBox(fileType, m_pDevice, ui->comboBoxType, XBinary::FT_FLAG_FORMATS | XBinary::FT_FLAG_STATICUNPACKERS);
+        } else {
+            m_fileType = fileType;
+        }
+    }
+
     loadRecords();
+    updateActions();
 }
 
 const QList<XBinary::ARCHIVERECORD> *ArchiveExplorerWidget::getArchiveRecords() const
 {
     return &m_listArchiveRecords;
+}
+
+QString ArchiveExplorerWidget::getPassword() const
+{
+    return ui->lineEditPassword->text();
+}
+
+bool ArchiveExplorerWidget::isArchiveAvailable() const
+{
+    return m_bArchiveAvailable;
 }
 
 QString ArchiveExplorerWidget::getCurrentRecordFileName()
@@ -168,6 +204,25 @@ void ArchiveExplorerWidget::reloadData(bool bSaveSelection)
     }
 }
 
+void ArchiveExplorerWidget::on_comboBoxType_currentIndexChanged(int nIndex)
+{
+    Q_UNUSED(nIndex)
+
+    if (!m_pDevice) {
+        return;
+    }
+
+    // The user picked a specific file type: re-interpret the file as exactly
+    // that type through the native reader (bypassing ip7z auto-detection, which
+    // would otherwise ignore the selection). If the chosen type cannot be
+    // unpacked, loadRecords() shows the file itself and leaves Extract/Test
+    // disabled.
+    m_bUserFileType = true;
+    m_fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
+
+    reloadData(true);
+}
+
 void ArchiveExplorerWidget::on_toolButtonExtractAll_clicked()
 {
     if (ui->toolButtonExtractAll->isEnabled()) {
@@ -179,6 +234,13 @@ void ArchiveExplorerWidget::on_toolButtonTest_clicked()
 {
     if (ui->toolButtonTest->isEnabled()) {
         emit testRequested();
+    }
+}
+
+void ArchiveExplorerWidget::on_lineEditPassword_editingFinished()
+{
+    if (m_pDevice && m_pDevice->isOpen()) {
+        reloadData(true);
     }
 }
 
@@ -231,14 +293,19 @@ void ArchiveExplorerWidget::showContext(const QString &sRecordFileName, QPoint p
         listMenuItems.append(menuItem);
     };
 
-    if (!bIsFolder) {
-        pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_OPEN, this, SLOT(openRecord()), XShortcuts::GROUPID_NONE);
-        appendMenuItem(tr("Extract"), this, SLOT(extractRecord()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
-    }
+    // These actions require a real, unpackable archive. When the file is only
+    // shown as a single fallback entry (m_bArchiveAvailable == false) they are
+    // omitted, matching the disabled Extract / Test toolbar buttons.
+    if (m_bArchiveAvailable) {
+        if (!bIsFolder) {
+            pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_OPEN, this, SLOT(openRecord()), XShortcuts::GROUPID_NONE);
+            appendMenuItem(tr("Extract"), this, SLOT(extractRecord()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
+        }
 
-    appendMenuItem(tr("Extract all"), this, SLOT(on_toolButtonExtractAll_clicked()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
-    appendMenuItem(tr("Test archive"), this, SLOT(on_toolButtonTest_clicked()), XOptions::ICONTYPE_SCAN, XShortcuts::GROUPID_NONE);
-    pShortcuts->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_NONE);
+        appendMenuItem(tr("Extract all"), this, SLOT(on_toolButtonExtractAll_clicked()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
+        appendMenuItem(tr("Test archive"), this, SLOT(on_toolButtonTest_clicked()), XOptions::ICONTYPE_SCAN, XShortcuts::GROUPID_NONE);
+        pShortcuts->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_NONE);
+    }
 
     pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_COPY_FILENAME, this, SLOT(copyFileName()), XShortcuts::GROUPID_COPY);
     appendMenuItem(tr("Member path"), this, SLOT(copyRecordPath()), XOptions::ICONTYPE_PATH, XShortcuts::GROUPID_COPY);
@@ -456,6 +523,19 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
         return false;
     }
 
+    const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
+    const QString sRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
+    QFile *pSourceFile = qobject_cast<QFile *>(m_pDevice);
+
+    if (m_archiveSource == ARCHIVE_SOURCE_IP7Z) {
+        if (!pSourceFile || pSourceFile->fileName().isEmpty() || sRecordFileName.isEmpty()) return false;
+
+        QString sError;
+        return XArchives::isIp7zSourceAvailable() &&
+               XArchives::extractArchiveRecordWithIp7zSource(pSourceFile->fileName(), sRecordFileName,
+                                                            getPassword(), pOutputDevice, &sError, nullptr);
+    }
+
     XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
 
     if (!pArchive) {
@@ -466,6 +546,7 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
     XBinary::PDSTRUCT pdStruct = XBinary::createPdStruct();
     XBinary::UNPACK_STATE state = {};
     QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
+    mapProperties.insert(XBinary::UNPACK_PROP_PASSWORD, getPassword());
 
     if (pArchive->initUnpack(&state, mapProperties, &pdStruct)) {
         bool bSeekOk = true;
@@ -552,7 +633,11 @@ void ArchiveExplorerWidget::on_tableViewRecords_doubleClicked(const QModelIndex 
 
     ui->tableViewRecords->setCurrentIndex(index);
     ui->tableViewRecords->selectRow(index.row());
-    openRecord();
+
+    // Opening a member requires extracting it; only meaningful for a real archive.
+    if (m_bArchiveAvailable) {
+        openRecord();
+    }
 }
 
 void ArchiveExplorerWidget::onCurrentRecordChanged(const QModelIndex &current, const QModelIndex &previous)
@@ -587,7 +672,7 @@ void ArchiveExplorerWidget::registerShortcuts(bool bState)
 
 void ArchiveExplorerWidget::updateActions()
 {
-    bool bIsArchive = m_pDevice && m_pDevice->isOpen() && XFormats::isArchive(m_fileType);
+    bool bIsArchive = isArchiveAvailable();
 
     ui->toolButtonExtractAll->setEnabled(bIsArchive);
     ui->toolButtonTest->setEnabled(bIsArchive);
@@ -600,6 +685,8 @@ void ArchiveExplorerWidget::loadRecords()
     // store, then install the freshly populated model below.
     ui->tableViewRecords->clear();
     m_pModel = nullptr;
+    m_bArchiveAvailable = false;
+    m_archiveSource = ARCHIVE_SOURCE_NATIVE;
 
     bool bHadCurrentRecord = !m_sCurrentRecordFileName.isEmpty() || (m_nCurrentFileSize != 0);
 
@@ -614,35 +701,93 @@ void ArchiveExplorerWidget::loadRecords()
     QList<XBinary::FPART_PROP> listColumns;
 
     if (m_pDevice) {
-        XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
+        QFile *pSourceFile = qobject_cast<QFile *>(m_pDevice);
+        bool bUseNativeReader = true;
+        // Packer/installer handle-method types (Inno Setup, NSIS, ...) must use the native
+        // XStaticUnpacker reader: the ip7z (7-Zip) source would open them as a plain PE and list
+        // raw sections/overlay instead of the installed files.
+        const bool bPreferNative =
+            XArchives::isNativeReaderPreferredFileType(m_fileType, m_pDevice, nullptr) || XFormats::isStaticUnpacker(m_fileType);
 
-        if (pArchive) {
-            listColumns = pArchive->getAvailableFPARTProperties();
+        if ((!m_bUserFileType) && !bPreferNative && pSourceFile && !pSourceFile->fileName().isEmpty() && XArchives::isIp7zSourceAvailable()) {
+            QList<XBinary::ARCHIVERECORD> listIp7zRecords;
+            QString sError;
 
-            XBinary::UNPACK_STATE state = {};
-            QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
-            bool bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
-
-            if (!bInit) {
-                state = XBinary::UNPACK_STATE();
-                mapProperties.insert(XBinary::UNPACK_PROP_METADATAONLY, true);
-                bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
+            if (XArchives::listArchiveWithIp7zSource(pSourceFile->fileName(), getPassword(), &listIp7zRecords, &sError, nullptr)) {
+                m_listArchiveRecords = listIp7zRecords;
+                m_bArchiveAvailable = true;
+                m_archiveSource = ARCHIVE_SOURCE_IP7Z;
+                bUseNativeReader = false;
+            } else if (!XArchives::isIp7zUnsupportedFormatError(sError) && !getPassword().isEmpty()) {
+                bUseNativeReader = false;
             }
+        }
 
-            if (bInit) {
-                while (state.nCurrentIndex < state.nNumberOfRecords) {
-                    XBinary::ARCHIVERECORD record = pArchive->infoCurrent(&state, nullptr);
-                    m_listArchiveRecords.append(record);
-                    if (!pArchive->moveToNext(&state, nullptr)) {
+        if (bUseNativeReader) {
+            XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
+
+            if (pArchive) {
+                listColumns = pArchive->getAvailableFPARTProperties();
+                XBinary::UNPACK_STATE state = {};
+                QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
+                mapProperties.insert(XBinary::UNPACK_PROP_PASSWORD, getPassword());
+                bool bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
+
+                if (!bInit) {
+                    state = XBinary::UNPACK_STATE();
+                    mapProperties.insert(XBinary::UNPACK_PROP_METADATAONLY, true);
+                    bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
+                }
+
+                bool bComplete = bInit;
+                while (bComplete && (state.nCurrentIndex < state.nNumberOfRecords)) {
+                    const XBinary::ARCHIVERECORD record = pArchive->infoCurrent(&state, nullptr);
+                    if (record.mapProperties.isEmpty()) {
+                        bComplete = false;
                         break;
+                    }
+                    m_listArchiveRecords.append(record);
+                    if (!pArchive->moveToNext(&state, nullptr) && (state.nCurrentIndex < state.nNumberOfRecords)) {
+                        bComplete = false;
                     }
                 }
 
-                pArchive->finishUnpack(&state, nullptr);
-            }
+                bComplete = bComplete && (state.nCurrentIndex == state.nNumberOfRecords) &&
+                            pArchive->finishUnpack(&state, nullptr);
+                if (bComplete) {
+                    m_bArchiveAvailable = true;
+                } else {
+                    m_listArchiveRecords.clear();
+                    listColumns.clear();
+                }
 
-            delete pArchive;
+                delete pArchive;
+            }
         }
+    }
+
+    // If the selected file type could not be unpacked (initUnpack returned
+    // false, or the record enumeration was incomplete), fall back to showing the
+    // file itself as a single entry. m_bArchiveAvailable stays false, so
+    // Extract / Extract all / Test remain disabled.
+    if ((!m_bArchiveAvailable) && m_pDevice && m_listArchiveRecords.isEmpty()) {
+        XBinary::ARCHIVERECORD record = {};
+
+        QString sName = tr("(file)");
+        QFile *pSourceFile = qobject_cast<QFile *>(m_pDevice);
+
+        if (pSourceFile && !pSourceFile->fileName().isEmpty()) {
+            sName = QFileInfo(pSourceFile->fileName()).fileName();
+        }
+
+        qint64 nSize = m_pDevice->size();
+
+        record.nStreamOffset = 0;
+        record.nStreamSize = nSize;
+        record.mapProperties.insert(XBinary::FPART_PROP_ORIGINALNAME, sName);
+        record.mapProperties.insert(XBinary::FPART_PROP_UNCOMPRESSEDSIZE, nSize);
+
+        m_listArchiveRecords.append(record);
     }
 
     // show every property the format parser actually filled, in a fixed preferred

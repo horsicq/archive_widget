@@ -33,7 +33,19 @@ void DialogUnpackFile::setData(const QString &sFileName, XArchive::RECORD *pReco
 
 void DialogUnpackFile::setData(const QString &sFileName, const QString &sResultFileFolder)
 {
-    m_pUnpackFileProcess->setData(sFileName, sResultFileFolder, getPdStruct());
+    setData(sFileName, sResultFileFolder, QMap<XBinary::UNPACK_PROP, QVariant>());
+}
+
+void DialogUnpackFile::setData(const QString &sFileName, const QString &sResultFileFolder,
+                               const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties)
+{
+    m_pUnpackFileProcess->setData(sFileName, sResultFileFolder, mapProperties, getPdStruct());
+    start();
+}
+
+void DialogUnpackFile::setDataTest(const QString &sFileName, const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties)
+{
+    m_pUnpackFileProcess->setDataTest(sFileName, mapProperties, getPdStruct());
     start();
 }
 
