@@ -536,31 +536,17 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
                                                             getPassword(), pOutputDevice, &sError, nullptr);
     }
 
-    XArchive *pArchive = static_cast<XArchive *>(XFormats::createClass(m_fileType, m_pDevice));
+    XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
 
     if (!pArchive) {
         return false;
     }
 
-    bool bResult = false;
     XBinary::PDSTRUCT pdStruct = XBinary::createPdStruct();
-    XBinary::UNPACK_STATE state = {};
     QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
     mapProperties.insert(XBinary::UNPACK_PROP_PASSWORD, getPassword());
-
-    if (pArchive->initUnpack(&state, mapProperties, &pdStruct)) {
-        bool bSeekOk = true;
-
-        for (qint32 nIndex = 0; (nIndex < nRow) && bSeekOk; nIndex++) {
-            bSeekOk = pArchive->moveToNext(&state, &pdStruct);
-        }
-
-        if (bSeekOk && (state.nCurrentIndex < state.nNumberOfRecords)) {
-            bResult = pArchive->unpackCurrent(&state, pOutputDevice, &pdStruct);
-        }
-
-        pArchive->finishUnpack(&state, &pdStruct);
-    }
+    const bool bResult = pArchive->unpackRecordByIndex(
+        nRow, &record, pOutputDevice, mapProperties, &pdStruct);
 
     delete pArchive;
 
@@ -804,6 +790,8 @@ void ArchiveExplorerWidget::loadRecords()
         listPreferred.append(XBinary::FPART_PROP_ATIME);
         listPreferred.append(XBinary::FPART_PROP_UNCOMPRESSEDCRC);
         listPreferred.append(XBinary::FPART_PROP_RESULTCRC);
+        listPreferred.append(XBinary::FPART_PROP_CHECKSUM);
+        listPreferred.append(XBinary::FPART_PROP_CHECKSUMTYPE);
         listPreferred.append(XBinary::FPART_PROP_ENCRYPTED);
         listPreferred.append(XBinary::FPART_PROP_FILEMODE);
         listPreferred.append(XBinary::FPART_PROP_USERNAME);
@@ -812,6 +800,7 @@ void ArchiveExplorerWidget::loadRecords()
         listPreferred.append(XBinary::FPART_PROP_GID);
         listPreferred.append(XBinary::FPART_PROP_LINKNAME);
         listPreferred.append(XBinary::FPART_PROP_INFO);
+        listPreferred.append(XBinary::FPART_PROP_HOSTOS);
 
         QList<XBinary::FPART_PROP> listPresent;
         QSet<XBinary::FPART_PROP> stAdded;
