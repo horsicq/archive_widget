@@ -66,6 +66,9 @@ private slots:
     void on_tableViewRecords_customContextMenuRequested(const QPoint &pos);
     void showContext(const QString &sRecordFileName, QPoint point);
     void openRecord();
+    void hexRecord();
+    void stringsRecord();
+    void entropyRecord();
     void extractRecord();
     void copyFileName();
     void copyRecordPath();
@@ -84,9 +87,16 @@ private:
         ARCHIVE_SOURCE_IP7Z
     };
 
+    enum RECORD_ANALYSIS {
+        RECORD_ANALYSIS_HEX,
+        RECORD_ANALYSIS_STRINGS,
+        RECORD_ANALYSIS_ENTROPY
+    };
+
     qint32 getCurrentRecordIndex() const;
-    bool extractRecordToDevice(qint32 nRow, QIODevice *pOutputDevice);
+    bool extractRecordToDevice(qint32 nRow, QIODevice *pOutputDevice, qint64 nMaxOutputSize = -1);
     bool extractRecordToFile(qint32 nRow, const QString &sFileName);
+    void analyzeRecord(RECORD_ANALYSIS analysis);
     QString getRecordDetails(const XBinary::ARCHIVERECORD &record) const;
     void updateActions();
     void loadRecords();

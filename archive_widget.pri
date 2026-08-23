@@ -17,7 +17,6 @@ DEPENDPATH += $$PWD
 
 HEADERS += \
     $$PWD/archive_widget.h \
-    $$PWD/archiveexplorerwidget.h \
     $$PWD/createviewmodelprocess.h \
     $$PWD/dialogarchive.h \
     $$PWD/dialogcreateviewmodel.h \
@@ -29,7 +28,6 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/archive_widget.cpp \
-    $$PWD/archiveexplorerwidget.cpp \
     $$PWD/createviewmodelprocess.cpp \
     $$PWD/dialogarchive.cpp \
     $$PWD/dialogcreateviewmodel.cpp \
@@ -41,7 +39,6 @@ SOURCES += \
 
 FORMS += \
     $$PWD/archive_widget.ui \
-    $$PWD/archiveexplorerwidget.ui \
     $$PWD/dialogarchive.ui \
     $$PWD/dialogshowimage.ui \
     $$PWD/xarchivewidget.ui \
@@ -60,6 +57,11 @@ FORMS += \
 !contains(XCONFIG, xmodel_archiverecords) {
     XCONFIG += xmodel_archiverecords
     include($$PWD/../Controls/xmodel_archiverecords.pri)
+}
+
+!contains(XCONFIG, archiveexplorerwidget) {
+    XCONFIG += archiveexplorerwidget
+    include($$PWD/archiveexplorerwidget.pri)
 }
 
 DISTFILES += \

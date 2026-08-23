@@ -20,6 +20,28 @@ if (NOT DEFINED XSHORTCUTS_SOURCES)
     set(ARCHIVEEXPLORERWIDGET_SOURCES ${ARCHIVEEXPLORERWIDGET_SOURCES} ${XSHORTCUTS_SOURCES})
 endif()
 
+if (NOT DEFINED SEARCHSTRINGSWIDGET_SOURCES)
+    include(${CMAKE_CURRENT_LIST_DIR}/../FormatWidgets/SearchStrings/searchstringswidget.cmake)
+    set(ARCHIVEEXPLORERWIDGET_SOURCES ${ARCHIVEEXPLORERWIDGET_SOURCES} ${SEARCHSTRINGSWIDGET_SOURCES})
+endif()
+
+if (NOT DEFINED XENTROPYWIDGET_SOURCES)
+    include(${CMAKE_CURRENT_LIST_DIR}/../XEntropyWidget/xentropywidget.cmake)
+    set(ARCHIVEEXPLORERWIDGET_SOURCES ${ARCHIVEEXPLORERWIDGET_SOURCES} ${XENTROPYWIDGET_SOURCES})
+endif()
+
+# The legacy QHexView dialog wrapper references removed process-dialog APIs.
+# Its core view is self-contained, read-only capable, and provides both hex and
+# ASCII columns without pulling the stale wrapper dependencies.
+include_directories(${CMAKE_CURRENT_LIST_DIR}/../QHexView)
+if (NOT DEFINED QHEXVIEW_CORE_SOURCES)
+    set(QHEXVIEW_CORE_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/../QHexView/qhexview.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/../QHexView/qhexview.h
+    )
+endif()
+set(ARCHIVEEXPLORERWIDGET_SOURCES ${ARCHIVEEXPLORERWIDGET_SOURCES} ${QHEXVIEW_CORE_SOURCES})
+
 set(ARCHIVEEXPLORERWIDGET_SOURCES
     ${ARCHIVEEXPLORERWIDGET_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/archiveexplorerwidget.cpp

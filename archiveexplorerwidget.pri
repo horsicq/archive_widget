@@ -34,5 +34,23 @@ FORMS += \
     include($$PWD/../XShortcuts/xshortcuts.pri)
 }
 
+!contains(XCONFIG, searchstringswidget) {
+    XCONFIG += searchstringswidget
+    include($$PWD/../FormatWidgets/SearchStrings/searchstringswidget.pri)
+}
+
+!contains(XCONFIG, xentropywidget) {
+    XCONFIG += xentropywidget
+    include($$PWD/../XEntropyWidget/xentropywidget.pri)
+}
+
+!contains(XCONFIG, qhexview_core) {
+    XCONFIG += qhexview_core
+    INCLUDEPATH += $$PWD/../QHexView
+    DEPENDPATH += $$PWD/../QHexView
+    HEADERS += $$PWD/../QHexView/qhexview.h
+    SOURCES += $$PWD/../QHexView/qhexview.cpp
+}
+
 DISTFILES += \
     $$PWD/archiveexplorerwidget.cmake

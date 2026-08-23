@@ -4,12 +4,14 @@ include(${CMAKE_CURRENT_LIST_DIR}/../FormatWidgets/allformatwidgets.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XArchive/xarchives.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../XShortcuts/xshortcuts.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/../Controls/xmodel_archiverecords.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/archiveexplorerwidget.cmake)
 
 set(ARCHIVE_WIDGET_SOURCES
     ${ALLFORMATWIDGETS_SOURCES}
     ${XARCHIVES_SOURCES}
     ${XSHORTCUTS_SOURCES}
     ${XMODEL_ARCHIVERECORDS_SOURCES}
+    ${ARCHIVEEXPLORERWIDGET_SOURCES}
     ${CMAKE_CURRENT_LIST_DIR}/archive_widget.cmake
     ${CMAKE_CURRENT_LIST_DIR}/archive_widget.cpp
     ${CMAKE_CURRENT_LIST_DIR}/archive_widget.ui
@@ -25,6 +27,4 @@ set(ARCHIVE_WIDGET_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/xarchivewidget.ui
     ${CMAKE_CURRENT_LIST_DIR}/xgenericarchivewidget.cpp
     ${CMAKE_CURRENT_LIST_DIR}/xgenericarchivewidget.ui
-    ${CMAKE_CURRENT_LIST_DIR}/archiveexplorerwidget.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/archiveexplorerwidget.ui
     )

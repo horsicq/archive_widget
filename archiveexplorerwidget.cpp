@@ -21,6 +21,8 @@
 #include "archiveexplorerwidget.h"
 
 #include <QDesktopServices>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -30,10 +32,14 @@
 #include <QStorageInfo>
 #include <QTemporaryFile>
 #include <QUrl>
+#include <QVBoxLayout>
 
 #include <algorithm>
 
 #include "ui_archiveexplorerwidget.h"
+#include "dialogentropy.h"
+#include "dialogsearchstrings.h"
+#include "qhexview.h"
 #include "xoptions.h"
 
 namespace {
@@ -57,6 +63,50 @@ bool isArchiveFolderRecord(const XBinary::ARCHIVERECORD &record)
     QString sRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
 
     return record.mapProperties.value(XBinary::FPART_PROP_ISFOLDER).toBool() || sRecordFileName.endsWith(QChar('/')) || sRecordFileName.endsWith(QChar('\\'));
+}
+
+bool copyDeviceExactly(QIODevice *pSource, QIODevice *pDestination, qint64 nSize)
+{
+    if (!pSource || !pDestination || !pSource->isOpen() || !pSource->isReadable() || pSource->isSequential() || !pDestination->isOpen() ||
+        !pDestination->isWritable() || (nSize < 0)) {
+        return false;
+    }
+
+    const qint64 nOldPosition = pSource->pos();
+    bool bResult = (nOldPosition >= 0) && pSource->seek(0);
+    qint64 nRemaining = nSize;
+    QByteArray buffer;
+    buffer.resize(64 * 1024);
+
+    while (bResult && (nRemaining > 0)) {
+        const qint64 nRequested = qMin<qint64>(buffer.size(), nRemaining);
+        const qint64 nRead = pSource->read(buffer.data(), nRequested);
+
+        if (nRead != nRequested) {
+            bResult = false;
+            break;
+        }
+
+        qint64 nWritten = 0;
+        while (nWritten < nRead) {
+            const qint64 nCurrent = pDestination->write(buffer.constData() + nWritten, nRead - nWritten);
+
+            if (nCurrent <= 0) {
+                bResult = false;
+                break;
+            }
+
+            nWritten += nCurrent;
+        }
+
+        nRemaining -= nRead;
+    }
+
+    if (nOldPosition >= 0) {
+        bResult = pSource->seek(nOldPosition) && bResult;
+    }
+
+    return bResult && (nRemaining == 0);
 }
 
 }  // namespace
@@ -304,6 +354,17 @@ void ArchiveExplorerWidget::showContext(const QString &sRecordFileName, QPoint p
 
         appendMenuItem(tr("Extract all"), this, SLOT(on_toolButtonExtractAll_clicked()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
         appendMenuItem(tr("Test archive"), this, SLOT(on_toolButtonTest_clicked()), XOptions::ICONTYPE_SCAN, XShortcuts::GROUPID_NONE);
+    }
+
+    // Analysis is also useful for the single fallback row shown when a file is
+    // not an unpackable archive. Each action stages a bounded read-only copy.
+    if (!bIsFolder) {
+        pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_HEX, this, SLOT(hexRecord()), XShortcuts::GROUPID_NONE);
+        pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_STRINGS, this, SLOT(stringsRecord()), XShortcuts::GROUPID_NONE);
+        pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_ENTROPY, this, SLOT(entropyRecord()), XShortcuts::GROUPID_NONE);
+    }
+
+    if (m_bArchiveAvailable || !bIsFolder) {
         pShortcuts->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_NONE);
     }
 
@@ -408,7 +469,7 @@ void ArchiveExplorerWidget::openRecord()
 
     QString sTemporaryFileName = fileTemp.fileName();
 
-    if (!extractRecordToDevice(nRow, &fileTemp) || !fileTemp.flush()) {
+    if (!extractRecordToDevice(nRow, &fileTemp, N_MAX_OPEN_RECORD_SIZE) || !fileTemp.flush() || (fileTemp.size() != nUncompressedSize)) {
         QMessageBox::critical(this, tr("Error"), tr("Cannot extract file"));
         return;
     }
@@ -421,6 +482,135 @@ void ArchiveExplorerWidget::openRecord()
         m_listTemporaryFiles.removeAll(sTemporaryFileName);
         QFile::remove(sTemporaryFileName);
         QMessageBox::critical(this, tr("Error"), tr("Cannot open file"));
+    }
+}
+
+void ArchiveExplorerWidget::hexRecord()
+{
+    analyzeRecord(RECORD_ANALYSIS_HEX);
+}
+
+void ArchiveExplorerWidget::stringsRecord()
+{
+    analyzeRecord(RECORD_ANALYSIS_STRINGS);
+}
+
+void ArchiveExplorerWidget::entropyRecord()
+{
+    analyzeRecord(RECORD_ANALYSIS_ENTROPY);
+}
+
+void ArchiveExplorerWidget::analyzeRecord(RECORD_ANALYSIS analysis)
+{
+    const qint32 nRow = getCurrentRecordIndex();
+
+    if ((nRow < 0) || (nRow >= m_listArchiveRecords.count()) || !m_pDevice || !m_pDevice->isOpen()) {
+        return;
+    }
+
+    const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
+
+    if (isArchiveFolderRecord(record)) {
+        return;
+    }
+
+    if (!record.mapProperties.contains(XBinary::FPART_PROP_UNCOMPRESSEDSIZE)) {
+        QMessageBox::information(this, tr("Analyze file"), tr("The unpacked size is unknown. Extract the file before analyzing it."));
+        return;
+    }
+
+    const qint64 nUncompressedSize = record.mapProperties.value(XBinary::FPART_PROP_UNCOMPRESSEDSIZE).toLongLong();
+
+    if ((nUncompressedSize < 0) || (nUncompressedSize > N_MAX_OPEN_RECORD_SIZE)) {
+        QMessageBox::information(this, tr("Analyze file"),
+                                 tr("Files larger than %1 cannot be analyzed directly. Extract the file first.")
+                                     .arg(XBinary::bytesCountToString(N_MAX_OPEN_RECORD_SIZE, 1024)));
+        return;
+    }
+
+    QStorageInfo temporaryStorage(QDir::tempPath());
+    const qint64 nRequiredFreeSpace = (nUncompressedSize * 2) + (64LL * 1024LL * 1024LL);
+
+    if (temporaryStorage.isValid() && temporaryStorage.isReady() && (temporaryStorage.bytesAvailable() < nRequiredFreeSpace)) {
+        QMessageBox::critical(this, tr("Error"), tr("There is not enough free space to analyze this file."));
+        return;
+    }
+
+    QTemporaryFile fileTemp(QDir(QDir::tempPath()).filePath(QStringLiteral("xfileunpacker-analysis-XXXXXX")));
+
+    if (!fileTemp.open()) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot create temporary file"));
+        return;
+    }
+
+    bool bPrepared = false;
+
+    if (m_bArchiveAvailable) {
+        bPrepared = extractRecordToDevice(nRow, &fileTemp, N_MAX_OPEN_RECORD_SIZE);
+    } else {
+        bPrepared = copyDeviceExactly(m_pDevice, &fileTemp, nUncompressedSize);
+    }
+
+    if (!bPrepared || !fileTemp.flush() || (fileTemp.size() != nUncompressedSize)) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot prepare file for analysis"));
+        return;
+    }
+
+    const QString sTemporaryFileName = fileTemp.fileName();
+    fileTemp.close();
+
+    QFile analysisFile(sTemporaryFileName);
+
+    if (!analysisFile.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(this, tr("Error"), tr("Cannot open temporary file"));
+        return;
+    }
+
+    QString sRecordName = getArchiveRecordBaseName(record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString());
+
+    if (sRecordName.isEmpty()) {
+        sRecordName = tr("file");
+    }
+
+    if (analysis == RECORD_ANALYSIS_HEX) {
+        QDialog dialog(this);
+        dialog.setWindowTitle(tr("Hex: %1").arg(sRecordName));
+        dialog.resize(900, 600);
+
+        QVBoxLayout *pLayout = new QVBoxLayout(&dialog);
+        QHexView *pHexView = new QHexView(&dialog);
+        QHexView::OPTIONS options = {};
+        pHexView->setData(&analysisFile, &options);
+        pHexView->setReadonly(true);
+        pLayout->addWidget(pHexView);
+
+        QDialogButtonBox *pButtons = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+        connect(pButtons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+        pLayout->addWidget(pButtons);
+        dialog.exec();
+    } else if (analysis == RECORD_ANALYSIS_STRINGS) {
+        DialogSearchStrings dialog(this);
+        dialog.setGlobal(getShortcuts(), getGlobalOptions());
+
+        SearchStringsWidget::OPTIONS options = {};
+        options.nBaseAddress = 0;
+        options.bAnsi = true;
+        options.bUnicode = true;
+        options.bNullTerminated = false;
+        options.nMinLenght = 5;
+        options.bLinks = false;
+        options.bMenu_Hex = false;
+        options.bMenu_Disasm = false;
+        options.bMenu_Demangle = false;
+        options.sTitle = tr("Strings: %1").arg(sRecordName);
+        dialog.setData(&analysisFile, XBinary::FT_UNKNOWN, options, true);
+        dialog.exec();
+    } else if (analysis == RECORD_ANALYSIS_ENTROPY) {
+        DialogEntropy dialog(this);
+        dialog.setGlobal(getShortcuts(), getGlobalOptions());
+        dialog.setWindowTitle(tr("Entropy: %1").arg(sRecordName));
+        dialog.setData(&analysisFile);
+        dialog.exec();
     }
 }
 
@@ -516,10 +706,10 @@ qint32 ArchiveExplorerWidget::getCurrentRecordIndex() const
     return ui->tableViewRecords->getProxyModel()->mapToSource(proxyIndex).row();
 }
 
-bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutputDevice)
+bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutputDevice, qint64 nMaxOutputSize)
 {
     if ((nRow < 0) || (nRow >= m_listArchiveRecords.count()) || !pOutputDevice || !pOutputDevice->isOpen() || !pOutputDevice->isWritable() || !m_pDevice ||
-        !m_pDevice->isOpen()) {
+        !m_pDevice->isOpen() || (nMaxOutputSize < -1)) {
         return false;
     }
 
@@ -527,13 +717,25 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
     const QString sRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
     QFile *pSourceFile = qobject_cast<QFile *>(m_pDevice);
 
+    if (nMaxOutputSize >= 0) {
+        if (!record.mapProperties.contains(XBinary::FPART_PROP_UNCOMPRESSEDSIZE)) {
+            return false;
+        }
+
+        const qint64 nUncompressedSize = record.mapProperties.value(XBinary::FPART_PROP_UNCOMPRESSEDSIZE).toLongLong();
+
+        if ((nUncompressedSize < 0) || (nUncompressedSize > nMaxOutputSize)) {
+            return false;
+        }
+    }
+
     if (m_archiveSource == ARCHIVE_SOURCE_IP7Z) {
         if (!pSourceFile || pSourceFile->fileName().isEmpty() || sRecordFileName.isEmpty()) return false;
 
         QString sError;
         return XArchives::isIp7zSourceAvailable() &&
                XArchives::extractArchiveRecordWithIp7zSource(pSourceFile->fileName(), sRecordFileName,
-                                                            getPassword(), pOutputDevice, &sError, nullptr);
+                                                            getPassword(), pOutputDevice, &sError, nullptr, nMaxOutputSize);
     }
 
     XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
@@ -545,6 +747,10 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
     XBinary::PDSTRUCT pdStruct = XBinary::createPdStruct();
     QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
     mapProperties.insert(XBinary::UNPACK_PROP_PASSWORD, getPassword());
+    if (nMaxOutputSize >= 0) {
+        mapProperties.insert(XBinary::UNPACK_PROP_MAX_OUTPUT_SIZE,
+                             nMaxOutputSize);
+    }
     const bool bResult = pArchive->unpackRecordByIndex(
         nRow, &record, pOutputDevice, mapProperties, &pdStruct);
 
