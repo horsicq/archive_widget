@@ -39,7 +39,7 @@
 #include "ui_archiveexplorerwidget.h"
 #include "dialogentropy.h"
 #include "dialogsearchstrings.h"
-#include "qhexview.h"
+#include "dialoghexview.h"
 #include "xoptions.h"
 
 namespace {
@@ -573,21 +573,13 @@ void ArchiveExplorerWidget::analyzeRecord(RECORD_ANALYSIS analysis)
     }
 
     if (analysis == RECORD_ANALYSIS_HEX) {
-        QDialog dialog(this);
-        dialog.setWindowTitle(tr("Hex: %1").arg(sRecordName));
-        dialog.resize(900, 600);
+        XHexViewWidget::OPTIONS options = {};
 
-        QVBoxLayout *pLayout = new QVBoxLayout(&dialog);
-        QHexView *pHexView = new QHexView(&dialog);
-        QHexView::OPTIONS options = {};
-        pHexView->setData(&analysisFile, &options);
-        pHexView->setReadonly(true);
-        pLayout->addWidget(pHexView);
-
-        QDialogButtonBox *pButtons = new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
-        connect(pButtons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-        pLayout->addWidget(pButtons);
-        dialog.exec();
+        DialogHexView dialogHexView(this);
+        dialogHexView.setWindowTitle(tr("Hex: %1").arg(sRecordName));
+        dialogHexView.setGlobal(getShortcuts(), getGlobalOptions());
+        dialogHexView.setData(&analysisFile, options);
+        dialogHexView.exec();
     } else if (analysis == RECORD_ANALYSIS_STRINGS) {
         DialogSearchStrings dialog(this);
         dialog.setGlobal(getShortcuts(), getGlobalOptions());
