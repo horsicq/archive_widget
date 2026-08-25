@@ -924,20 +924,46 @@ void ArchiveExplorerWidget::loadRecords()
                 }
 
                 bool bComplete = bInit;
-                while (bComplete && (state.nCurrentIndex < state.nNumberOfRecords)) {
+                const qint32 nNumberOfRecords = state.nNumberOfRecords;
+                while (bComplete && (state.nCurrentIndex < nNumberOfRecords)) {
                     const XBinary::ARCHIVERECORD record = pArchive->infoCurrent(&state, nullptr);
                     if (record.mapProperties.isEmpty()) {
                         bComplete = false;
                         break;
                     }
                     m_listArchiveRecords.append(record);
-                    if (!pArchive->moveToNext(&state, nullptr) && (state.nCurrentIndex < state.nNumberOfRecords)) {
+
+                    // Mode A readers (the single-record packers XMEW/XYODA/XASPACK/
+                    // XFSG/XNSPACK/XPETITE) end enumeration by returning false from
+                    // moveToNext WITHOUT advancing the index.  Accept that as a clean
+                    // finish, mirroring XBinary::getArchiveRecords, instead of demanding
+                    // nCurrentIndex == nNumberOfRecords — the old check cleared the whole
+                    // record list and rendered every such packer as an inextractable (file).
+                    const qint32 nPreviousIndex = state.nCurrentIndex;
+                    const bool bMoved = pArchive->moveToNext(&state, nullptr);
+                    if (state.nNumberOfRecords != nNumberOfRecords) {
                         bComplete = false;
+                        break;
+                    }
+                    if (!bMoved) {
+                        if (((nPreviousIndex + 1) != nNumberOfRecords) ||
+                            ((state.nCurrentIndex != nPreviousIndex) &&
+                             (state.nCurrentIndex != nNumberOfRecords))) {
+                            bComplete = false;
+                        }
+                        break;
+                    }
+                    if ((state.nCurrentIndex != (nPreviousIndex + 1)) ||
+                        (state.nCurrentIndex >= nNumberOfRecords)) {
+                        bComplete = false;
+                        break;
                     }
                 }
 
-                bComplete = bComplete && (state.nCurrentIndex == state.nNumberOfRecords) &&
-                            pArchive->finishUnpack(&state, nullptr);
+                // Always finish the enumeration so the UNPACK_CONTEXT is released
+                // even when the record walk ended early.
+                const bool bFinished = pArchive->finishUnpack(&state, nullptr);
+                bComplete = bComplete && bFinished;
                 if (bComplete) {
                     m_bArchiveAvailable = true;
                 } else {
