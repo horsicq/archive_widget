@@ -32,6 +32,17 @@ endif()
 
 # Hex view of a record: the shared XHexView widget (via its DialogHexView wrapper),
 # the same one the sibling archive_widget and the format widgets use.
+#
+# xhexview.cmake is a kitchen-sink that also pulls the YARA scanner (yara_widget + XYara) for a
+# hex-view context-menu action that is #ifdef USE_YARA. XFileUnpacker does not define USE_YARA and
+# does not link the yara library, so pre-empt those two source sets (their guards then skip them);
+# otherwise xyara.cpp compiles and leaves unresolved yr_* externals at link time.
+if (NOT DEFINED YARA_WIDGET_SOURCES)
+    set(YARA_WIDGET_SOURCES "")
+endif()
+if (NOT DEFINED XYARA_SOURCES)
+    set(XYARA_SOURCES "")
+endif()
 if (NOT DEFINED XHEXVIEW_SOURCES)
     include(${CMAKE_CURRENT_LIST_DIR}/../XHexView/xhexview.cmake)
     set(ARCHIVEEXPLORERWIDGET_SOURCES ${ARCHIVEEXPLORERWIDGET_SOURCES} ${XHEXVIEW_SOURCES})
