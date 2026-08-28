@@ -82,11 +82,6 @@ protected:
     virtual void registerShortcuts(bool bState);
 
 private:
-    enum ARCHIVE_SOURCE {
-        ARCHIVE_SOURCE_NATIVE,
-        ARCHIVE_SOURCE_IP7Z
-    };
-
     enum RECORD_ANALYSIS {
         RECORD_ANALYSIS_HEX,
         RECORD_ANALYSIS_STRINGS,
@@ -111,8 +106,6 @@ private:
     qint64 m_nCurrentFileSize;
     bool m_bAdvanced;
     bool m_bArchiveAvailable;
-    bool m_bUserFileType;
-    ARCHIVE_SOURCE m_archiveSource;
     QStringList m_listTemporaryFiles;
 };
 

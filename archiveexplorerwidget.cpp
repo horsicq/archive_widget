@@ -121,8 +121,6 @@ ArchiveExplorerWidget::ArchiveExplorerWidget(QWidget *pParent) : XShortcutsWidge
     m_nCurrentFileSize = 0;
     m_bAdvanced = false;
     m_bArchiveAvailable = false;
-    m_bUserFileType = false;
-    m_archiveSource = ARCHIVE_SOURCE_NATIVE;
 
     XOptions::adjustToolButton(ui->toolButtonExtractAll, XOptions::ICONTYPE_EXTRACTOR);
     XOptions::adjustToolButton(ui->toolButtonTest, XOptions::ICONTYPE_SCAN);
@@ -151,11 +149,6 @@ void ArchiveExplorerWidget::setData(XBinary::FT fileType, QIODevice *pDevice, bo
     ui->lineEditPassword->clear();
 
     m_pDevice = pDevice;
-
-    // A fresh archive session starts in auto-detect mode: the best reader
-    // (including the ip7z source) may pick the format. The user forcing a type
-    // via the combobox switches to that exact type through the native reader.
-    m_bUserFileType = false;
 
     // Populate the file-type selector from the device (same pattern as
     // XEntropyWidget). Block signals so the programmatic population does not
@@ -262,12 +255,9 @@ void ArchiveExplorerWidget::on_comboBoxType_currentIndexChanged(int nIndex)
         return;
     }
 
-    // The user picked a specific file type: re-interpret the file as exactly
-    // that type through the native reader (bypassing ip7z auto-detection, which
-    // would otherwise ignore the selection). If the chosen type cannot be
-    // unpacked, loadRecords() shows the file itself and leaves Extract/Test
-    // disabled.
-    m_bUserFileType = true;
+    // Re-interpret the file as exactly the selected native reader type. If it
+    // cannot be unpacked, loadRecords() shows the file itself and leaves
+    // Extract/Test disabled.
     m_fileType = (XBinary::FT)(ui->comboBoxType->currentData().toInt());
 
     reloadData(true);
@@ -706,8 +696,6 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
     }
 
     const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
-    const QString sRecordFileName = record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString();
-    QFile *pSourceFile = qobject_cast<QFile *>(m_pDevice);
 
     if (nMaxOutputSize >= 0) {
         if (!record.mapProperties.contains(XBinary::FPART_PROP_UNCOMPRESSEDSIZE)) {
@@ -719,15 +707,6 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
         if ((nUncompressedSize < 0) || (nUncompressedSize > nMaxOutputSize)) {
             return false;
         }
-    }
-
-    if (m_archiveSource == ARCHIVE_SOURCE_IP7Z) {
-        if (!pSourceFile || pSourceFile->fileName().isEmpty() || sRecordFileName.isEmpty()) return false;
-
-        QString sError;
-        return XArchives::isIp7zSourceAvailable() &&
-               XArchives::extractArchiveRecordWithIp7zSource(pSourceFile->fileName(), sRecordFileName,
-                                                            getPassword(), pOutputDevice, &sError, nullptr, nMaxOutputSize);
     }
 
     XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
@@ -870,7 +849,6 @@ void ArchiveExplorerWidget::loadRecords()
     ui->tableViewRecords->clear();
     m_pModel = nullptr;
     m_bArchiveAvailable = false;
-    m_archiveSource = ARCHIVE_SOURCE_NATIVE;
 
     bool bHadCurrentRecord = !m_sCurrentRecordFileName.isEmpty() || (m_nCurrentFileSize != 0);
 
@@ -885,94 +863,70 @@ void ArchiveExplorerWidget::loadRecords()
     QList<XBinary::FPART_PROP> listColumns;
 
     if (m_pDevice) {
-        QFile *pSourceFile = qobject_cast<QFile *>(m_pDevice);
-        bool bUseNativeReader = true;
-        // Packer/installer handle-method types (Inno Setup, NSIS, ...) must use the native
-        // XStaticUnpacker reader: the ip7z (7-Zip) source would open them as a plain PE and list
-        // raw sections/overlay instead of the installed files.
-        const bool bPreferNative =
-            XArchives::isNativeReaderPreferredFileType(m_fileType, m_pDevice, nullptr) || XFormats::isStaticUnpacker(m_fileType);
+        XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
 
-        if ((!m_bUserFileType) && !bPreferNative && pSourceFile && !pSourceFile->fileName().isEmpty() && XArchives::isIp7zSourceAvailable()) {
-            QList<XBinary::ARCHIVERECORD> listIp7zRecords;
-            QString sError;
+        if (pArchive) {
+            listColumns = pArchive->getAvailableFPARTProperties();
+            XBinary::UNPACK_STATE state = {};
+            QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
+            mapProperties.insert(XBinary::UNPACK_PROP_PASSWORD, getPassword());
+            bool bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
 
-            if (XArchives::listArchiveWithIp7zSource(pSourceFile->fileName(), getPassword(), &listIp7zRecords, &sError, nullptr)) {
-                m_listArchiveRecords = listIp7zRecords;
+            if (!bInit) {
+                state = XBinary::UNPACK_STATE();
+                mapProperties.insert(XBinary::UNPACK_PROP_METADATAONLY, true);
+                bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
+            }
+
+            bool bComplete = bInit;
+            const qint32 nNumberOfRecords = state.nNumberOfRecords;
+            while (bComplete && (state.nCurrentIndex < nNumberOfRecords)) {
+                const XBinary::ARCHIVERECORD record = pArchive->infoCurrent(&state, nullptr);
+                if (record.mapProperties.isEmpty()) {
+                    bComplete = false;
+                    break;
+                }
+                m_listArchiveRecords.append(record);
+
+                // Mode A readers (the single-record packers XMEW/XYODA/XASPACK/
+                // XFSG/XNSPACK/XPETITE) end enumeration by returning false from
+                // moveToNext WITHOUT advancing the index.  Accept that as a clean
+                // finish, mirroring XBinary::getArchiveRecords, instead of demanding
+                // nCurrentIndex == nNumberOfRecords — the old check cleared the whole
+                // record list and rendered every such packer as an inextractable (file).
+                const qint32 nPreviousIndex = state.nCurrentIndex;
+                const bool bMoved = pArchive->moveToNext(&state, nullptr);
+                if (state.nNumberOfRecords != nNumberOfRecords) {
+                    bComplete = false;
+                    break;
+                }
+                if (!bMoved) {
+                    if (((nPreviousIndex + 1) != nNumberOfRecords) ||
+                        ((state.nCurrentIndex != nPreviousIndex) &&
+                         (state.nCurrentIndex != nNumberOfRecords))) {
+                        bComplete = false;
+                    }
+                    break;
+                }
+                if ((state.nCurrentIndex != (nPreviousIndex + 1)) ||
+                    (state.nCurrentIndex >= nNumberOfRecords)) {
+                    bComplete = false;
+                    break;
+                }
+            }
+
+            // Always finish the enumeration so the UNPACK_CONTEXT is released
+            // even when the record walk ended early.
+            const bool bFinished = pArchive->finishUnpack(&state, nullptr);
+            bComplete = bComplete && bFinished;
+            if (bComplete) {
                 m_bArchiveAvailable = true;
-                m_archiveSource = ARCHIVE_SOURCE_IP7Z;
-                bUseNativeReader = false;
-            } else if (!XArchives::isIp7zUnsupportedFormatError(sError) && !getPassword().isEmpty()) {
-                bUseNativeReader = false;
+            } else {
+                m_listArchiveRecords.clear();
+                listColumns.clear();
             }
-        }
 
-        if (bUseNativeReader) {
-            XBinary *pArchive = XFormats::createClass(m_fileType, m_pDevice);
-
-            if (pArchive) {
-                listColumns = pArchive->getAvailableFPARTProperties();
-                XBinary::UNPACK_STATE state = {};
-                QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
-                mapProperties.insert(XBinary::UNPACK_PROP_PASSWORD, getPassword());
-                bool bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
-
-                if (!bInit) {
-                    state = XBinary::UNPACK_STATE();
-                    mapProperties.insert(XBinary::UNPACK_PROP_METADATAONLY, true);
-                    bInit = pArchive->initUnpack(&state, mapProperties, nullptr);
-                }
-
-                bool bComplete = bInit;
-                const qint32 nNumberOfRecords = state.nNumberOfRecords;
-                while (bComplete && (state.nCurrentIndex < nNumberOfRecords)) {
-                    const XBinary::ARCHIVERECORD record = pArchive->infoCurrent(&state, nullptr);
-                    if (record.mapProperties.isEmpty()) {
-                        bComplete = false;
-                        break;
-                    }
-                    m_listArchiveRecords.append(record);
-
-                    // Mode A readers (the single-record packers XMEW/XYODA/XASPACK/
-                    // XFSG/XNSPACK/XPETITE) end enumeration by returning false from
-                    // moveToNext WITHOUT advancing the index.  Accept that as a clean
-                    // finish, mirroring XBinary::getArchiveRecords, instead of demanding
-                    // nCurrentIndex == nNumberOfRecords — the old check cleared the whole
-                    // record list and rendered every such packer as an inextractable (file).
-                    const qint32 nPreviousIndex = state.nCurrentIndex;
-                    const bool bMoved = pArchive->moveToNext(&state, nullptr);
-                    if (state.nNumberOfRecords != nNumberOfRecords) {
-                        bComplete = false;
-                        break;
-                    }
-                    if (!bMoved) {
-                        if (((nPreviousIndex + 1) != nNumberOfRecords) ||
-                            ((state.nCurrentIndex != nPreviousIndex) &&
-                             (state.nCurrentIndex != nNumberOfRecords))) {
-                            bComplete = false;
-                        }
-                        break;
-                    }
-                    if ((state.nCurrentIndex != (nPreviousIndex + 1)) ||
-                        (state.nCurrentIndex >= nNumberOfRecords)) {
-                        bComplete = false;
-                        break;
-                    }
-                }
-
-                // Always finish the enumeration so the UNPACK_CONTEXT is released
-                // even when the record walk ended early.
-                const bool bFinished = pArchive->finishUnpack(&state, nullptr);
-                bComplete = bComplete && bFinished;
-                if (bComplete) {
-                    m_bArchiveAvailable = true;
-                } else {
-                    m_listArchiveRecords.clear();
-                    listColumns.clear();
-                }
-
-                delete pArchive;
-            }
+            delete pArchive;
         }
     }
 
