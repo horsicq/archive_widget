@@ -346,7 +346,7 @@ void XArchiveWidget::setupTableView()
 
     QItemSelectionModel *pSelectionModel = ui->tableViewRecords->selectionModel();
     if (pSelectionModel) {
-        connect(pSelectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
-                SLOT(onTableElement_selected(QItemSelection, QItemSelection)), Qt::UniqueConnection);
+        connect(pSelectionModel, SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(onTableElement_selected(QItemSelection, QItemSelection)),
+                Qt::UniqueConnection);
     }
 }

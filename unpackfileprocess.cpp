@@ -45,8 +45,8 @@ void UnpackFileProcess::setData(const QString &sFileName, const QString &sResult
     setData(sFileName, sResultFileFolder, QMap<XBinary::UNPACK_PROP, QVariant>(), pPdStruct);
 }
 
-void UnpackFileProcess::setData(const QString &sFileName, const QString &sResultFileFolder,
-                                const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties, XBinary::PDSTRUCT *pPdStruct)
+void UnpackFileProcess::setData(const QString &sFileName, const QString &sResultFileFolder, const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties,
+                                XBinary::PDSTRUCT *pPdStruct)
 {
     m_sFileName = sFileName;
     m_pDevice = nullptr;
@@ -58,8 +58,7 @@ void UnpackFileProcess::setData(const QString &sFileName, const QString &sResult
     m_bTestMode = false;
 }
 
-void UnpackFileProcess::setDataTest(const QString &sFileName, const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties,
-                                    XBinary::PDSTRUCT *pPdStruct)
+void UnpackFileProcess::setDataTest(const QString &sFileName, const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties, XBinary::PDSTRUCT *pPdStruct)
 {
     m_sFileName = sFileName;
     m_pDevice = nullptr;

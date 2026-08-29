@@ -67,8 +67,8 @@ bool isArchiveFolderRecord(const XBinary::ARCHIVERECORD &record)
 
 bool copyDeviceExactly(QIODevice *pSource, QIODevice *pDestination, qint64 nSize)
 {
-    if (!pSource || !pDestination || !pSource->isOpen() || !pSource->isReadable() || pSource->isSequential() || !pDestination->isOpen() ||
-        !pDestination->isWritable() || (nSize < 0)) {
+    if (!pSource || !pDestination || !pSource->isOpen() || !pSource->isReadable() || pSource->isSequential() || !pDestination->isOpen() || !pDestination->isWritable() ||
+        (nSize < 0)) {
         return false;
     }
 
@@ -220,8 +220,8 @@ void ArchiveExplorerWidget::reloadData(bool bSaveSelection)
         qint32 nTargetRow = -1;
 
         auto isSelectedRecord = [&sSelectedRecord, nSelectedStreamOffset, nSelectedStreamSize](const XBinary::ARCHIVERECORD &record) {
-            return (record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString() == sSelectedRecord) &&
-                   (record.nStreamOffset == nSelectedStreamOffset) && (record.nStreamSize == nSelectedStreamSize);
+            return (record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString() == sSelectedRecord) && (record.nStreamOffset == nSelectedStreamOffset) &&
+                   (record.nStreamSize == nSelectedStreamSize);
         };
 
         if ((nSelectedRow >= 0) && (nSelectedRow < nNumberOfRecords) && isSelectedRecord(m_listArchiveRecords.at(nSelectedRow))) {
@@ -322,8 +322,7 @@ void ArchiveExplorerWidget::showContext(const QString &sRecordFileName, QPoint p
     const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
     bool bIsFolder = isArchiveFolderRecord(record);
 
-    auto appendMenuItem = [&listMenuItems](const QString &sText, const QObject *pRecv, const char *pMethod, XOptions::ICONTYPE iconType,
-                                           quint64 nSubgroups) {
+    auto appendMenuItem = [&listMenuItems](const QString &sText, const QObject *pRecv, const char *pMethod, XOptions::ICONTYPE iconType, quint64 nSubgroups) {
         XShortcuts::MENUITEM menuItem = {};
         menuItem.sText = sText;
         menuItem.pRecv = pRecv;
@@ -404,9 +403,9 @@ void ArchiveExplorerWidget::openRecord()
     qint64 nUncompressedSize = record.mapProperties.value(XBinary::FPART_PROP_UNCOMPRESSEDSIZE).toLongLong();
 
     if ((nUncompressedSize < 0) || (nUncompressedSize > N_MAX_OPEN_RECORD_SIZE)) {
-        QMessageBox::information(this, tr("Open file"),
-                                 tr("Files larger than %1 cannot be opened directly. Extract the file first.")
-                                     .arg(XBinary::bytesCountToString(N_MAX_OPEN_RECORD_SIZE, 1024)));
+        QMessageBox::information(
+            this, tr("Open file"),
+            tr("Files larger than %1 cannot be opened directly. Extract the file first.").arg(XBinary::bytesCountToString(N_MAX_OPEN_RECORD_SIZE, 1024)));
         return;
     }
 
@@ -419,14 +418,13 @@ void ArchiveExplorerWidget::openRecord()
     }
 
     const QSet<QString> stExecutableSuffixes = QSet<QString>() << "appimage" << "bat" << "bin" << "cmd" << "com" << "command" << "cpl" << "desktop" << "exe"
-                                                                 << "hta" << "jar" << "js" << "jse" << "lnk" << "msi" << "msp" << "pif" << "pl" << "ps1" << "py"
-                                                                 << "reg" << "run" << "scr" << "sh" << "url" << "vbe" << "vbs" << "wsf" << "wsh";
+                                                               << "hta" << "jar" << "js" << "jse" << "lnk" << "msi" << "msp" << "pif" << "pl" << "ps1" << "py"
+                                                               << "reg" << "run" << "scr" << "sh" << "url" << "vbe" << "vbs" << "wsf" << "wsh";
 
     if (stExecutableSuffixes.contains(sSafeSuffix)) {
-        QMessageBox::StandardButton result = QMessageBox::warning(
-            this, tr("Open file"),
-            tr("This file type can run code. Open \"%1\" with its default application?").arg(sBaseName),
-            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        QMessageBox::StandardButton result =
+            QMessageBox::warning(this, tr("Open file"), tr("This file type can run code. Open \"%1\" with its default application?").arg(sBaseName),
+                                 QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
         if (result != QMessageBox::Yes) {
             return;
@@ -512,9 +510,9 @@ void ArchiveExplorerWidget::analyzeRecord(RECORD_ANALYSIS analysis)
     const qint64 nUncompressedSize = record.mapProperties.value(XBinary::FPART_PROP_UNCOMPRESSEDSIZE).toLongLong();
 
     if ((nUncompressedSize < 0) || (nUncompressedSize > N_MAX_OPEN_RECORD_SIZE)) {
-        QMessageBox::information(this, tr("Analyze file"),
-                                 tr("Files larger than %1 cannot be analyzed directly. Extract the file first.")
-                                     .arg(XBinary::bytesCountToString(N_MAX_OPEN_RECORD_SIZE, 1024)));
+        QMessageBox::information(
+            this, tr("Analyze file"),
+            tr("Files larger than %1 cannot be analyzed directly. Extract the file first.").arg(XBinary::bytesCountToString(N_MAX_OPEN_RECORD_SIZE, 1024)));
         return;
     }
 
@@ -719,11 +717,9 @@ bool ArchiveExplorerWidget::extractRecordToDevice(qint32 nRow, QIODevice *pOutpu
     QMap<XBinary::UNPACK_PROP, QVariant> mapProperties;
     mapProperties.insert(XBinary::UNPACK_PROP_PASSWORD, getPassword());
     if (nMaxOutputSize >= 0) {
-        mapProperties.insert(XBinary::UNPACK_PROP_MAX_OUTPUT_SIZE,
-                             nMaxOutputSize);
+        mapProperties.insert(XBinary::UNPACK_PROP_MAX_OUTPUT_SIZE, nMaxOutputSize);
     }
-    const bool bResult = pArchive->unpackRecordByIndex(
-        nRow, &record, pOutputDevice, mapProperties, &pdStruct);
+    const bool bResult = pArchive->unpackRecordByIndex(nRow, &record, pOutputDevice, mapProperties, &pdStruct);
 
     delete pArchive;
 
@@ -901,15 +897,12 @@ void ArchiveExplorerWidget::loadRecords()
                     break;
                 }
                 if (!bMoved) {
-                    if (((nPreviousIndex + 1) != nNumberOfRecords) ||
-                        ((state.nCurrentIndex != nPreviousIndex) &&
-                         (state.nCurrentIndex != nNumberOfRecords))) {
+                    if (((nPreviousIndex + 1) != nNumberOfRecords) || ((state.nCurrentIndex != nPreviousIndex) && (state.nCurrentIndex != nNumberOfRecords))) {
                         bComplete = false;
                     }
                     break;
                 }
-                if ((state.nCurrentIndex != (nPreviousIndex + 1)) ||
-                    (state.nCurrentIndex >= nNumberOfRecords)) {
+                if ((state.nCurrentIndex != (nPreviousIndex + 1)) || (state.nCurrentIndex >= nNumberOfRecords)) {
                     bComplete = false;
                     break;
                 }
@@ -1055,8 +1048,8 @@ void ArchiveExplorerWidget::loadRecords()
 
     ui->tableViewRecords->setCustomModel(m_pModel, true);
 
-    connect(ui->tableViewRecords->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this,
-            SLOT(onCurrentRecordChanged(QModelIndex, QModelIndex)), Qt::UniqueConnection);
+    connect(ui->tableViewRecords->selectionModel(), SIGNAL(currentChanged(QModelIndex, QModelIndex)), this, SLOT(onCurrentRecordChanged(QModelIndex, QModelIndex)),
+            Qt::UniqueConnection);
 
     emit recordsLoaded(m_listArchiveRecords.count());
 }

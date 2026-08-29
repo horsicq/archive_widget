@@ -36,8 +36,7 @@ void DialogUnpackFile::setData(const QString &sFileName, const QString &sResultF
     setData(sFileName, sResultFileFolder, QMap<XBinary::UNPACK_PROP, QVariant>());
 }
 
-void DialogUnpackFile::setData(const QString &sFileName, const QString &sResultFileFolder,
-                               const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties)
+void DialogUnpackFile::setData(const QString &sFileName, const QString &sResultFileFolder, const QMap<XBinary::UNPACK_PROP, QVariant> &mapProperties)
 {
     m_pUnpackFileProcess->setData(sFileName, sResultFileFolder, mapProperties, getPdStruct());
     start();
