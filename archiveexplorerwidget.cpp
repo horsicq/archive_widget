@@ -65,6 +65,24 @@ bool isArchiveFolderRecord(const XBinary::ARCHIVERECORD &record)
     return record.mapProperties.value(XBinary::FPART_PROP_ISFOLDER).toBool() || sRecordFileName.endsWith(QChar('/')) || sRecordFileName.endsWith(QChar('\\'));
 }
 
+bool isSelectedArchiveRecord(const XBinary::ARCHIVERECORD &record, const QString &sSelectedRecord, XADDR nSelectedStreamOffset, XADDR nSelectedStreamSize)
+{
+    return (record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString() == sSelectedRecord) && (record.nStreamOffset == nSelectedStreamOffset) &&
+           (record.nStreamSize == nSelectedStreamSize);
+}
+
+void appendArchiveMenuItem(QList<XShortcuts::MENUITEM> *pListMenuItems, const QString &sText, const QObject *pRecv, const char *pMethod, XOptions::ICONTYPE iconType,
+                           quint64 nSubgroups)
+{
+    XShortcuts::MENUITEM menuItem = {};
+    menuItem.sText = sText;
+    menuItem.pRecv = pRecv;
+    menuItem.pMethod = pMethod;
+    menuItem.iconType = iconType;
+    menuItem.nSubgroups = nSubgroups;
+    pListMenuItems->append(menuItem);
+}
+
 bool copyDeviceExactly(QIODevice *pSource, QIODevice *pDestination, qint64 nSize)
 {
     if (!pSource || !pDestination || !pSource->isOpen() || !pSource->isReadable() || pSource->isSequential() || !pDestination->isOpen() || !pDestination->isWritable() ||
@@ -219,16 +237,12 @@ void ArchiveExplorerWidget::reloadData(bool bSaveSelection)
         qint32 nNumberOfRecords = m_listArchiveRecords.count();
         qint32 nTargetRow = -1;
 
-        auto isSelectedRecord = [&sSelectedRecord, nSelectedStreamOffset, nSelectedStreamSize](const XBinary::ARCHIVERECORD &record) {
-            return (record.mapProperties.value(XBinary::FPART_PROP_ORIGINALNAME).toString() == sSelectedRecord) && (record.nStreamOffset == nSelectedStreamOffset) &&
-                   (record.nStreamSize == nSelectedStreamSize);
-        };
-
-        if ((nSelectedRow >= 0) && (nSelectedRow < nNumberOfRecords) && isSelectedRecord(m_listArchiveRecords.at(nSelectedRow))) {
+        if ((nSelectedRow >= 0) && (nSelectedRow < nNumberOfRecords) &&
+            isSelectedArchiveRecord(m_listArchiveRecords.at(nSelectedRow), sSelectedRecord, nSelectedStreamOffset, nSelectedStreamSize)) {
             nTargetRow = nSelectedRow;
         } else {
             for (qint32 i = 0; i < nNumberOfRecords; i++) {
-                if (isSelectedRecord(m_listArchiveRecords.at(i))) {
+                if (isSelectedArchiveRecord(m_listArchiveRecords.at(i), sSelectedRecord, nSelectedStreamOffset, nSelectedStreamSize)) {
                     nTargetRow = i;
                     break;
                 }
@@ -322,27 +336,17 @@ void ArchiveExplorerWidget::showContext(const QString &sRecordFileName, QPoint p
     const XBinary::ARCHIVERECORD &record = m_listArchiveRecords.at(nRow);
     bool bIsFolder = isArchiveFolderRecord(record);
 
-    auto appendMenuItem = [&listMenuItems](const QString &sText, const QObject *pRecv, const char *pMethod, XOptions::ICONTYPE iconType, quint64 nSubgroups) {
-        XShortcuts::MENUITEM menuItem = {};
-        menuItem.sText = sText;
-        menuItem.pRecv = pRecv;
-        menuItem.pMethod = pMethod;
-        menuItem.iconType = iconType;
-        menuItem.nSubgroups = nSubgroups;
-        listMenuItems.append(menuItem);
-    };
-
     // These actions require a real, unpackable archive. When the file is only
     // shown as a single fallback entry (m_bArchiveAvailable == false) they are
     // omitted, matching the disabled Extract / Test toolbar buttons.
     if (m_bArchiveAvailable) {
         if (!bIsFolder) {
             pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_OPEN, this, SLOT(openRecord()), XShortcuts::GROUPID_NONE);
-            appendMenuItem(tr("Extract"), this, SLOT(extractRecord()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
+            appendArchiveMenuItem(&listMenuItems, tr("Extract"), this, SLOT(extractRecord()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
         }
 
-        appendMenuItem(tr("Extract all"), this, SLOT(on_toolButtonExtractAll_clicked()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
-        appendMenuItem(tr("Test archive"), this, SLOT(on_toolButtonTest_clicked()), XOptions::ICONTYPE_SCAN, XShortcuts::GROUPID_NONE);
+        appendArchiveMenuItem(&listMenuItems, tr("Extract all"), this, SLOT(on_toolButtonExtractAll_clicked()), XOptions::ICONTYPE_EXTRACTOR, XShortcuts::GROUPID_NONE);
+        appendArchiveMenuItem(&listMenuItems, tr("Test archive"), this, SLOT(on_toolButtonTest_clicked()), XOptions::ICONTYPE_SCAN, XShortcuts::GROUPID_NONE);
     }
 
     // Analysis is also useful for the single fallback row shown when a file is
@@ -358,12 +362,12 @@ void ArchiveExplorerWidget::showContext(const QString &sRecordFileName, QPoint p
     }
 
     pShortcuts->_addMenuItem(&listMenuItems, X_ID_ARCHIVE_COPY_FILENAME, this, SLOT(copyFileName()), XShortcuts::GROUPID_COPY);
-    appendMenuItem(tr("Member path"), this, SLOT(copyRecordPath()), XOptions::ICONTYPE_PATH, XShortcuts::GROUPID_COPY);
-    appendMenuItem(tr("Row details"), this, SLOT(copyRecordDetails()), XOptions::ICONTYPE_COPY, XShortcuts::GROUPID_COPY);
+    appendArchiveMenuItem(&listMenuItems, tr("Member path"), this, SLOT(copyRecordPath()), XOptions::ICONTYPE_PATH, XShortcuts::GROUPID_COPY);
+    appendArchiveMenuItem(&listMenuItems, tr("Row details"), this, SLOT(copyRecordDetails()), XOptions::ICONTYPE_COPY, XShortcuts::GROUPID_COPY);
 
     pShortcuts->_addMenuSeparator(&listMenuItems, XShortcuts::GROUPID_NONE);
-    appendMenuItem(tr("Properties"), this, SLOT(showRecordProperties()), XOptions::ICONTYPE_INFO, XShortcuts::GROUPID_NONE);
-    appendMenuItem(tr("Refresh"), this, SLOT(refreshRecords()), XOptions::ICONTYPE_RELOAD, XShortcuts::GROUPID_NONE);
+    appendArchiveMenuItem(&listMenuItems, tr("Properties"), this, SLOT(showRecordProperties()), XOptions::ICONTYPE_INFO, XShortcuts::GROUPID_NONE);
+    appendArchiveMenuItem(&listMenuItems, tr("Refresh"), this, SLOT(refreshRecords()), XOptions::ICONTYPE_RELOAD, XShortcuts::GROUPID_NONE);
 
     pShortcuts->adjustContextMenu(&contextMenu, &listMenuItems);
     contextMenu.exec(point);
